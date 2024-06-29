@@ -21,7 +21,7 @@ final List<Map<String, dynamic>> FeedsSDate = [
         "https://images.unsplash.com/photo-1524666041070-9d87656c25bb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bWFsZXxlbnwwfHwwfHx8MA%3D%3D",
     "hospitaname": "VY Hospital",
     "location": "Germany",
-    "blood": "O+",
+    "blood": "Oadsd+",
     "rating": "4.8/5",
     "time": "02.00 PM",
     "date": "13-march-2024"
