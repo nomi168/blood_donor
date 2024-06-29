@@ -1,0 +1,2357 @@
+// ignore_for_file: file_names
+
+import 'dart:async';
+import 'dart:developer';
+
+import 'package:blood_donor/Provider/FirebaseAuth.dart';
+import 'package:blood_donor/Provider/Page.dart';
+import 'package:blood_donor/Screens/Main%20Screen/Dashoard/Blood%20Dnor/Blood.dart';
+import 'package:blood_donor/Screens/Main%20Screen/Dashoard/DonateNow.dart';
+import 'package:blood_donor/Screens/Main%20Screen/Dashoard/Feed1.dart';
+import 'package:blood_donor/Screens/Main%20Screen/Dashoard/Post%20Request/PostRequest.dart';
+import 'package:blood_donor/Screens/Main%20Screen/Feed%20Screen/Notification.dart';
+import 'package:blood_donor/Screens/Main%20Screen/SendRequestForBood/SendRequestScreen.dart';
+import 'package:blood_donor/constants.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sizer/sizer.dart';
+
+import 'Blood Bank/Blood_ank.dart';
+import 'Emergency Donor/Emergency_Blood.dart';
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({
+    super.key,
+  });
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  List<String> nomi1 = [
+    'A+',
+    'B+',
+    'O+',
+    'AB+',
+    'A-',
+    'B-',
+    'O-',
+    'AB-',
+    'A',
+    'B',
+    'AB',
+    'O'
+  ];
+  String selectedIndex1 = '';
+  int _currentIndex = 0;
+  String profilename = '';
+  String user_id = '';
+  final CarouselController _carouselController = CarouselController();
+  final Completer<GoogleMapController> _controller =
+      Completer<GoogleMapController>();
+  static const CameraPosition _kGooglePlex = CameraPosition(
+    target: LatLng(0, 0),
+    zoom: 10.0,
+  );
+
+  Set<Polygon> polygons = {};
+  Set<Circle> circles = {};
+
+  final List<String> images = [
+    'images/Banners/1.jpeg',
+    'images/Banners/2.jpeg',
+    'images/Banners/3.jpeg'
+  ];
+
+  TextEditingController fromController = TextEditingController();
+  TextEditingController toController = TextEditingController();
+  TextEditingController hospital = TextEditingController();
+
+  String name = '';
+  String image = '';
+  String blood = '';
+  String email = '';
+  String hospitaln = '';
+  String location = '';
+  String date = '';
+  String time = '';
+  String note = '';
+  String rating = '';
+  String id = '';
+  String userType = '';
+
+  String requestname = '';
+  String requesthosname = '';
+  String requestdate = '';
+  String requesttime = '';
+  String requestblood = '';
+  String requestbloc = '';
+  String requestnote = '';
+  String requestid = '';
+  String requestrating = '';
+  String requestimage = '';
+  String requestemail = '';
+
+  String donorname = '';
+
+  String donoremail = '';
+  String donorimage = '';
+  String donorblood = '';
+  String takerid = '';
+  NotificationServices notificationServices = NotificationServices();
+  final CollectionReference usersCollection =
+      FirebaseFirestore.instance.collection('users');
+  String devicetoken = '';
+
+  getNotificationToken() async {
+    String token1 = await notificationServices.getDeviceToken();
+    if (token1 == devicetoken) {
+    } else {
+      try {
+        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .where('id', isEqualTo: user_id)
+            .get();
+
+        if (querySnapshot.docs.isNotEmpty) {
+          // Get the document reference
+          DocumentSnapshot documentSnapshot = querySnapshot.docs.first;
+          String documentId = documentSnapshot.id;
+
+          // Update the data in the document
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(documentId)
+              .update({'deviceToken': token1});
+
+          print('Data updated successfully in users table');
+        } else {
+          print('User not found with email:');
+        }
+      } catch (e) {
+        print('Error: $e');
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    getUserDataByEmail();
+    getFirstTaker();
+    getData();
+    notificationServices.requestNotificationPermission();
+    notificationServices.firebaseInit(context);
+    notificationServices.setupInteractMessage(context);
+
+    // notificationServices.getDeviceToken().then((value) {
+    //   if (kDebugMode) {
+    //     print('device token');
+    //     print(value);
+    //   }
+    // });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Sizer(builder: (context, oreintation, deviceType) {
+      return WillPopScope(
+          onWillPop: () => _onWillPop(context),
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            home: Scaffold(
+              backgroundColor: Colors.white,
+              body: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(5.w, 1.h, 0, 0),
+                            child: Text(
+                              'Hello!  $profilename',
+                              style: TextStyle(
+                                  fontSize: 12.sp, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        // Expanded(
+                        //   child: Padding(
+                        //       padding: EdgeInsets.fromLTRB(33.w, 1.h, 0, 0),
+                        //       child: IconButton(
+                        //         icon: Icon(
+                        //           Icons.notifications_active,
+                        //           size: 23.sp,
+                        //         ),
+                        //         onPressed: () {
+                        //           // notificationServices
+                        //           //     .getDeviceToken()
+                        //           //     .then((value) async {
+                        //           //   try {
+                        //           //     var data = {
+                        //           //       'to':
+                        //           //           'dsnCibn2RXKTdrB_49UktA:APA91bG4o3rq38LPJEEiGU4TO_P3ELzFYNtotWit5XzUlzGMuzFHDaMSveNyU2DXYYeYZMfBjFJqr6p9OkF9Fud-l0QHahGnAFb0e2EOEMyRIJftPchgYXefyX6pG-7Zj3Vm0b79Czre',
+                        //           //       'priority': 'high',
+                        //           //       'notification': {
+                        //           //         'title': 'Nomi',
+                        //           //         'body': 'Hay please check'
+                        //           //       },
+                        //           //       'data': {'type:': 'msj', 'id': 'Nomi12345'}
+                        //           //     };
+                        //           //     print('nomi');
+
+                        //           //     var response = await http.post(
+                        //           //       Uri.parse(
+                        //           //           'https://fcm.googleapis.com/fcm/send'),
+                        //           //       body: jsonEncode(data),
+                        //           //       headers: {
+                        //           //         'Content-Type':
+                        //           //             'application/json; charset=UTF-8',
+                        //           //         'Authorization':
+                        //           //             'key=AAAAhM4yLBU:APA91bFYi77T3adopH4ZKF6BwWAMjq0v-zrcByWIs_SukIolxTfIEXBwJLOzxF5GaYiT3xn03Y3gbQ-XWzkESGKMR1awLL3JPoc2x5dHh0uxmi-HSZ8xAHIEcQ0fF6XJ5j6KiYsyDzvU'
+                        //           //       },
+                        //           //     );
+                        //           //     print('nomi');
+
+                        //           //     if (response.statusCode == 200) {
+                        //           //       print('Notification sent successfully');
+                        //           //     } else {
+                        //           //       print(
+                        //           //           'Failed to send notification. Status code: ${response.statusCode}');
+                        //           //       print('Response body: ${response.body}');
+                        //           //     }
+                        //           //   } catch (e) {
+                        //           //     print('Error sending notification: $e');
+                        //           //   }
+                        //           // });
+                        //         },
+                        //       )),
+                        // )
+                      ],
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(5.w, 0, 0, 0),
+                      child: Text(
+                        'Are you looking for blood?',
+                        style: TextStyle(
+                            fontSize: 11.sp, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    // Padding(
+                    //   padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
+                    //   child: Material(
+                    //     elevation: 7.0, // Add shadow/elevation
+                    //     borderRadius:
+                    //         BorderRadius.circular(10.0), // Add border radius
+                    //     child: TextFormField(
+                    //       controller: hospital,
+                    //       decoration: InputDecoration(
+                    //         label: const Text('Search Hospital'),
+                    //         contentPadding: const EdgeInsets.symmetric(
+                    //             horizontal: 16.0), // Adjust padding
+                    //         border: OutlineInputBorder(
+                    //           borderRadius: BorderRadius.circular(8.0),
+                    //           borderSide: const BorderSide(
+                    //               color: Colors.grey), // Border color
+                    //         ),
+                    //         suffixIcon: const Icon(Icons.local_hospital),
+                    //         focusedBorder: OutlineInputBorder(
+                    //           borderRadius: BorderRadius.circular(8.0),
+                    //           borderSide: const BorderSide(
+                    //               color: Colors.blue), // Border color when focused
+                    //         ),
+                    //         hintText: 'Search Hospital',
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
+                    Padding(
+                        padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
+                        child: Material(
+                          elevation: 7.0,
+                          borderRadius: BorderRadius.circular(10.0),
+                          child: DropdownButtonFormField(
+                            decoration: const InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 13.0),
+                              labelText: "Select Blood",
+                              suffixIcon: Icon(Icons.bloodtype),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10.0),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.blue, width: 2.5),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10.0),
+                                ),
+                              ),
+                            ),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(10.0)),
+                            items: nomi1
+                                .map((e) => DropdownMenuItem(
+                                      // ignore: sort_child_properties_last
+                                      child: Text(e),
+                                      value: e,
+                                    ))
+                                .toList(),
+                            onChanged: (v) {
+                              setState(() {
+                                selectedIndex1 = v!;
+                              });
+                            },
+                          ),
+                        )),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
+                      child: Material(
+                        elevation: 10.0,
+                        shadowColor: Colors.black,
+                        borderRadius: BorderRadius.circular(10.0),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            String blood = selectedIndex1.toString();
+                            Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) {
+                                  return SendRequestScreen(blood: blood);
+                                },
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
+                                  const begin = Offset(
+                                      10.0, 0.0); // slide in from the right
+                                  const end = Offset.zero;
+                                  const curve = Curves.easeInOutQuart;
+
+                                  var tween = Tween(begin: begin, end: end)
+                                      .chain(CurveTween(curve: curve));
+                                  var offsetAnimation = animation.drive(tween);
+
+                                  return SlideTransition(
+                                    position: offsetAnimation,
+                                    child: child,
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                          style: ButtonStyle(
+                            shape: MaterialStateProperty.all<
+                                RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                            ),
+                            padding:
+                                MaterialStateProperty.all<EdgeInsetsGeometry>(
+                              // ignore: prefer_const_constructors
+                              EdgeInsets.symmetric(
+                                  vertical: 13.5, horizontal: 32.w),
+                            ),
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                                const Color(0xFFDE0A1E)),
+                          ),
+                          child: Text(
+                            'Send Request',
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 2.h,
+                    ),
+                    CarouselSlider(
+                      items: images.map((url) {
+                        return Image.asset(url, fit: BoxFit.contain);
+                      }).toList(),
+                      options: CarouselOptions(
+                        autoPlay: true,
+                        autoPlayInterval: const Duration(seconds: 5),
+                        enlargeCenterPage: true,
+                        aspectRatio: 2.0,
+                        onPageChanged: (index, reason) {
+                          setState(() {
+                            _currentIndex = index;
+                          });
+                        },
+                      ),
+                      carouselController: _carouselController,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: images.map((url) {
+                        int index = images.indexOf(url);
+                        return Container(
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 10.0, horizontal: 2.0),
+                          child: Container(
+                            width: 8.0,
+                            height: 8.0,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: _currentIndex == index
+                                  ? const Color(0xFFDE0A1E)
+                                  : Colors.grey,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    SizedBox(
+                      height: 2.h,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                            child: GestureDetector(
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(5.w, 0.h, 1.5.w, 1.h),
+                            child: Material(
+                              elevation: 5,
+                              shadowColor: Colors.grey,
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                height: 15.h,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.fromLTRB(5.w, 3.h, 5.w, 0),
+                                      child: Center(
+                                        child: Image.network(
+                                          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQigoM43RUySVjX6VVeTVg2xcXGuk7SOoTw_A&usqp=CAU',
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                        padding: EdgeInsets.fromLTRB(
+                                            3.w, 0.h, 2.w, 0),
+                                        child: Text(
+                                          'Post Blood',
+                                          style: TextStyle(
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black54),
+                                        )),
+                                    Padding(
+                                        padding: EdgeInsets.fromLTRB(
+                                            3.w, 0.h, 2.w, 0),
+                                        child: Text(
+                                          'Request',
+                                          style: TextStyle(
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black54),
+                                        )),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          onTap: () {
+                            if (userType == 'donor') {
+                              EasyLoading.showInfo(
+                                  'Donor cannot add the Blood Post');
+                            } else {
+                              // ignore: avoid_print
+                              Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder:
+                                      (context, animation, secondaryAnimation) {
+                                    return const PostRequest();
+                                  },
+                                  transitionDuration:
+                                      const Duration(seconds: 1),
+                                  transitionsBuilder: (context, animation,
+                                      secondaryAnimation, child) {
+                                    const begin = Offset(
+                                        10.0, 0.0); // slide in from the right
+                                    const end = Offset.zero;
+                                    const curve = Curves.easeInOutQuart;
+
+                                    var tween = Tween(begin: begin, end: end)
+                                        .chain(CurveTween(curve: curve));
+                                    var offsetAnimation =
+                                        animation.drive(tween);
+
+                                    return SlideTransition(
+                                      position: offsetAnimation,
+                                      child: child,
+                                    );
+                                  },
+                                ),
+                              );
+                            }
+                          },
+                        )),
+                        Expanded(
+                            child: GestureDetector(
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(3.w, 0.h, 3.w, 1.h),
+                            child: Material(
+                              elevation: 5,
+                              shadowColor: Colors.grey,
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                height: 15.h,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: const Color(0xFFDE0A1E),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.fromLTRB(5.w, 3.h, 5.w, 0),
+                                      child: Center(
+                                        child: Image.network(
+                                          'https://www.shutterstock.com/image-vector/blood-collection-transfusion-icon-donor-600nw-2129911235.jpg',
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                        padding: EdgeInsets.fromLTRB(
+                                            3.w, 1.h, 2.w, 0),
+                                        child: Text(
+                                          'Blood',
+                                          style: TextStyle(
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black54),
+                                        )),
+                                    Padding(
+                                        padding: EdgeInsets.fromLTRB(
+                                            3.w, 0.h, 2.w, 0),
+                                        child: Text(
+                                          'Bank',
+                                          style: TextStyle(
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black54),
+                                        )),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) {
+                                  return const Blood_B();
+                                },
+                                transitionDuration: const Duration(seconds: 1),
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
+                                  const begin = Offset(
+                                      10.0, 0.0); // slide in from the right
+                                  const end = Offset.zero;
+                                  const curve = Curves.easeInOutQuart;
+
+                                  var tween = Tween(begin: begin, end: end)
+                                      .chain(CurveTween(curve: curve));
+                                  var offsetAnimation = animation.drive(tween);
+
+                                  return SlideTransition(
+                                    position: offsetAnimation,
+                                    child: child,
+                                  );
+                                },
+                              ),
+                            );
+
+                            // Navigator.push(
+                            //   context,
+                            //   PageRouteBuilder(
+                            //     pageBuilder:
+                            //         (context, animation, secondaryAnimation) {
+                            //       return const NearBloodBank();
+                            //     },
+                            //     transitionDuration: const Duration(seconds: 1),
+                            //     transitionsBuilder: (context, animation,
+                            //         secondaryAnimation, child) {
+                            //       const begin = Offset(
+                            //           10.0, 0.0); // slide in from the right
+                            //       const end = Offset.zero;
+                            //       const curve = Curves.easeInOutQuart;
+
+                            //       var tween = Tween(begin: begin, end: end)
+                            //           .chain(CurveTween(curve: curve));
+                            //       var offsetAnimation = animation.drive(tween);
+
+                            //       return SlideTransition(
+                            //         position: offsetAnimation,
+                            //         child: child,
+                            //       );
+                            //     },
+                            //   ),
+                            // );
+                          },
+                        )),
+                        Expanded(
+                            child: GestureDetector(
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(1.w, 0.h, 5.w, 0.5.h),
+                            child: Material(
+                              elevation: 5,
+                              shadowColor: Colors.grey,
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                height: 14.5.h,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.fromLTRB(5.w, 0.h, 5.w, 0),
+                                      child: Center(
+                                        child: Image.network(
+                                          'https://www.shutterstock.com/image-vector/blood-drop-plus-heart-shape-600nw-2238094877.jpg',
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                        padding: EdgeInsets.fromLTRB(
+                                            3.w, 0.h, 2.w, 0),
+                                        child: Text(
+                                          'Emergency',
+                                          style: TextStyle(
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black54),
+                                        )),
+                                    Padding(
+                                        padding: EdgeInsets.fromLTRB(
+                                            3.w, 0.h, 2.w, 0),
+                                        child: Text(
+                                          'Donors',
+                                          style: TextStyle(
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black54),
+                                        )),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) {
+                                  return const Emerency_Blood();
+                                },
+                                transitionDuration: const Duration(seconds: 1),
+                                transitionsBuilder: (context, animation,
+                                    secondaryAnimation, child) {
+                                  const begin = Offset(
+                                      10.0, 0.0); // slide in from the right
+                                  const end = Offset.zero;
+                                  const curve = Curves.easeInOutQuart;
+
+                                  var tween = Tween(begin: begin, end: end)
+                                      .chain(CurveTween(curve: curve));
+                                  var offsetAnimation = animation.drive(tween);
+
+                                  return SlideTransition(
+                                    position: offsetAnimation,
+                                    child: child,
+                                  );
+                                },
+                              ),
+                            );
+
+                            // ignore: avoid_print
+                            // Navigator.push(
+                            //   context,
+                            //   PageRouteBuilder(
+                            //     pageBuilder:
+                            //         (context, animation, secondaryAnimation) {
+                            //       return const SubscriptionPlan();
+                            //     },
+                            //     transitionDuration: const Duration(seconds: 1),
+                            //     transitionsBuilder: (context, animation,
+                            //         secondaryAnimation, child) {
+                            //       const begin = Offset(
+                            //           5.0, 0.0); // slide in from the right
+                            //       const end = Offset.zero;
+                            //       const curve = Curves.easeInOutQuart;
+
+                            //       var tween = Tween(begin: begin, end: end)
+                            //           .chain(CurveTween(curve: curve));
+                            //       var offsetAnimation = animation.drive(tween);
+
+                            //       return SlideTransition(
+                            //         position: offsetAnimation,
+                            //         child: child,
+                            //       );
+                            //     },
+                            //   ),
+                            // );
+                          },
+                        )),
+                      ],
+                    ),
+                    if (userType.isNotEmpty && userType == 'taker')
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(5.w, 1.5.h, 5.w, 0),
+                        child: Material(
+                          elevation: 5,
+                          shadowColor: Colors.grey,
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                              height: 14.h,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: Colors.red,
+                                  width: 1,
+                                ),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Padding(
+                                          padding: EdgeInsets.fromLTRB(
+                                              3.w, 1.h, 0, 0.h),
+                                          child: Text(
+                                            'Blood Donor',
+                                            style: TextStyle(
+                                                fontSize: 12.sp,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.red),
+                                          )),
+                                      Padding(
+                                          padding: EdgeInsets.fromLTRB(
+                                              35.w, 1.h, 0, 0.h),
+                                          child: const Icon(
+                                              Icons.location_on_outlined)),
+                                      Padding(
+                                          padding: EdgeInsets.fromLTRB(
+                                              2.w, 1.h, 0, 0.h),
+                                          child: Consumer<MyPageProvider>(
+                                            builder: (context, value, child) {
+                                              return Text(
+                                                value.location.toString(),
+                                                style: TextStyle(
+                                                    fontSize: 12.sp,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.red),
+                                              );
+                                            },
+                                          )),
+                                    ],
+                                  ),
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 5.w),
+                                    child: Row(
+                                      children: [
+                                        GestureDetector(
+                                          child: Container(
+                                            alignment: Alignment.center,
+                                            height: 65,
+                                            width: 18.w,
+                                            // padding: EdgeInsets.,
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                color: Colors.black12),
+                                            child: Column(
+                                              children: [
+                                                SizedBox(
+                                                  height: 5,
+                                                ),
+                                                Icon(
+                                                  Icons.bloodtype_outlined,
+                                                  color: Colors.red,
+                                                  size: 30,
+                                                ),
+                                                Text(
+                                                  'O',
+                                                  style: TextStyle(
+                                                      fontSize: 15.sp,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          onTap: () {
+                                            String blood = 'O';
+                                            Navigator.push(
+                                              context,
+                                              PageRouteBuilder(
+                                                pageBuilder: (context,
+                                                    animation,
+                                                    secondaryAnimation) {
+                                                  return BloodDonor(
+                                                      blood: blood);
+                                                },
+                                                transitionDuration:
+                                                    const Duration(seconds: 1),
+                                                transitionsBuilder: (context,
+                                                    animation,
+                                                    secondaryAnimation,
+                                                    child) {
+                                                  const begin = Offset(5.0,
+                                                      0.0); // slide in from the right
+                                                  const end = Offset.zero;
+                                                  const curve =
+                                                      Curves.easeInOutQuart;
+
+                                                  var tween = Tween(
+                                                          begin: begin,
+                                                          end: end)
+                                                      .chain(CurveTween(
+                                                          curve: curve));
+                                                  var offsetAnimation =
+                                                      animation.drive(tween);
+
+                                                  return SlideTransition(
+                                                    position: offsetAnimation,
+                                                    child: child,
+                                                  );
+                                                },
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                        SizedBox(
+                                          width: 10,
+                                        ),
+                                        Expanded(
+                                            child: GestureDetector(
+                                          child: Container(
+                                            height: 65,
+                                            width: 20.w,
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                color: Colors.black12),
+                                            child: Column(
+                                              children: [
+                                                SizedBox(
+                                                  height: 5,
+                                                ),
+                                                Icon(
+                                                  Icons.bloodtype_outlined,
+                                                  color: Colors.red,
+                                                  size: 30,
+                                                ),
+                                                Text(
+                                                  'AB',
+                                                  style: TextStyle(
+                                                      fontSize: 15.sp,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          onTap: () {
+                                            String blood = 'AB';
+                                            Navigator.push(
+                                              context,
+                                              PageRouteBuilder(
+                                                pageBuilder: (context,
+                                                    animation,
+                                                    secondaryAnimation) {
+                                                  return BloodDonor(
+                                                      blood: blood);
+                                                },
+                                                transitionDuration:
+                                                    const Duration(seconds: 1),
+                                                transitionsBuilder: (context,
+                                                    animation,
+                                                    secondaryAnimation,
+                                                    child) {
+                                                  const begin = Offset(5.0,
+                                                      0.0); // slide in from the right
+                                                  const end = Offset.zero;
+                                                  const curve =
+                                                      Curves.easeInOutQuart;
+
+                                                  var tween = Tween(
+                                                          begin: begin,
+                                                          end: end)
+                                                      .chain(CurveTween(
+                                                          curve: curve));
+                                                  var offsetAnimation =
+                                                      animation.drive(tween);
+
+                                                  return SlideTransition(
+                                                    position: offsetAnimation,
+                                                    child: child,
+                                                  );
+                                                },
+                                              ),
+                                            );
+                                          },
+                                        )),
+                                        SizedBox(
+                                          width: 10,
+                                        ),
+                                        Expanded(
+                                            child: GestureDetector(
+                                          child: Container(
+                                            height: 65,
+                                            width: 20.w,
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                color: Colors.black12),
+                                            child: Column(
+                                              children: [
+                                                SizedBox(
+                                                  height: 5,
+                                                ),
+                                                Icon(
+                                                  Icons.bloodtype_outlined,
+                                                  color: Colors.red,
+                                                  size: 30,
+                                                ),
+                                                Text(
+                                                  'B',
+                                                  style: TextStyle(
+                                                      fontSize: 15.sp,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          onTap: () {
+                                            String blood = 'B';
+                                            Navigator.push(
+                                              context,
+                                              PageRouteBuilder(
+                                                pageBuilder: (context,
+                                                    animation,
+                                                    secondaryAnimation) {
+                                                  return BloodDonor(
+                                                      blood: blood);
+                                                },
+                                                transitionDuration:
+                                                    const Duration(seconds: 1),
+                                                transitionsBuilder: (context,
+                                                    animation,
+                                                    secondaryAnimation,
+                                                    child) {
+                                                  const begin = Offset(5.0,
+                                                      0.0); // slide in from the right
+                                                  const end = Offset.zero;
+                                                  const curve =
+                                                      Curves.easeInOutQuart;
+
+                                                  var tween = Tween(
+                                                          begin: begin,
+                                                          end: end)
+                                                      .chain(CurveTween(
+                                                          curve: curve));
+                                                  var offsetAnimation =
+                                                      animation.drive(tween);
+
+                                                  return SlideTransition(
+                                                    position: offsetAnimation,
+                                                    child: child,
+                                                  );
+                                                },
+                                              ),
+                                            );
+                                          },
+                                        )),
+                                        SizedBox(
+                                          width: 10,
+                                        ),
+                                        Expanded(
+                                            child: GestureDetector(
+                                          onTap: () {
+                                            String blood = 'A-';
+                                            Navigator.push(
+                                              context,
+                                              PageRouteBuilder(
+                                                pageBuilder: (context,
+                                                    animation,
+                                                    secondaryAnimation) {
+                                                  return BloodDonor(
+                                                    blood: blood,
+                                                  );
+                                                },
+                                                transitionDuration:
+                                                    const Duration(seconds: 1),
+                                                transitionsBuilder: (context,
+                                                    animation,
+                                                    secondaryAnimation,
+                                                    child) {
+                                                  const begin = Offset(5.0,
+                                                      0.0); // slide in from the right
+                                                  const end = Offset.zero;
+                                                  const curve =
+                                                      Curves.easeInOutQuart;
+
+                                                  var tween = Tween(
+                                                          begin: begin,
+                                                          end: end)
+                                                      .chain(CurveTween(
+                                                          curve: curve));
+                                                  var offsetAnimation =
+                                                      animation.drive(tween);
+
+                                                  return SlideTransition(
+                                                    position: offsetAnimation,
+                                                    child: child,
+                                                  );
+                                                },
+                                              ),
+                                            );
+                                          },
+                                          child: Container(
+                                            height: 65,
+                                            width: 25.w,
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                color: Colors.black12),
+                                            child: Column(
+                                              children: [
+                                                SizedBox(
+                                                  height: 5,
+                                                ),
+                                                Icon(
+                                                  Icons.bloodtype_outlined,
+                                                  color: Colors.red,
+                                                  size: 30,
+                                                ),
+                                                Text(
+                                                  'A-',
+                                                  style: TextStyle(
+                                                      fontSize: 15.sp,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ))
+                                      ],
+                                    ),
+                                  ),
+                                  // Row(
+                                  //   children: [
+                                  // Padding(
+                                  //   padding: EdgeInsets.fromLTRB(
+                                  //       2.w, 1.h, 0, 0.h),
+                                  //   child: const Icon(
+                                  //     Icons.bloodtype_outlined,
+                                  //     color: Colors.red,
+                                  //     size: 30,
+                                  //   ),
+                                  // ),
+                                  //     Padding(
+                                  //       padding: EdgeInsets.fromLTRB(
+                                  //           6.w, 1.h, 0, 0.h),
+                                  //       child: const Icon(
+                                  //         Icons.bloodtype_outlined,
+                                  //         color: Colors.red,
+                                  //         size: 30,
+                                  //       ),
+                                  //     ),
+                                  //     Padding(
+                                  //       padding: EdgeInsets.fromLTRB(
+                                  //           6.w, 1.h, 0, 0.h),
+                                  //       child: const Icon(
+                                  //         Icons.bloodtype_outlined,
+                                  //         color: Colors.red,
+                                  //         size: 30,
+                                  //       ),
+                                  //     ),
+                                  //     Padding(
+                                  //       padding: EdgeInsets.fromLTRB(
+                                  //           6.w, 1.h, 0, 0.h),
+                                  //       child: const Icon(
+                                  //         Icons.bloodtype_outlined,
+                                  //         color: Colors.red,
+                                  //         size: 30,
+                                  //       ),
+                                  //     ),
+                                  //   ],
+                                  // ),
+                                  // Row(
+                                  //   children: [
+
+                                  //     Padding(
+                                  //       padding: EdgeInsets.fromLTRB(
+                                  //           9.w, 0.5.h, 0, 0),
+                                  //       child: Text(
+                                  //         'B+',
+                                  //         style: TextStyle(
+                                  //             fontSize: 15.sp,
+                                  //             fontWeight: FontWeight.bold),
+                                  //       ),
+                                  //     ),
+                                  //     Padding(
+                                  //       padding: EdgeInsets.fromLTRB(
+                                  //           7.w, 0.5.h, 0, 0),
+                                  //       child: Text(
+                                  //         'AB-',
+                                  //         style: TextStyle(
+                                  //             fontSize: 15.sp,
+                                  //             fontWeight: FontWeight.bold),
+                                  //       ),
+                                  //     ),
+                                  //     Padding(
+                                  //       padding: EdgeInsets.fromLTRB(
+                                  //           7.w, 0.5.h, 0, 0),
+                                  //       child: Text(
+                                  //         'A-',
+                                  //         style: TextStyle(
+                                  //             fontSize: 15.sp,
+                                  //             fontWeight: FontWeight.bold),
+                                  //       ),
+                                  //     ),
+                                  //   ],
+                                  // ),
+                                ],
+                              )),
+                        ),
+                      ),
+
+                    Row(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(6.5.w, 0.h, 0, 0),
+                          child: Text(
+                            'Donation Request',
+                            style: TextStyle(
+                                fontSize: 15.sp, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Padding(
+                            padding: EdgeInsets.fromLTRB(30.w, 0.h, 0, 0),
+                            child: TextButton(
+                              child: Text(
+                                'See All',
+                                style: TextStyle(
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black54),
+                              ),
+                              onPressed: () {},
+                            )),
+                      ],
+                    ),
+
+                    GestureDetector(
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(5.w, 0.h, 5.w, 0),
+                        child: Material(
+                          elevation: 5,
+                          shadowColor: Colors.grey,
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                              height: 25.h,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: const Color(0xFFDE0A1E),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Stack(
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.fromLTRB(
+                                        0.w, 0.h, 64.w, 10.h),
+                                    child: Center(
+                                      child: CircleAvatar(
+                                        radius: 33,
+                                        backgroundImage: image != 'null' &&
+                                                image.isNotEmpty
+                                            ? NetworkImage(image)
+                                            : NetworkImage(
+                                                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnj2TWYskM8Or0ykoHKfKbf8YulsCWgTptlp1XdTjexw&s'),
+                                        // Fit the image within the CircleAvatar
+                                        backgroundColor: Colors.black54,
+                                        foregroundColor: Colors.transparent,
+
+                                        // Set the BoxFit to cover the entire CircleAvatar
+                                      ),
+                                    ),
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.fromLTRB(
+                                            25.w, 1.5.h, 0, 0),
+                                        child: Text(
+                                          name,
+                                          style: TextStyle(
+                                              fontSize: 13.sp,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.fromLTRB(
+                                            25.w, 1.h, 0, 0),
+                                        child: Text(
+                                          hospitaln,
+                                          style: TextStyle(
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black54),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.fromLTRB(
+                                            25.w, 1.h, 3.w, 0),
+                                        child: Text(
+                                          location,
+                                          style: TextStyle(
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black54),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.fromLTRB(65.w, 1.h, 0, 12.h),
+                                    child: const Icon(
+                                      Icons.bloodtype_outlined,
+                                      color: Colors.red,
+                                      size: 30,
+                                    ),
+                                  ),
+                                  Padding(
+                                      padding: EdgeInsets.fromLTRB(
+                                          75.w, 1.5.h, 0, 12.h),
+                                      child: Text(
+                                        blood,
+                                        style: TextStyle(
+                                            fontSize: 15.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black45),
+                                      )),
+                                  Padding(
+                                      padding: EdgeInsets.fromLTRB(
+                                          25.w, 15.h, 0, 0.h),
+                                      child: Text(
+                                        'Time: $time, $date',
+                                        style: TextStyle(
+                                            fontSize: 11.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black45),
+                                      )),
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.fromLTRB(5.w, 17.h, 5.w, 0),
+                                    // ignore: prefer_const_constructors
+                                    child: Divider(
+                                      color: Colors.black26,
+                                      thickness: 2,
+                                      height: 5,
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.fromLTRB(
+                                            10.w, 18.h, 0, 1.h),
+                                        child: TextButton(
+                                          // ignore: prefer_const_constructors
+                                          child: Text(
+                                            'Decline',
+                                            style: TextStyle(
+                                                fontSize: 14.sp,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black45),
+                                          ),
+                                          onPressed: () {},
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.fromLTRB(
+                                            9.w, 18.h, 0.w, 9.8),
+                                        // ignore: prefer_const_constructors
+                                        child: VerticalDivider(
+                                          color: Colors.black54,
+                                          thickness: 2,
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.fromLTRB(
+                                            5.w, 18.h, 0, 1.h),
+                                        child: TextButton(
+                                          // ignore: prefer_const_constructors
+                                          child: Text(
+                                            'Donate Now',
+                                            style: TextStyle(
+                                                fontSize: 14.sp,
+                                                fontWeight: FontWeight.bold,
+                                                color: const Color(0xFFDE0A1E)),
+                                          ),
+                                          onPressed: () {
+                                            if (userType == 'donor') {
+                                              Navigator.push(
+                                                context,
+                                                PageRouteBuilder(
+                                                  pageBuilder: (context,
+                                                      animation,
+                                                      secondaryAnimation) {
+                                                    return DonateNow(
+                                                        name: name,
+                                                        image: image,
+                                                        blood: blood,
+                                                        email: email,
+                                                        hospital: hospitaln,
+                                                        location: location,
+                                                        date: date,
+                                                        time: time,
+                                                        rating: rating,
+                                                        note: note,
+                                                        id: id);
+                                                  },
+                                                  transitionDuration:
+                                                      const Duration(
+                                                          seconds: 1),
+                                                  transitionsBuilder: (context,
+                                                      animation,
+                                                      secondaryAnimation,
+                                                      child) {
+                                                    const begin = Offset(10.0,
+                                                        0.0); // slide in from the right
+                                                    const end = Offset.zero;
+                                                    const curve =
+                                                        Curves.easeInOutQuart;
+
+                                                    var tween = Tween(
+                                                            begin: begin,
+                                                            end: end)
+                                                        .chain(CurveTween(
+                                                            curve: curve));
+                                                    var offsetAnimation =
+                                                        animation.drive(tween);
+
+                                                    return SlideTransition(
+                                                      position: offsetAnimation,
+                                                      child: child,
+                                                    );
+                                                  },
+                                                ),
+                                              );
+                                            } else {
+                                              EasyLoading.showError(
+                                                  'Taker is doesnot to donate any blood');
+                                            }
+                                          },
+                                        ),
+                                      )
+                                    ],
+                                  )
+                                ],
+                              )),
+                        ),
+                      ),
+                      onTap: () {
+                        // ignore: avoid_print
+                        print('Nomi1');
+                      },
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    if (requestbloc.isEmpty) SizedBox(),
+                    if (requestbloc.isNotEmpty)
+                      Column(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(left: 5.w),
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Text('Blood Journey Map',
+                                  style: TextStyle(
+                                      fontSize: 15.sp,
+                                      fontWeight: FontWeight.bold),
+                                  textAlign: TextAlign.left),
+                            ),
+                          ),
+                          GestureDetector(
+                            child: Container(
+                                height: 25.h,
+                                margin: EdgeInsets.symmetric(horizontal: 5.w),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: 40.w,
+                                      margin: EdgeInsets.all(5.w),
+                                      color: Colors.red,
+                                      height: 25.h,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(20),
+                                        child: Container(
+                                          child: CachedNetworkImage(
+                                            fit: BoxFit.fitWidth,
+                                            imageUrl: requestimage.isNotEmpty
+                                                ? requestimage
+                                                : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
+                                            placeholder: (context, url) =>
+                                                const CupertinoActivityIndicator(
+                                              color: PRIMARY_COLOR,
+                                            ),
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    Icon(Icons.error),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                        child: Column(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Container(
+                                              margin: EdgeInsets.only(top: 2.h),
+                                              child: Icon(Icons.person),
+                                            ),
+                                            Expanded(
+                                              child: Padding(
+                                                  padding: EdgeInsets.fromLTRB(
+                                                      2.w, 2.h, 0.w, 00),
+                                                  child: Text(
+                                                    requestname,
+                                                    style: TextStyle(
+                                                        fontSize: 11.sp,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black),
+                                                  )),
+                                            )
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Container(
+                                              margin: EdgeInsets.only(top: 2.h),
+                                              child: Icon(Icons.local_hospital),
+                                            ),
+                                            Expanded(
+                                              child: Padding(
+                                                  padding: EdgeInsets.fromLTRB(
+                                                      1.w, 2.h, 0.w, 00),
+                                                  child: Text(
+                                                    requesthosname,
+                                                    style: TextStyle(
+                                                        fontSize: 11.sp,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black),
+                                                  )),
+                                            )
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Container(
+                                              margin: EdgeInsets.only(top: 2.h),
+                                              child: Icon(
+                                                Icons.lock_clock,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                            Expanded(
+                                                child: Padding(
+                                                    padding:
+                                                        EdgeInsets.fromLTRB(
+                                                            1.w, 2.h, 0.w, 00),
+                                                    child: Text(
+                                                      requesttime,
+                                                      style: TextStyle(
+                                                          fontSize: 12.sp,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors.black),
+                                                    )))
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Container(
+                                              margin: EdgeInsets.only(top: 2.h),
+                                              child: Icon(
+                                                Icons.date_range,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                            Expanded(
+                                                child: Padding(
+                                                    padding:
+                                                        EdgeInsets.fromLTRB(
+                                                            1.w, 2.h, 0.w, 00),
+                                                    child: Text(
+                                                      requestdate,
+                                                      style: TextStyle(
+                                                          fontSize: 12.sp,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors.black),
+                                                    )))
+                                          ],
+                                        ),
+                                      ],
+                                    ))
+                                  ],
+                                )),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder:
+                                      (context, animation, secondaryAnimation) {
+                                    return Feed1(
+                                        name: requestname,
+                                        image: requestimage,
+                                        blood: requestblood,
+                                        email: requestemail,
+                                        hospital: requesthosname,
+                                        location: requestbloc,
+                                        date: requestdate,
+                                        time: requesttime,
+                                        rating: requestrating,
+                                        note: requestnote,
+                                        id: requestid,
+                                        donorname: donorname,
+                                        donorblood: donorblood,
+                                        donoremail: donoremail,
+                                        donorimage: donorimage,
+                                        takerid: takerid);
+                                  },
+                                  transitionDuration:
+                                      const Duration(seconds: 1),
+                                  transitionsBuilder: (context, animation,
+                                      secondaryAnimation, child) {
+                                    const begin = Offset(
+                                        10.0, 0.0); // slide in from the right
+                                    const end = Offset.zero;
+                                    const curve = Curves.easeInOutQuart;
+
+                                    var tween = Tween(begin: begin, end: end)
+                                        .chain(CurveTween(curve: curve));
+                                    var offsetAnimation =
+                                        animation.drive(tween);
+
+                                    return SlideTransition(
+                                      position: offsetAnimation,
+                                      child: child,
+                                    );
+                                  },
+                                ),
+                              );
+                              // ignore: avoid_print
+                              print('Nomi1');
+                            },
+                          ),
+                        ],
+                      ),
+                    SizedBox(
+                      height: 13.h,
+                    )
+
+                    // Padding(
+                    //   padding: EdgeInsets.fromLTRB(0.w, 1.5.h, 0, 0),
+                    //   child:
+                    // ),
+
+                    // Padding(
+                    //   padding: EdgeInsets.fromLTRB(6.5.w, 1.5.h, 0, 0),
+                    //   child: Text(
+                    //     'Blood Journey Map',
+                    //     style:
+                    //         TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold),
+                    //   ),
+                    // ),
+                    // GestureDetector(
+                    //   child: Padding(
+                    //     padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
+                    //     child: Material(
+                    //       elevation: 5,
+                    //       shadowColor: Colors.grey,
+                    //       borderRadius: BorderRadius.circular(12),
+                    //       child: Container(
+                    //           height: 30.h,
+                    //           decoration: BoxDecoration(
+                    //             borderRadius: BorderRadius.circular(12),
+                    //             border: Border.all(
+                    //               color: Colors.red,
+                    //               width: 1,
+                    //             ),
+                    //           ),
+                    //           child: Stack(
+                    //             children: [
+                    //               Padding(
+                    //                 padding: EdgeInsets.fromLTRB(5.w, 2.h, 45.w, 00),
+                    //                 child: Container(
+                    //                   color: Colors.amberAccent,
+                    //                   height: 25.h,
+                    //                   child: GoogleMap(
+                    //                     mapType: MapType.hybrid,
+                    //                     initialCameraPosition: _kGooglePlex,
+                    //                     polygons: polygons,
+                    //                     circles: circles,
+                    //                     onMapCreated:
+                    //                         (GoogleMapController controller) {
+                    //                       _controller.complete(controller);
+                    //                     },
+                    //                   ),
+                    //                 ),
+                    //               ),
+                    //               Padding(
+                    //                   padding:
+                    //                       EdgeInsets.fromLTRB(50.w, 2.h, 5.w, 00),
+                    //                   child: Text(
+                    //                     donator.name,
+                    //                     style: TextStyle(
+                    //                         fontSize: 13.sp,
+                    //                         fontWeight: FontWeight.bold,
+                    //                         color: Colors.black),
+                    //                   )),
+                    //               Padding(
+                    //                   padding:
+                    //                       EdgeInsets.fromLTRB(50.w, 6.h, 5.w, 00),
+                    //                   child: Text(
+                    //                     donator.location,
+                    //                     style: TextStyle(
+                    //                         fontSize: 12.sp,
+                    //                         fontWeight: FontWeight.bold,
+                    //                         color: Colors.black),
+                    //                   )),
+                    //               Padding(
+                    //                   padding:
+                    //                       EdgeInsets.fromLTRB(50.w, 12.h, 5.w, 00),
+                    //                   child: Text(
+                    //                     donator.time,
+                    //                     style: TextStyle(
+                    //                         fontSize: 12.sp,
+                    //                         fontWeight: FontWeight.bold,
+                    //                         color: Colors.black),
+                    //                   )),
+                    //               Padding(
+                    //                   padding:
+                    //                       EdgeInsets.fromLTRB(50.w, 15.h, 5.w, 00),
+                    //                   child: Text(
+                    //                     donator.date,
+                    //                     style: TextStyle(
+                    //                         fontSize: 12.sp,
+                    //                         fontWeight: FontWeight.bold,
+                    //                         color: Colors.black),
+                    //                   )),
+                    //               Padding(
+                    //                   padding:
+                    //                       EdgeInsets.fromLTRB(50.w, 15.h, 5.w, 00),
+                    //                   child: Text(
+                    //                     donator.date,
+                    //                     style: TextStyle(
+                    //                         fontSize: 12.sp,
+                    //                         fontWeight: FontWeight.bold,
+                    //                         color: Colors.black),
+                    //                   )),
+                    //             ],
+                    //           )),
+                    //     ),
+                    //   ),
+                    //   onTap: () {
+                    //     // Navigator.push(
+                    //     //   context,
+                    //     //   PageRouteBuilder(
+                    //     //     pageBuilder: (context, animation, secondaryAnimation) {
+                    //     //       return Feed(location: location);
+                    //     //     },
+                    //     //     transitionsBuilder:
+                    //     //         (context, animation, secondaryAnimation, child) {
+                    //     //       const begin =
+                    //     //           Offset(10.0, 0.0); // slide in from the right
+                    //     //       const end = Offset.zero;
+                    //     //       const curve = Curves.easeInOutQuart;
+
+                    //     //       var tween = Tween(begin: begin, end: end)
+                    //     //           .chain(CurveTween(curve: curve));
+                    //     //       var offsetAnimation = animation.drive(tween);
+
+                    //     //       return SlideTransition(
+                    //     //         position: offsetAnimation,
+                    //     //         child: child,
+                    //     //       );
+                    //     //     },
+                    //     //   ),
+                    //     // );
+                    //     // ignore: avoid_print
+                    //     print('Nomi1');
+                    //   },
+                    // ),
+                  ],
+                ),
+              ),
+            ),
+          ));
+    });
+  }
+
+  Future<bool> _onWillPop(BuildContext context) async {
+    return (await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Confirm Exit'),
+            content: Text('Are you sure you want to exit the application?'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text('No'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text('Yes'),
+              ),
+            ],
+          ),
+        )) ??
+        false;
+  }
+
+  // Future<void> _getCurrentLocation() async {
+  //   try {
+  //     Position position = await Geolocator.getCurrentPosition(
+  //       desiredAccuracy: LocationAccuracy.high,
+  //     );
+
+  //     final GoogleMapController controller = await _controller.future;
+
+  //     setState(() {
+  //       circles.clear();
+  //       circles.add(Circle(
+  //         circleId: const CircleId('CurrentLocationCircle'),
+  //         center: LatLng(position.latitude, position.longitude),
+  //         radius: 120.0,
+  //         fillColor: Colors.blue.withOpacity(0.3),
+  //         strokeColor: Colors.blue,
+  //         strokeWidth: 10,
+  //       ));
+
+  //       controller.animateCamera(
+  //         CameraUpdate.newLatLngZoom(
+  //           LatLng(position.latitude, position.longitude),
+  //           9.6,
+  //         ),
+  //       );
+
+  //       fromController.text =
+  //           "${position.latitude.toString()}, ${position.longitude.toString()}";
+  //     });
+  //   } catch (e) {
+  //     // ignore: avoid_print
+  //     print("Error: $e");
+  //   }
+  // }
+
+  // // ignore: unused_element
+  // Future<void> _goToCurrentLocation() async {
+  //   _getCurrentLocation();
+  // }
+
+  // Future<void> showPath() async {
+  //   try {
+  //     String from = fromController.text;
+  //     String to = toController.text;
+
+  //     List<Location> fromLocations = await locationFromAddress(from);
+  //     List<Location> toLocations = await locationFromAddress(to);
+
+  //     if (fromLocations.isNotEmpty && toLocations.isNotEmpty) {
+  //       Location fromLocation = fromLocations.first;
+
+  //       // Let the user choose the correct "To" location from multiple results
+  //       Location? toLocation = await _chooseLocation(toLocations);
+
+  //       if (toLocation != null) {
+  //         // ignore: unused_local_variable
+  //         final GoogleMapController controller = await _controller.future;
+  //         if (!_controller.isCompleted) {
+  //           _controller.complete(controller);
+  //         }
+
+  //         LatLng fromLatLng =
+  //             LatLng(fromLocation.latitude, fromLocation.longitude);
+  //         LatLng toLatLng = LatLng(toLocation.latitude, toLocation.longitude);
+
+  //         // ignore: unused_local_variable
+  //         LatLngBounds bounds = LatLngBounds(
+  //           southwest: fromLatLng,
+  //           northeast: toLatLng,
+  //         );
+
+  //         // Comment out the line below to prevent the camera from moving
+  //         // controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50.0));
+
+  //         // ignore: unused_local_variable
+  //         Polyline polyline = Polyline(
+  //           polylineId: const PolylineId('Path'),
+  //           color: Colors.red,
+  //           points: [fromLatLng, toLatLng],
+  //         );
+
+  //         setState(() {
+  //           circles.clear();
+  //           circles.add(Circle(
+  //             circleId: const CircleId('CurrentLocationCircle'),
+  //             center: fromLatLng,
+  //             radius: 120.0,
+  //             fillColor: Colors.blue.withOpacity(0.3),
+  //             strokeColor: Colors.blue,
+  //             strokeWidth: 10,
+  //           ));
+  //           circles.add(Circle(
+  //             circleId: const CircleId('DestinationCircle'),
+  //             center: toLatLng,
+  //             radius: 120.0,
+  //             fillColor: Colors.green.withOpacity(0.3),
+  //             strokeColor: Colors.green,
+  //             strokeWidth: 10,
+  //           ));
+  //           polygons.clear();
+  //           polygons.add(Polygon(
+  //             polygonId: const PolygonId('PathPolygon'),
+  //             points: [fromLatLng, toLatLng],
+  //             fillColor: const Color(0xFFDE0A1E).withOpacity(0.5),
+  //             strokeWidth: 2,
+  //             strokeColor: const Color(0xFFDE0A1E),
+  //           ));
+  //         });
+
+  //         // ignore: await_only_futures
+  //         double distance = await Geolocator.distanceBetween(
+  //           fromLocation.latitude,
+  //           fromLocation.longitude,
+  //           toLocation.latitude,
+  //           toLocation.longitude,
+  //         );
+
+  //         double distanceInKm = distance / 1000;
+
+  //         // ignore: use_build_context_synchronously
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           SnackBar(
+  //             content: Text('Distance: ${distanceInKm.toStringAsFixed(2)} km'),
+  //           ),
+  //         );
+  //       }
+  //     }
+  //   } catch (e) {
+  //     // ignore: avoid_print
+  //     print("Error: $e");
+  //   }
+  // }
+
+  // Future<Location?> _chooseLocation(List<Location> locations) async {
+  //   // You can implement a UI to let the user choose the correct location
+  //   // For simplicity, here we choose the first location from the list
+  //   return locations.first;
+  // }
+
+  // String getRemainingTime(DateTime donationDate) {
+  //   DateTime now = DateTime.now();
+  //   Duration difference = now.difference(donationDate);
+
+  //   int hours = difference.inHours;
+  //   int minutes = difference.inMinutes.remainder(60);
+
+  //   if (hours >= 1) {
+  //     // If the difference is 1 hour or more, display in hours format.
+  //     double remainingTime = hours + (minutes / 60);
+  //     return '$remainingTime hours';
+  //   } else {
+  //     // If less than 1 hour, display in minutes format.
+  //     return '$minutes minutes';
+  //   }
+  // }
+
+  // void sendNotificationToAllUsers() async {
+  //   try {
+  //     // Fetch all users from Firestore
+  //     QuerySnapshot usersSnapshot = await usersCollection.get();
+
+  //     // Iterate over each user document
+  //     for (QueryDocumentSnapshot userDoc in usersSnapshot.docs) {
+  //       // Get the device token from the user document
+  //       String deviceToken = userDoc['deviceToken'];
+
+  //       // Prepare notification data
+  //       var data = {
+  //         'to': deviceToken,
+  //         'priority': 'high',
+  //         'notification': {'title': 'Nomi', 'body': 'Hay please check'},
+  //         'data': {
+  //           'type': 'msj',
+  //           'id': 'Nomi12345'
+  //         } // Additional data if needed
+  //       };
+
+  //       // Send notification to the device
+  //       var response = await http.post(
+  //         Uri.parse('https://fcm.googleapis.com/fcm/send'),
+  //         body: jsonEncode(data),
+  //         headers: {
+  //           'Content-Type': 'application/json; charset=UTF-8',
+  //           'Authorization':
+  //               'key=AAAAhM4yLBU:APA91bFYi77T3adopH4ZKF6BwWAMjq0v-zrcByWIs_SukIolxTfIEXBwJLOzxF5GaYiT3xn03Y3gbQ-XWzkESGKMR1awLL3JPoc2x5dHh0uxmi-HSZ8xAHIEcQ0fF6XJ5j6KiYsyDzvU'
+  //         },
+  //       );
+
+  //       // Check response status
+  //       if (response.statusCode == 200) {
+  //         print('Notification sent successfully to user: ${userDoc.id}');
+  //       } else {
+  //         print(
+  //             'Failed to send notification to user: ${userDoc.id}. Status code: ${response.statusCode}');
+  //         print('Response body: ${response.body}');
+  //       }
+  //     }
+  //   } catch (e) {
+  //     print('Error sending notification: $e');
+  //   }
+  // }
+
+  Future<void> getUserDataByEmail() async {
+    try {
+      // Use the 'where' method to query documents with the specified email
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String userEmail = prefs.getString('user_email') ?? '';
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: userEmail)
+          .get();
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot userDoc = querySnapshot.docs.first;
+
+        // Access user data
+        String name = userDoc['firstname'];
+        String name1 = userDoc['lastname'];
+        String type = userDoc['type'];
+        String id = userDoc['id'];
+        String devicet = userDoc['deviceToken'];
+        profilename = name + ' $name1';
+        userType = type;
+        user_id = id;
+        devicetoken = devicet;
+        setState(() {});
+        print(profilename);
+        _goToCurrentLocation();
+        getNotificationToken();
+      } else {
+        // No user found with the specified email
+        print('User not found with email: $userEmail');
+      }
+    } catch (e) {
+      // Handle error
+      print('Error: $e');
+    }
+  }
+
+  Future<void> getFirstTaker() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('taker')
+          .where('status', isEqualTo: false)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Clear previous state or initialize variables
+        // List<Map<String, dynamic>> allDonations = [];
+
+        // Extract data from the first document
+        DocumentSnapshot firstDoc = querySnapshot.docs.first;
+        String pic = firstDoc['image'];
+        String name1 = firstDoc['name'];
+        String blood1 = firstDoc['blood'];
+        String hospital = firstDoc['hospitalname'];
+        String location1 = firstDoc['location'];
+        String date1 = firstDoc['date'];
+        String time1 = firstDoc['time'];
+        String note1 = firstDoc['note'];
+        String rating1 = firstDoc['rating'];
+        String tid = firstDoc['taker_id'];
+        String email1 = firstDoc['email'];
+
+        image = pic;
+        name = name1;
+        blood = blood1;
+        hospitaln = hospital;
+        location = location1;
+        date = date1;
+        time = time1;
+        note = note1;
+        rating = rating1;
+        id = tid;
+        email = email1;
+        setState(() {});
+        // Add data to a list of maps
+        // allDonations.add({
+        //   'acceptName': acceptName,
+        //   'acceptPic': acceptPic,
+        //   'acceptRating': acceptRating,
+        //   'acceptBlood': acceptBlood,
+        // });
+
+        // Now you can use the list of maps 'allDonations' to display or manipulate the data as needed
+      } else {
+        print('No donations found in the "taker" collection.');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  void updateDonorLocation(String location) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('donor_location')
+          .where('user_id', isEqualTo: user_id)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Get the document reference
+        DocumentSnapshot documentSnapshot = querySnapshot.docs.first;
+        String documentId = documentSnapshot.id;
+
+        // Update the data in the document
+        await FirebaseFirestore.instance
+            .collection('donor_location')
+            .doc(documentId)
+            .update({'donor_location': location});
+
+        print('Data updated successfully in donor Location table');
+      } else {
+        print('User not found with email:');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  Future<void> _getCurrentLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
+      Placemark place = placemarks[0];
+
+      String address =
+          "${place.name}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
+      updateDonorLocation(address);
+
+      final GoogleMapController controller = await _controller.future;
+
+      setState(() {
+        circles.clear();
+        circles.add(Circle(
+          circleId: const CircleId('CurrentLocationCircle'),
+          center: LatLng(position.latitude, position.longitude),
+          radius: 120.0,
+          fillColor: Colors.blue.withOpacity(0.3),
+          strokeColor: Colors.blue,
+          strokeWidth: 10,
+        ));
+
+        controller.animateCamera(
+          CameraUpdate.newLatLngZoom(
+            LatLng(position.latitude, position.longitude),
+            9.6,
+          ),
+        );
+
+        fromController.text = address;
+
+        log("My location is ${fromController.text}");
+      });
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
+
+  Future<void> _goToCurrentLocation() async {
+    if (userType == 'donor') {
+      _getCurrentLocation();
+    } else {
+      print("Taker is login");
+    }
+  }
+
+  // Future<void> showPath(String location) async {
+  //   try {
+  //     final provider = Provider.of<AuthProvider>(context, listen: false);
+  //     String from = fromController.text;
+  //     String to = location;
+  //     log("My location is $requestbloc");
+
+  //     List<Location> fromLocations = await locationFromAddress(from);
+  //     List<Location> toLocations = await locationFromAddress(to);
+
+  //     if (fromLocations.isNotEmpty && toLocations.isNotEmpty) {
+  //       Location fromLocation = fromLocations.first;
+
+  //       // Let the user choose the correct "To" location from multiple results
+  //       Location? toLocation = await _chooseLocation(toLocations);
+
+  //       if (toLocation != null) {
+  //         // ignore: unused_local_variable
+  //         final GoogleMapController controller = await _controller.future;
+
+  //         LatLng fromLatLng =
+  //             LatLng(fromLocation.latitude, fromLocation.longitude);
+  //         LatLng toLatLng = LatLng(toLocation.latitude, toLocation.longitude);
+
+  //         // ignore: unused_local_variable
+  //         LatLngBounds bounds = LatLngBounds(
+  //           southwest: fromLatLng,
+  //           northeast: toLatLng,
+  //         );
+
+  //         // Comment out the line below to prevent the camera from moving
+  //         // controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50.0));
+
+  //         // ignore: unused_local_variable
+  //         Polyline polyline = Polyline(
+  //           polylineId: const PolylineId('Path'),
+  //           color: Colors.red,
+  //           points: [fromLatLng, toLatLng],
+  //         );
+
+  //         setState(() {
+  //           circles.clear();
+  //           circles.add(Circle(
+  //             circleId: const CircleId('CurrentLocationCircle'),
+  //             center: fromLatLng,
+  //             radius: 120.0,
+  //             fillColor: Colors.blue.withOpacity(0.3),
+  //             strokeColor: Colors.blue,
+  //             strokeWidth: 10,
+  //           ));
+  //           circles.add(Circle(
+  //             circleId: const CircleId('DestinationCircle'),
+  //             center: toLatLng,
+  //             radius: 120.0,
+  //             fillColor: Colors.green.withOpacity(0.3),
+  //             strokeColor: Colors.green,
+  //             strokeWidth: 10,
+  //           ));
+  //           polygons.clear();
+  //           polygons.add(Polygon(
+  //             polygonId: const PolygonId('PathPolygon'),
+  //             points: [fromLatLng, toLatLng],
+  //             fillColor: const Color(0xFFDE0A1E).withOpacity(0.5),
+  //             strokeWidth: 2,
+  //             strokeColor: const Color(0xFFDE0A1E),
+  //           ));
+  //         });
+
+  //         double distance = await Geolocator.distanceBetween(
+  //           fromLocation.latitude,
+  //           fromLocation.longitude,
+  //           toLocation.latitude,
+  //           toLocation.longitude,
+  //         );
+
+  //         double distanceInKm = distance / 1000;
+  //         provider.notifyListeners();
+
+  //         // ignore: use_build_context_synchronously
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           SnackBar(
+  //             content: Text('Distance: ${distanceInKm.toStringAsFixed(2)} km'),
+  //           ),
+  //         );
+  //         setState(() {});
+  //       }
+  //     }
+  //   } catch (e) {
+  //     print("Error: $e");
+  //   }
+  // }
+
+  // Future<Location?> _chooseLocation(List<Location> locations) async {
+  //   // You can implement a UI to let the user choose the correct location
+  //   // For simplicity, here we choose the first location from the list
+  //   return locations.first;
+  // }
+
+  Future<void> getAcceptDonor() async {
+    try {
+      final provider = Provider.of<AuthProvider>(context, listen: false);
+      // Use the 'where' method to query documents with the specified email
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String userEmail = prefs.getString('user_email') ?? '';
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('acceptdonation')
+          .where('acceptemail', isEqualTo: userEmail)
+          .where('status', isEqualTo: false)
+          .limit(1)
+          .get();
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot userDoc = querySnapshot.docs.first;
+
+        // Access user data
+
+        String name = userDoc['fullname'];
+        String hospital = userDoc['hospitalname'];
+        String blood = userDoc['blood'];
+        String date = userDoc['date'];
+        String time = userDoc['time'];
+        String loc = userDoc['location'];
+        String rsting = userDoc['rating'];
+        int idd = userDoc['id'];
+        String note = userDoc['note'];
+        String image = userDoc['image'];
+        String emai = userDoc['email'];
+        String d_name = userDoc['acceptname'];
+        String d_email = userDoc['acceptemail'];
+        String d_image = userDoc['acceptimage'];
+        String d_blood = userDoc['acceptblood'];
+        String takid = userDoc['takerid'];
+
+        requestname = name;
+        requesthosname = hospital;
+        requestblood = blood;
+        requestdate = date;
+        requesttime = time;
+        requestbloc = loc;
+        requestrating = rsting;
+        requestid = idd.toString();
+        requestnote = note;
+        requestimage = image;
+        requestemail = emai;
+        donorname = d_name;
+        donoremail = d_email;
+        donorblood = d_blood;
+        donorimage = d_image;
+        takerid = takid;
+        provider.notifyListeners();
+      } else {
+        // No user found with the specified email
+        print('User not found with email: $userEmail');
+      }
+    } catch (e) {
+      // Handle error
+      print('Error: $e');
+    }
+  }
+
+  getData() async {
+    await getAcceptDonor();
+    Future.delayed(Duration(seconds: 2), () async {
+      // showPath(requestbloc);
+    });
+  }
+
+//  Future<void> getAcceptDonation() async {
+//   try {
+
+//     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+//         .collection('taker')
+//         .where('taker_email', isEqualTo: userEmail)
+//         .get();
+
+//     if (querySnapshot.docs.isNotEmpty) {
+//       // Clear previous state
+//       setState(() {
+//         name = '';
+//         image = '';
+//         rating = '';
+//         blood = '';
+//       });
+
+//       // Iterate over each document in the query snapshot
+//       querySnapshot.docs.forEach((DocumentSnapshot userDoc) {
+//         String acceptName = userDoc['acceptname'];
+//         String acceptPic = userDoc['acceptimage'];
+//         String acceptRating = userDoc['acceptrating'];
+//         String acceptBlood = userDoc['acceptblood'];
+
+//         // Update state for each document
+//         setState(() {
+//           name = acceptName;
+//           image = acceptPic;
+//           rating = acceptRating;
+//           blood = acceptBlood;
+//         });
+//       });
+//     } else {
+//       print('User not found with email: $userEmail');
+//     }
+//   } catch (e) {
+//     print('Error: $e');
+//   }
+// }
+}

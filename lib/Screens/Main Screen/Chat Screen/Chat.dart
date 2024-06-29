@@ -1,0 +1,564 @@
+import 'dart:io';
+
+import 'package:async/async.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sizer/sizer.dart';
+
+import '../../../constants.dart';
+import 'HeroScreen.dart';
+
+class ChatScree1 extends StatefulWidget {
+  final String sender_id;
+  final String receiver_id;
+  final String image;
+  final String name;
+  final String sendemail;
+  final String receiveremail;
+  final String senderimage;
+  const ChatScree1({
+    super.key,
+    required this.image,
+    required this.name,
+    required this.sendemail,
+    required this.receiveremail,
+    required this.senderimage,
+    required this.sender_id,
+    required this.receiver_id,
+  });
+
+  @override
+  State<ChatScree1> createState() => _ChatScree1State();
+}
+
+class _ChatScree1State extends State<ChatScree1> {
+  final TextEditingController _controller = TextEditingController();
+  final User? user = FirebaseAuth.instance.currentUser;
+  String userType = '';
+  String userEmail1 = '';
+  String global_id = '';
+  String localid = '';
+  String taker_id = '';
+  int id = 0;
+  List<dynamic> receiverIds = [];
+  List<dynamic> senderrIds = [];
+  int unique_id = 0;
+
+  final ImagePicker _picker = ImagePicker();
+  final FocusNode nosw = FocusNode();
+  bool isvisible = false;
+
+  @override
+  void initState() {
+    super.initState();
+    getUserDataByEmail();
+    FirebaseMessaging.instance.requestPermission();
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      _handleNotificationData(message.data);
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      _handleNotificationData(message.data);
+    });
+    getMessages();
+    getmessageid();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  void _handleNotificationData(Map<String, dynamic> data) async {
+    String? id = data['id'];
+    if (id != null) {
+      await FirebaseFirestore.instance.collection('notifications').add({
+        'notificationId': id,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+    }
+  }
+
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Sizer(builder: (context, orientation, deviceType) {
+      return Scaffold(
+        resizeToAvoidBottomInset: true,
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
+              if (userType == 'donor')
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HeroScreen(image: widget.image),
+                      ),
+                    );
+                  },
+                  child: Hero(
+                    tag: 'profile-image',
+                    child: Material(
+                      color: Colors.transparent,
+                      child: CircleAvatar(
+                        backgroundImage: NetworkImage(widget.image),
+                        radius: 20,
+                      ),
+                    ),
+                  ),
+                ),
+              if (userType == 'taker')
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            HeroScreen(image: widget.senderimage),
+                      ),
+                    );
+                  },
+                  child: Hero(
+                    tag: 'profile-image',
+                    child: Material(
+                      color: Colors.transparent,
+                      child: CircleAvatar(
+                        backgroundImage: NetworkImage(widget.senderimage),
+                        radius: 20,
+                      ),
+                    ),
+                  ),
+                ),
+              Padding(
+                  padding: EdgeInsets.fromLTRB(4.w, 0, 0, 0),
+                  child: Text(
+                    widget.name,
+                    style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black54),
+                  ))
+            ],
+          ),
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: Container(
+                height: 60.h,
+                child: StreamBuilder<QuerySnapshot>(
+                  key: UniqueKey(),
+                  stream: getMessages(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                      return Center(child: Text('No messages'));
+                    }
+
+                    List<Map<String, dynamic>> messages = snapshot.data!.docs
+                        .map((doc) => doc.data() as Map<String, dynamic>)
+                        .toList();
+
+                    List<Widget> messageWidgets = buildMessagesList(messages);
+
+                    WidgetsBinding.instance!.addPostFrameCallback((_) {
+                      if (_scrollController.hasClients) {
+                        _scrollController
+                            .jumpTo(_scrollController.position.maxScrollExtent);
+                      }
+                    });
+                    return ListView(
+                      controller: _scrollController,
+                      children: messageWidgets,
+                    );
+                  },
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10, top: 10, left: 10),
+              child: Row(
+                children: [
+                  Expanded(
+                      child: TextField(
+                          focusNode: FocusNode(),
+                          onTapOutside: (event) {
+                            nosw.unfocus();
+                          },
+                          controller: _controller,
+                          decoration: InputDecoration(
+                            hintText: 'Enter your message...',
+                            helperStyle: TextStyle(color: Colors.black54),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                                borderSide: BorderSide(color: Colors.grey)),
+                            contentPadding: EdgeInsets.symmetric(
+                              vertical: 10.0,
+                              horizontal: 15.0,
+                            ),
+                          ),
+                          onChanged: (text) {
+                            TextSelection previousSelection =
+                                _controller.selection;
+                            _controller.text = text;
+                            _controller.selection = previousSelection;
+                          })
+                        ..onTapOutside),
+                  IconButton(
+                    icon: Icon(
+                      Icons.send,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () async {
+                      if (_controller.text.isNotEmpty) {
+                        if (_controller.text.toString().startsWith(' ')) {
+                        } else {
+                          if (userType == 'donor') {
+                            await getmessageid();
+                            unique_id++;
+
+                            await sendMessage(
+                              widget.sender_id,
+                              widget.receiver_id,
+                              userEmail1,
+                              widget.receiveremail,
+                              _controller.text,
+                            );
+                            _controller.clear();
+                          }
+                          if (userType == 'taker') {
+                            await getmessageid();
+                            unique_id++;
+
+                            await sendMessage(
+                              widget.sender_id,
+                              widget.receiver_id,
+                              userEmail1,
+                              widget.sendemail,
+                              _controller.text,
+                            );
+                            _controller.clear();
+                          }
+                        }
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  Future<void> sendMessage(String senderid, String receiverid,
+      String senderEmail, String receiverEmail, String content,
+      {bool isImage = false}) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String userChat = prefs.getString('chat_id') ?? '';
+    CollectionReference chats =
+        FirebaseFirestore.instance.collection('messages');
+    DateTime now = DateTime.now();
+
+    // Format the timestamp as a string
+    String formattedTime = DateFormat('h:mm a').format(now);
+
+    await chats.add({
+      'senderEmail': receiverEmail,
+      'receiverEmail': senderEmail,
+      'content': content,
+      'time': formattedTime,
+      'sender_id': senderid,
+      'receiver_id': receiverid,
+      'isImage': isImage,
+      "index": unique_id
+    });
+  }
+
+  Stream<QuerySnapshot> getMessages() {
+    try {
+      List<Stream<QuerySnapshot>> streams = [];
+
+      if (userType == 'donor') {
+        var query = FirebaseFirestore.instance
+            .collection('messages')
+            .where('sender_id', isEqualTo: localid)
+            .where('receiver_id', isEqualTo: widget.receiver_id)
+            .orderBy('index', descending: false);
+
+        streams.add(query.snapshots());
+      } else {
+        var query = FirebaseFirestore.instance
+            .collection('messages')
+            .where('receiver_id', isEqualTo: localid)
+            .where('sender_id', isEqualTo: widget.sender_id)
+            .orderBy('index', descending: false);
+        streams.add(query.snapshots());
+      }
+
+      // Merge streams into a single stream
+      return StreamGroup.merge<QuerySnapshot>(streams);
+    } catch (e) {
+      print(e.toString());
+      // Return an empty stream if error occurs
+      return Stream.empty();
+    }
+  }
+
+  List<Widget> buildMessagesList(List<Map<String, dynamic>> dataList) {
+    // Sort the messages by time (with seconds)
+    dataList.sort((a, b) {
+      try {
+        DateTime timeA = DateFormat('h:mm:ss a').parse(a['time']);
+        DateTime timeB = DateFormat('h:mm:ss a').parse(b['time']);
+        return timeA.compareTo(timeB);
+      } catch (e) {
+        print('Error parsing time: ${e.toString()}');
+        return 0;
+      }
+    });
+
+    return dataList.map((data) => buildMessage(data)).toList();
+  }
+
+  Future<void> getAcceptChatDonor(String id) async {
+    try {
+      // Use the 'where' method to query documents with the specified email
+      // SharedPreferences prefs = await SharedPreferences.getInstance();
+      // String userEmail = prefs.getString('user_email') ?? '';
+
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('chat_accept')
+          .where('sender_id', isEqualTo: id)
+          .get();
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot userDoc = querySnapshot.docs.first;
+
+        // Access user data
+        List<dynamic> receiverId = [];
+        for (var doc in querySnapshot.docs) {
+          String receiverid = doc['receiver_id'];
+          receiverId.add(receiverid);
+        }
+        receiverIds = receiverId;
+        setState(() {});
+      } else {
+        // No user found with the specified email
+        print('User not found with ID:');
+      }
+    } catch (e) {
+      // Handle error
+      print('Error: $e');
+    }
+  }
+
+  Future<void> getAcceptChatTaker(String id) async {
+    try {
+      // Use the 'where' method to query documents with the specified email
+      // SharedPreferences prefs = await SharedPreferences.getInstance();
+      // String userEmail = prefs.getString('user_email') ?? '';
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('chat_accept')
+          .where('receiver_id', isEqualTo: id)
+          .get();
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot userDoc = querySnapshot.docs.first;
+
+        // Access user data
+        List<dynamic> senderId = [];
+        for (var doc in querySnapshot.docs) {
+          String senderid = doc['sender_id'];
+          senderId.add(senderid);
+        }
+        setState(() {
+          senderrIds = senderId;
+        });
+      } else {
+        // No user found with the specified email
+        print('User not found with ID:');
+      }
+    } catch (e) {
+      // Handle error
+      print('Error: $e');
+    }
+  }
+
+  Future<void> getUserDataByEmail() async {
+    try {
+      // Use the 'where' method to query documents with the specified email
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String userEmail = prefs.getString('user_email') ?? '';
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: userEmail)
+          // .orderBy('time', descending: false)
+          .get();
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot userDoc = querySnapshot.docs.first;
+
+        // Access user data
+        String id = userDoc['id'];
+        String type = userDoc['type'];
+        String email = userDoc['email'];
+        setState(() {
+          userType = type;
+          userEmail1 = email;
+          localid = id;
+        });
+        if (userType == 'donor') {
+          getAcceptChatDonor(id);
+        }
+        if (userType == 'taker') {
+          getAcceptChatTaker(id);
+        }
+      } else {
+        // No user found with the specified email
+        print('User not found with email: $userEmail');
+      }
+    } catch (e) {
+      // Handle error
+      print('Error: $e');
+    }
+  }
+
+  Widget buildMessage(Map<String, dynamic> data) {
+    bool isMe = data['receiverEmail'] == userEmail1;
+
+    // ignore: unused_local_variable
+
+    // List<Map<String, dynamic>> data1 = [data];
+    // data1.sort((a, b) {
+    //   // Compare the index values
+    //   return a['index'].compareTo(b['index']);
+    // });
+    // data1.sort((a, b) {
+    //   // Parse the time strings into DateTime objects
+    //   DateTime timeA = DateTime.parse('1970-01-01 ' + a['time']);
+    //   DateTime timeB = DateTime.parse('1970-01-01 ' + b['time']);
+    //   // Compare the DateTime objects
+    //   return timeA.compareTo(timeB);
+    // });
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Align(
+        alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+          decoration: BoxDecoration(
+            color: isMe ? Colors.green[200] : Colors.grey[200],
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            crossAxisAlignment:
+                isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+            children: [
+              Text(
+                data['content'],
+                style: TextStyle(fontSize: 16),
+              ),
+              SizedBox(height: 5),
+              Text(
+                data['time'] != null ? (data['time']) : 'Time not available',
+                style: TextStyle(fontSize: 10, color: Colors.grey),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> getmessageid() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('messages')
+          .orderBy('index', descending: true)
+          .limit(1)
+          .get();
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot userDoc = querySnapshot.docs.first;
+
+        // Access user data
+        int ind = userDoc['index'];
+        unique_id = ind;
+      } else {
+        // No user found with the specified email
+        print('User not found with email: ');
+      }
+    } catch (e) {
+      // Handle error
+      print('Error: $e');
+    }
+  }
+
+  // List<Widget> buildMessagesList(List<Map<String, dynamic>> dataList) {
+  //   // Debugging: Print the time strings
+  //   dataList.forEach((data) => print('Time string: ${data['time']}'));
+
+  //   // Sort the messages by time
+  //   dataList.sort((a, b) {
+  //     try {
+  //       DateTime timeA = DateFormat.jm().parse(a['time']);
+  //       DateTime timeB = DateFormat.jm().parse(b['time']);
+  //       return timeA.compareTo(timeB);
+  //     } catch (e) {
+  //       print('Error parsing time: ${e.toString()}');
+  //       return 0;
+  //     }
+  //   });
+
+  //   return dataList.map((data) => buildMessage(data)).toList();
+  // }
+
+  Future<String?> uploadImage(XFile pickedFile) async {
+    try {
+      // Get the size of the picked image
+      File imageFile = File(pickedFile.path);
+      int fileSizeInBytes = await imageFile.length();
+
+      // Check if the file size exceeds 1 MB
+      if (fileSizeInBytes > 1024 * 1024) {
+        showCustomSnackBar(context, 'Image size exceeds 1 MB', false);
+        print('Image size exceeds 1 MB.');
+        return null;
+      }
+
+      final storageRef = FirebaseStorage.instance
+          .ref()
+          .child('messages')
+          .child(DateTime.now().millisecondsSinceEpoch.toString());
+
+      final uploadTask = storageRef.putFile(imageFile);
+      final snapshot = await uploadTask.whenComplete(() => null);
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+      return downloadUrl;
+    } catch (e) {
+      print('Image upload error: $e');
+      return null;
+    }
+  }
+}
