@@ -1,11 +1,16 @@
 // ignore_for_file: file_names
 
+import 'dart:developer';
+
 import 'package:blood_donor/Screens/Main%20Screen/Menu%20Screens/HelpCenter.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Menu%20Screens/Invite.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Menu%20Screens/Logout.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Menu%20Screens/Settings.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Menu%20Screens/TermsCondition.dart';
+import 'package:blood_donor/constants.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
@@ -17,7 +22,32 @@ class MenuScreen extends StatefulWidget {
   State<MenuScreen> createState() => _MenuScreenState();
 }
 
-class _MenuScreenState extends State<MenuScreen> {
+class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
+      log("My State is $state");
+      updateStatus(false);
+    } else if (state == AppLifecycleState.resumed) {
+      log("My State is $state");
+      updateStatus(true);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Sizer(
@@ -321,26 +351,30 @@ class _MenuScreenState extends State<MenuScreen> {
   }
 
   void _showLogoutDialog(BuildContext context) {
-    showDialog(
+    showCupertinoDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return CupertinoAlertDialog(
           title: Text("Confirm Logout"),
           content: Text("Are you sure you want to logout?"),
           actions: [
-            TextButton(
+            CupertinoDialogAction(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text("Cancel"),
+              child: Text(
+                "Cancel",
+                style: TextStyle(color: PRIMARY_COLOR),
+              ),
             ),
-            TextButton(
+            CupertinoDialogAction(
               onPressed: () async {
                 await FirebaseAuth.instance.signOut();
 
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 prefs.remove('user_uid');
                 prefs.clear();
+                updateStatus(false);
                 // ignore: use_build_context_synchronously
                 Navigator.pushAndRemoveUntil(
                   context,
@@ -372,11 +406,36 @@ class _MenuScreenState extends State<MenuScreen> {
 
                 // Navigator.of(context).pushReplacementNamed('/login'); // Navigate to login screen
               },
-              child: Text("Logout"),
+              child: Text(
+                "Logout",
+                style: TextStyle(color: PRIMARY_COLOR),
+              ),
             ),
           ],
         );
       },
     );
+  }
+
+  Future<void> updateStatus(bool isActive) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String userEmail = prefs.getString('user_email') ?? '';
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: userEmail)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        String userId = querySnapshot.docs.first.id;
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .update({'status': isActive});
+        log("My Statis is $isActive");
+      }
+    } catch (e) {
+      print('Error updating status: $e');
+    }
   }
 }

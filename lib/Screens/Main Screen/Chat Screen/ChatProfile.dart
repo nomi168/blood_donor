@@ -1,6 +1,8 @@
 import 'package:blood_donor/Modals/AcceptChat.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
@@ -14,7 +16,7 @@ class ChatProfile extends StatefulWidget {
   State<ChatProfile> createState() => _ChatProfileState();
 }
 
-class _ChatProfileState extends State<ChatProfile> {
+class _ChatProfileState extends State<ChatProfile> with WidgetsBindingObserver {
   List<AcceptChat> chatrequestData = [];
   String usertype = '';
   String id = '';
@@ -22,6 +24,7 @@ class _ChatProfileState extends State<ChatProfile> {
   @override
   void initState() {
     super.initState();
+
     getChatUsers();
   }
 
@@ -108,9 +111,24 @@ class _ChatProfileState extends State<ChatProfile> {
                                       ),
                                     );
                                   },
-                                  leading: CircleAvatar(
-                                    backgroundImage: NetworkImage(chat.image),
+                                  leading: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Container(
+                                      height: 45,
+                                      width: 45,
+                                      child: CachedNetworkImage(
+                                        fit: BoxFit.cover,
+                                        imageUrl: chat.image,
+                                        placeholder: (context, url) =>
+                                            const CupertinoActivityIndicator(
+                                          color: Colors.white,
+                                        ),
+                                        errorWidget: (context, url, error) =>
+                                            Icon(Icons.error),
+                                      ),
+                                    ),
                                   ),
+
                                   title: Text(chat.name),
                                   // subtitle: Text(chat['message']),
                                   trailing: Text(chat.time),
@@ -175,9 +193,22 @@ class _ChatProfileState extends State<ChatProfile> {
                                       ),
                                     );
                                   },
-                                  leading: CircleAvatar(
-                                    backgroundImage:
-                                        NetworkImage(chat.senderimage),
+                                  leading: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Container(
+                                      height: 45,
+                                      width: 45,
+                                      child: CachedNetworkImage(
+                                        fit: BoxFit.cover,
+                                        imageUrl: chat.senderimage,
+                                        placeholder: (context, url) =>
+                                            const CupertinoActivityIndicator(
+                                          color: Colors.white,
+                                        ),
+                                        errorWidget: (context, url, error) =>
+                                            Icon(Icons.error),
+                                      ),
+                                    ),
                                   ),
                                   title: Text(chat.acceptname),
                                   // subtitle: Text(chat['message']),

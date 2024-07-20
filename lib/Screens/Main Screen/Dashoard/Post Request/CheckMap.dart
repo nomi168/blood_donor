@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -15,6 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../../Json Data/GoogleMapDark.dart';
+import '../../../../constants.dart';
 import '../Dashboatd.dart';
 
 class CheckMap extends StatefulWidget {
@@ -116,7 +118,7 @@ class _CheckMapState extends State<CheckMap> {
                   color: Colors.white,
                 ),
                 height: 40,
-                width: 120,
+                width: 90,
                 child: Row(
                   children: [
                     SizedBox(
@@ -124,7 +126,8 @@ class _CheckMapState extends State<CheckMap> {
                     ),
                     Text(
                       'Post Blood',
-                      style: TextStyle(fontSize: 11),
+                      style:
+                          TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(
                       width: 4,
@@ -503,6 +506,8 @@ class _CheckMapState extends State<CheckMap> {
   Future<void> sendNotificationsToNearbyDonors(
       List<String> nearbyLocations) async {
     try {
+      showLoader("Please Wait!");
+
       List<String> list = [];
       List<String> nonDuplicateList = [];
       // Iterate over each location in the list
@@ -566,11 +571,13 @@ class _CheckMapState extends State<CheckMap> {
             print(
                 'Failed to send notification to user: ${userDoc.id}. Status code: ${response.statusCode}');
             print('Response body: ${response.body}');
+            EasyLoading.dismiss();
           }
         }
       }
     } catch (e) {
       print('Error sending notification: $e');
+      EasyLoading.dismiss();
     }
   }
 
@@ -712,9 +719,11 @@ class _CheckMapState extends State<CheckMap> {
       await docRef.update({
         'taker_id': documentId,
       });
+      EasyLoading.dismiss();
 
       _showDonatePopup();
     } catch (error) {
+      EasyLoading.dismiss();
       print("Error in _handleSignup: $error");
       // Handle error and show a proper error message to the user
     }

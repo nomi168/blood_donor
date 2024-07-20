@@ -18,6 +18,7 @@ class Profile with ChangeNotifier {
   String get life => _life;
   String _date = '25 Feb';
   String get date => _date;
+  bool isSwitched = false;
 
   void updateName(String newMessage) {
     _name = newMessage;

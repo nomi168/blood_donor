@@ -8,7 +8,6 @@ import 'package:blood_donor/Provider/Page.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Dashoard/Blood%20Dnor/Blood.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Dashoard/DonateNow.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Dashoard/Feed1.dart';
-import 'package:blood_donor/Screens/Main%20Screen/Dashoard/Post%20Request/PostRequest.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Feed%20Screen/Notification.dart';
 import 'package:blood_donor/Screens/Main%20Screen/SendRequestForBood/SendRequestScreen.dart';
 import 'package:blood_donor/constants.dart';
@@ -23,10 +22,12 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:sizer/sizer.dart';
 
 import 'Blood Bank/Blood_ank.dart';
 import 'Emergency Donor/Emergency_Blood.dart';
+import 'Post Request/PostRequest.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -37,7 +38,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   List<String> nomi1 = [
     'A+',
     'B+',
@@ -108,10 +109,30 @@ class _HomeScreenState extends State<HomeScreen> {
   String donorimage = '';
   String donorblood = '';
   String takerid = '';
+  bool isLoading = true;
   NotificationServices notificationServices = NotificationServices();
   final CollectionReference usersCollection =
       FirebaseFirestore.instance.collection('users');
   String devicetoken = '';
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
+      log("My State is $state");
+      updateStatus(false);
+    } else if (state == AppLifecycleState.resumed) {
+      log("My State is $state");
+      updateStatus(true);
+    }
+  }
 
   getNotificationToken() async {
     String token1 = await notificationServices.getDeviceToken();
@@ -147,10 +168,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-
+    WidgetsBinding.instance.addObserver(this);
     getUserDataByEmail();
     getFirstTaker();
     getData();
+    Future.delayed(Duration(seconds: 3), () {
+      isLoading = false;
+      // Populate feedsData with actual data
+    });
     notificationServices.requestNotificationPermission();
     notificationServices.firebaseInit(context);
     notificationServices.setupInteractMessage(context);
@@ -425,25 +450,56 @@ class _HomeScreenState extends State<HomeScreen> {
                     SizedBox(
                       height: 2.h,
                     ),
-                    Row(
-                      children: [
-                        Expanded(
-                            child: GestureDetector(
-                          child: Padding(
-                            padding: EdgeInsets.fromLTRB(5.w, 0.h, 1.5.w, 1.h),
-                            child: Material(
-                              elevation: 5,
-                              shadowColor: Colors.grey,
-                              borderRadius: BorderRadius.circular(12),
+
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 4.w),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          GestureDetector(
+                              onTap: () {
+                                if (userType == 'donor') {
+                                  EasyLoading.showInfo(
+                                      'Donor cannot add the Blood Post');
+                                } else {
+                                  // ignore: avoid_print
+                                  Navigator.push(
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder: (context, animation,
+                                          secondaryAnimation) {
+                                        return const PostRequest();
+                                      },
+                                      transitionDuration:
+                                          const Duration(seconds: 1),
+                                      transitionsBuilder: (context, animation,
+                                          secondaryAnimation, child) {
+                                        const begin = Offset(10.0,
+                                            0.0); // slide in from the right
+                                        const end = Offset.zero;
+                                        const curve = Curves.easeInOutQuart;
+
+                                        var tween = Tween(
+                                                begin: begin, end: end)
+                                            .chain(CurveTween(curve: curve));
+                                        var offsetAnimation =
+                                            animation.drive(tween);
+
+                                        return SlideTransition(
+                                          position: offsetAnimation,
+                                          child: child,
+                                        );
+                                      },
+                                    ),
+                                  );
+                                }
+                              },
                               child: Container(
-                                height: 15.h,
+                                height: 120,
+                                width: 100,
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: Colors.red,
-                                    width: 1,
-                                  ),
-                                ),
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(color: Colors.grey)),
                                 child: Column(
                                   children: [
                                     Padding(
@@ -477,63 +533,44 @@ class _HomeScreenState extends State<HomeScreen> {
                                         )),
                                   ],
                                 ),
-                              ),
-                            ),
-                          ),
-                          onTap: () {
-                            if (userType == 'donor') {
-                              EasyLoading.showInfo(
-                                  'Donor cannot add the Blood Post');
-                            } else {
-                              // ignore: avoid_print
-                              Navigator.push(
-                                context,
-                                PageRouteBuilder(
-                                  pageBuilder:
-                                      (context, animation, secondaryAnimation) {
-                                    return const PostRequest();
-                                  },
-                                  transitionDuration:
-                                      const Duration(seconds: 1),
-                                  transitionsBuilder: (context, animation,
-                                      secondaryAnimation, child) {
-                                    const begin = Offset(
-                                        10.0, 0.0); // slide in from the right
-                                    const end = Offset.zero;
-                                    const curve = Curves.easeInOutQuart;
+                              )),
+                          GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, animation,
+                                        secondaryAnimation) {
+                                      return const Blood_B();
+                                    },
+                                    transitionDuration:
+                                        const Duration(seconds: 1),
+                                    transitionsBuilder: (context, animation,
+                                        secondaryAnimation, child) {
+                                      const begin = Offset(
+                                          10.0, 0.0); // slide in from the right
+                                      const end = Offset.zero;
+                                      const curve = Curves.easeInOutQuart;
 
-                                    var tween = Tween(begin: begin, end: end)
-                                        .chain(CurveTween(curve: curve));
-                                    var offsetAnimation =
-                                        animation.drive(tween);
+                                      var tween = Tween(begin: begin, end: end)
+                                          .chain(CurveTween(curve: curve));
+                                      var offsetAnimation =
+                                          animation.drive(tween);
 
-                                    return SlideTransition(
-                                      position: offsetAnimation,
-                                      child: child,
-                                    );
-                                  },
-                                ),
-                              );
-                            }
-                          },
-                        )),
-                        Expanded(
-                            child: GestureDetector(
-                          child: Padding(
-                            padding: EdgeInsets.fromLTRB(3.w, 0.h, 3.w, 1.h),
-                            child: Material(
-                              elevation: 5,
-                              shadowColor: Colors.grey,
-                              borderRadius: BorderRadius.circular(12),
-                              child: Container(
-                                height: 15.h,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: const Color(0xFFDE0A1E),
-                                    width: 1,
+                                      return SlideTransition(
+                                        position: offsetAnimation,
+                                        child: child,
+                                      );
+                                    },
                                   ),
-                                ),
+                                );
+                              },
+                              child: Container(
+                                height: 120,
+                                width: 100,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(color: Colors.grey)),
                                 child: Column(
                                   children: [
                                     Padding(
@@ -567,82 +604,44 @@ class _HomeScreenState extends State<HomeScreen> {
                                         )),
                                   ],
                                 ),
-                              ),
-                            ),
-                          ),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                pageBuilder:
-                                    (context, animation, secondaryAnimation) {
-                                  return const Blood_B();
-                                },
-                                transitionDuration: const Duration(seconds: 1),
-                                transitionsBuilder: (context, animation,
-                                    secondaryAnimation, child) {
-                                  const begin = Offset(
-                                      10.0, 0.0); // slide in from the right
-                                  const end = Offset.zero;
-                                  const curve = Curves.easeInOutQuart;
+                              )),
+                          GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, animation,
+                                        secondaryAnimation) {
+                                      return const Emerency_Blood();
+                                    },
+                                    transitionDuration:
+                                        const Duration(seconds: 1),
+                                    transitionsBuilder: (context, animation,
+                                        secondaryAnimation, child) {
+                                      const begin = Offset(
+                                          10.0, 0.0); // slide in from the right
+                                      const end = Offset.zero;
+                                      const curve = Curves.easeInOutQuart;
 
-                                  var tween = Tween(begin: begin, end: end)
-                                      .chain(CurveTween(curve: curve));
-                                  var offsetAnimation = animation.drive(tween);
+                                      var tween = Tween(begin: begin, end: end)
+                                          .chain(CurveTween(curve: curve));
+                                      var offsetAnimation =
+                                          animation.drive(tween);
 
-                                  return SlideTransition(
-                                    position: offsetAnimation,
-                                    child: child,
-                                  );
-                                },
-                              ),
-                            );
-
-                            // Navigator.push(
-                            //   context,
-                            //   PageRouteBuilder(
-                            //     pageBuilder:
-                            //         (context, animation, secondaryAnimation) {
-                            //       return const NearBloodBank();
-                            //     },
-                            //     transitionDuration: const Duration(seconds: 1),
-                            //     transitionsBuilder: (context, animation,
-                            //         secondaryAnimation, child) {
-                            //       const begin = Offset(
-                            //           10.0, 0.0); // slide in from the right
-                            //       const end = Offset.zero;
-                            //       const curve = Curves.easeInOutQuart;
-
-                            //       var tween = Tween(begin: begin, end: end)
-                            //           .chain(CurveTween(curve: curve));
-                            //       var offsetAnimation = animation.drive(tween);
-
-                            //       return SlideTransition(
-                            //         position: offsetAnimation,
-                            //         child: child,
-                            //       );
-                            //     },
-                            //   ),
-                            // );
-                          },
-                        )),
-                        Expanded(
-                            child: GestureDetector(
-                          child: Padding(
-                            padding: EdgeInsets.fromLTRB(1.w, 0.h, 5.w, 0.5.h),
-                            child: Material(
-                              elevation: 5,
-                              shadowColor: Colors.grey,
-                              borderRadius: BorderRadius.circular(12),
-                              child: Container(
-                                height: 14.5.h,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: Colors.red,
-                                    width: 1,
+                                      return SlideTransition(
+                                        position: offsetAnimation,
+                                        child: child,
+                                      );
+                                    },
                                   ),
-                                ),
+                                );
+                              },
+                              child: Container(
+                                height: 120,
+                                width: 100,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(color: Colors.grey)),
                                 child: Column(
                                   children: [
                                     Padding(
@@ -676,494 +675,348 @@ class _HomeScreenState extends State<HomeScreen> {
                                         )),
                                   ],
                                 ),
-                              ),
+                              )),
+                        ],
+                      ),
+                    ),
+
+                    SizedBox(
+                      height: 15,
+                    ),
+
+                    if (userType.isNotEmpty && userType == 'taker')
+                      Container(
+                          height: 14.h,
+                          margin: EdgeInsets.symmetric(horizontal: 5.w),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.grey,
+                              width: 1,
                             ),
                           ),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                pageBuilder:
-                                    (context, animation, secondaryAnimation) {
-                                  return const Emerency_Blood();
-                                },
-                                transitionDuration: const Duration(seconds: 1),
-                                transitionsBuilder: (context, animation,
-                                    secondaryAnimation, child) {
-                                  const begin = Offset(
-                                      10.0, 0.0); // slide in from the right
-                                  const end = Offset.zero;
-                                  const curve = Curves.easeInOutQuart;
-
-                                  var tween = Tween(begin: begin, end: end)
-                                      .chain(CurveTween(curve: curve));
-                                  var offsetAnimation = animation.drive(tween);
-
-                                  return SlideTransition(
-                                    position: offsetAnimation,
-                                    child: child,
-                                  );
-                                },
-                              ),
-                            );
-
-                            // ignore: avoid_print
-                            // Navigator.push(
-                            //   context,
-                            //   PageRouteBuilder(
-                            //     pageBuilder:
-                            //         (context, animation, secondaryAnimation) {
-                            //       return const SubscriptionPlan();
-                            //     },
-                            //     transitionDuration: const Duration(seconds: 1),
-                            //     transitionsBuilder: (context, animation,
-                            //         secondaryAnimation, child) {
-                            //       const begin = Offset(
-                            //           5.0, 0.0); // slide in from the right
-                            //       const end = Offset.zero;
-                            //       const curve = Curves.easeInOutQuart;
-
-                            //       var tween = Tween(begin: begin, end: end)
-                            //           .chain(CurveTween(curve: curve));
-                            //       var offsetAnimation = animation.drive(tween);
-
-                            //       return SlideTransition(
-                            //         position: offsetAnimation,
-                            //         child: child,
-                            //       );
-                            //     },
-                            //   ),
-                            // );
-                          },
-                        )),
-                      ],
-                    ),
-                    if (userType.isNotEmpty && userType == 'taker')
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(5.w, 1.5.h, 5.w, 0),
-                        child: Material(
-                          elevation: 5,
-                          shadowColor: Colors.grey,
-                          borderRadius: BorderRadius.circular(12),
-                          child: Container(
-                              height: 14.h,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: Colors.red,
-                                  width: 1,
-                                ),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
                                 children: [
-                                  Row(
-                                    children: [
-                                      Padding(
-                                          padding: EdgeInsets.fromLTRB(
-                                              3.w, 1.h, 0, 0.h),
-                                          child: Text(
-                                            'Blood Donor',
+                                  Padding(
+                                      padding:
+                                          EdgeInsets.fromLTRB(3.w, 1.h, 0, 0.h),
+                                      child: Text(
+                                        'Blood Donor',
+                                        style: TextStyle(
+                                            fontSize: 12.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.red),
+                                      )),
+                                  Padding(
+                                      padding: EdgeInsets.fromLTRB(
+                                          35.w, 1.h, 0, 0.h),
+                                      child: const Icon(
+                                          Icons.location_on_outlined)),
+                                  Padding(
+                                      padding:
+                                          EdgeInsets.fromLTRB(2.w, 1.h, 0, 0.h),
+                                      child: Consumer<MyPageProvider>(
+                                        builder: (context, value, child) {
+                                          return Text(
+                                            value.location.toString(),
                                             style: TextStyle(
                                                 fontSize: 12.sp,
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.red),
-                                          )),
-                                      Padding(
-                                          padding: EdgeInsets.fromLTRB(
-                                              35.w, 1.h, 0, 0.h),
-                                          child: const Icon(
-                                              Icons.location_on_outlined)),
-                                      Padding(
-                                          padding: EdgeInsets.fromLTRB(
-                                              2.w, 1.h, 0, 0.h),
-                                          child: Consumer<MyPageProvider>(
-                                            builder: (context, value, child) {
-                                              return Text(
-                                                value.location.toString(),
-                                                style: TextStyle(
-                                                    fontSize: 12.sp,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.red),
+                                          );
+                                        },
+                                      )),
+                                ],
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: 5.w),
+                                child: Row(
+                                  children: [
+                                    GestureDetector(
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        height: 65,
+                                        width: 18.w,
+                                        // padding: EdgeInsets.,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            border: Border.all(
+                                                color: Colors.black26)),
+                                        child: Column(
+                                          children: [
+                                            SizedBox(
+                                              height: 5,
+                                            ),
+                                            Container(
+                                              child: Image.asset(
+                                                  'images/SVGRepo_iconCarrier.png',
+                                                  height: 30),
+                                            ),
+                                            Text(
+                                              'O',
+                                              style: TextStyle(
+                                                  fontSize: 15.sp,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      onTap: () {
+                                        String blood = 'O';
+                                        Navigator.push(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation,
+                                                secondaryAnimation) {
+                                              return BloodDonor(blood: blood);
+                                            },
+                                            transitionDuration:
+                                                const Duration(seconds: 1),
+                                            transitionsBuilder: (context,
+                                                animation,
+                                                secondaryAnimation,
+                                                child) {
+                                              const begin = Offset(5.0,
+                                                  0.0); // slide in from the right
+                                              const end = Offset.zero;
+                                              const curve =
+                                                  Curves.easeInOutQuart;
+
+                                              var tween = Tween(
+                                                      begin: begin, end: end)
+                                                  .chain(
+                                                      CurveTween(curve: curve));
+                                              var offsetAnimation =
+                                                  animation.drive(tween);
+
+                                              return SlideTransition(
+                                                position: offsetAnimation,
+                                                child: child,
                                               );
                                             },
-                                          )),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 5.w),
-                                    child: Row(
-                                      children: [
-                                        GestureDetector(
-                                          child: Container(
-                                            alignment: Alignment.center,
-                                            height: 65,
-                                            width: 18.w,
-                                            // padding: EdgeInsets.,
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                color: Colors.black12),
-                                            child: Column(
-                                              children: [
-                                                SizedBox(
-                                                  height: 5,
-                                                ),
-                                                Icon(
-                                                  Icons.bloodtype_outlined,
-                                                  color: Colors.red,
-                                                  size: 30,
-                                                ),
-                                                Text(
-                                                  'O',
-                                                  style: TextStyle(
-                                                      fontSize: 15.sp,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                              ],
-                                            ),
                                           ),
-                                          onTap: () {
-                                            String blood = 'O';
-                                            Navigator.push(
-                                              context,
-                                              PageRouteBuilder(
-                                                pageBuilder: (context,
-                                                    animation,
-                                                    secondaryAnimation) {
-                                                  return BloodDonor(
-                                                      blood: blood);
-                                                },
-                                                transitionDuration:
-                                                    const Duration(seconds: 1),
-                                                transitionsBuilder: (context,
-                                                    animation,
-                                                    secondaryAnimation,
-                                                    child) {
-                                                  const begin = Offset(5.0,
-                                                      0.0); // slide in from the right
-                                                  const end = Offset.zero;
-                                                  const curve =
-                                                      Curves.easeInOutQuart;
-
-                                                  var tween = Tween(
-                                                          begin: begin,
-                                                          end: end)
-                                                      .chain(CurveTween(
-                                                          curve: curve));
-                                                  var offsetAnimation =
-                                                      animation.drive(tween);
-
-                                                  return SlideTransition(
-                                                    position: offsetAnimation,
-                                                    child: child,
-                                                  );
-                                                },
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                        SizedBox(
-                                          width: 10,
-                                        ),
-                                        Expanded(
-                                            child: GestureDetector(
-                                          child: Container(
-                                            height: 65,
-                                            width: 20.w,
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                color: Colors.black12),
-                                            child: Column(
-                                              children: [
-                                                SizedBox(
-                                                  height: 5,
-                                                ),
-                                                Icon(
-                                                  Icons.bloodtype_outlined,
-                                                  color: Colors.red,
-                                                  size: 30,
-                                                ),
-                                                Text(
-                                                  'AB',
-                                                  style: TextStyle(
-                                                      fontSize: 15.sp,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          onTap: () {
-                                            String blood = 'AB';
-                                            Navigator.push(
-                                              context,
-                                              PageRouteBuilder(
-                                                pageBuilder: (context,
-                                                    animation,
-                                                    secondaryAnimation) {
-                                                  return BloodDonor(
-                                                      blood: blood);
-                                                },
-                                                transitionDuration:
-                                                    const Duration(seconds: 1),
-                                                transitionsBuilder: (context,
-                                                    animation,
-                                                    secondaryAnimation,
-                                                    child) {
-                                                  const begin = Offset(5.0,
-                                                      0.0); // slide in from the right
-                                                  const end = Offset.zero;
-                                                  const curve =
-                                                      Curves.easeInOutQuart;
-
-                                                  var tween = Tween(
-                                                          begin: begin,
-                                                          end: end)
-                                                      .chain(CurveTween(
-                                                          curve: curve));
-                                                  var offsetAnimation =
-                                                      animation.drive(tween);
-
-                                                  return SlideTransition(
-                                                    position: offsetAnimation,
-                                                    child: child,
-                                                  );
-                                                },
-                                              ),
-                                            );
-                                          },
-                                        )),
-                                        SizedBox(
-                                          width: 10,
-                                        ),
-                                        Expanded(
-                                            child: GestureDetector(
-                                          child: Container(
-                                            height: 65,
-                                            width: 20.w,
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                color: Colors.black12),
-                                            child: Column(
-                                              children: [
-                                                SizedBox(
-                                                  height: 5,
-                                                ),
-                                                Icon(
-                                                  Icons.bloodtype_outlined,
-                                                  color: Colors.red,
-                                                  size: 30,
-                                                ),
-                                                Text(
-                                                  'B',
-                                                  style: TextStyle(
-                                                      fontSize: 15.sp,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          onTap: () {
-                                            String blood = 'B';
-                                            Navigator.push(
-                                              context,
-                                              PageRouteBuilder(
-                                                pageBuilder: (context,
-                                                    animation,
-                                                    secondaryAnimation) {
-                                                  return BloodDonor(
-                                                      blood: blood);
-                                                },
-                                                transitionDuration:
-                                                    const Duration(seconds: 1),
-                                                transitionsBuilder: (context,
-                                                    animation,
-                                                    secondaryAnimation,
-                                                    child) {
-                                                  const begin = Offset(5.0,
-                                                      0.0); // slide in from the right
-                                                  const end = Offset.zero;
-                                                  const curve =
-                                                      Curves.easeInOutQuart;
-
-                                                  var tween = Tween(
-                                                          begin: begin,
-                                                          end: end)
-                                                      .chain(CurveTween(
-                                                          curve: curve));
-                                                  var offsetAnimation =
-                                                      animation.drive(tween);
-
-                                                  return SlideTransition(
-                                                    position: offsetAnimation,
-                                                    child: child,
-                                                  );
-                                                },
-                                              ),
-                                            );
-                                          },
-                                        )),
-                                        SizedBox(
-                                          width: 10,
-                                        ),
-                                        Expanded(
-                                            child: GestureDetector(
-                                          onTap: () {
-                                            String blood = 'A-';
-                                            Navigator.push(
-                                              context,
-                                              PageRouteBuilder(
-                                                pageBuilder: (context,
-                                                    animation,
-                                                    secondaryAnimation) {
-                                                  return BloodDonor(
-                                                    blood: blood,
-                                                  );
-                                                },
-                                                transitionDuration:
-                                                    const Duration(seconds: 1),
-                                                transitionsBuilder: (context,
-                                                    animation,
-                                                    secondaryAnimation,
-                                                    child) {
-                                                  const begin = Offset(5.0,
-                                                      0.0); // slide in from the right
-                                                  const end = Offset.zero;
-                                                  const curve =
-                                                      Curves.easeInOutQuart;
-
-                                                  var tween = Tween(
-                                                          begin: begin,
-                                                          end: end)
-                                                      .chain(CurveTween(
-                                                          curve: curve));
-                                                  var offsetAnimation =
-                                                      animation.drive(tween);
-
-                                                  return SlideTransition(
-                                                    position: offsetAnimation,
-                                                    child: child,
-                                                  );
-                                                },
-                                              ),
-                                            );
-                                          },
-                                          child: Container(
-                                            height: 65,
-                                            width: 25.w,
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                color: Colors.black12),
-                                            child: Column(
-                                              children: [
-                                                SizedBox(
-                                                  height: 5,
-                                                ),
-                                                Icon(
-                                                  Icons.bloodtype_outlined,
-                                                  color: Colors.red,
-                                                  size: 30,
-                                                ),
-                                                Text(
-                                                  'A-',
-                                                  style: TextStyle(
-                                                      fontSize: 15.sp,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ))
-                                      ],
+                                        );
+                                      },
                                     ),
-                                  ),
-                                  // Row(
-                                  //   children: [
-                                  // Padding(
-                                  //   padding: EdgeInsets.fromLTRB(
-                                  //       2.w, 1.h, 0, 0.h),
-                                  //   child: const Icon(
-                                  //     Icons.bloodtype_outlined,
-                                  //     color: Colors.red,
-                                  //     size: 30,
-                                  //   ),
-                                  // ),
-                                  //     Padding(
-                                  //       padding: EdgeInsets.fromLTRB(
-                                  //           6.w, 1.h, 0, 0.h),
-                                  //       child: const Icon(
-                                  //         Icons.bloodtype_outlined,
-                                  //         color: Colors.red,
-                                  //         size: 30,
-                                  //       ),
-                                  //     ),
-                                  //     Padding(
-                                  //       padding: EdgeInsets.fromLTRB(
-                                  //           6.w, 1.h, 0, 0.h),
-                                  //       child: const Icon(
-                                  //         Icons.bloodtype_outlined,
-                                  //         color: Colors.red,
-                                  //         size: 30,
-                                  //       ),
-                                  //     ),
-                                  //     Padding(
-                                  //       padding: EdgeInsets.fromLTRB(
-                                  //           6.w, 1.h, 0, 0.h),
-                                  //       child: const Icon(
-                                  //         Icons.bloodtype_outlined,
-                                  //         color: Colors.red,
-                                  //         size: 30,
-                                  //       ),
-                                  //     ),
-                                  //   ],
-                                  // ),
-                                  // Row(
-                                  //   children: [
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Expanded(
+                                        child: GestureDetector(
+                                      child: Container(
+                                        height: 65,
+                                        width: 20.w,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            border: Border.all(
+                                                color: Colors.black26)),
+                                        child: Column(
+                                          children: [
+                                            SizedBox(
+                                              height: 5,
+                                            ),
+                                            Container(
+                                              child: Image.asset(
+                                                  'images/SVGRepo_iconCarrier.png',
+                                                  height: 30),
+                                            ),
+                                            Text(
+                                              'AB',
+                                              style: TextStyle(
+                                                  fontSize: 15.sp,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      onTap: () {
+                                        String blood = 'AB';
+                                        Navigator.push(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation,
+                                                secondaryAnimation) {
+                                              return BloodDonor(blood: blood);
+                                            },
+                                            transitionDuration:
+                                                const Duration(seconds: 1),
+                                            transitionsBuilder: (context,
+                                                animation,
+                                                secondaryAnimation,
+                                                child) {
+                                              const begin = Offset(5.0,
+                                                  0.0); // slide in from the right
+                                              const end = Offset.zero;
+                                              const curve =
+                                                  Curves.easeInOutQuart;
 
-                                  //     Padding(
-                                  //       padding: EdgeInsets.fromLTRB(
-                                  //           9.w, 0.5.h, 0, 0),
-                                  //       child: Text(
-                                  //         'B+',
-                                  //         style: TextStyle(
-                                  //             fontSize: 15.sp,
-                                  //             fontWeight: FontWeight.bold),
-                                  //       ),
-                                  //     ),
-                                  //     Padding(
-                                  //       padding: EdgeInsets.fromLTRB(
-                                  //           7.w, 0.5.h, 0, 0),
-                                  //       child: Text(
-                                  //         'AB-',
-                                  //         style: TextStyle(
-                                  //             fontSize: 15.sp,
-                                  //             fontWeight: FontWeight.bold),
-                                  //       ),
-                                  //     ),
-                                  //     Padding(
-                                  //       padding: EdgeInsets.fromLTRB(
-                                  //           7.w, 0.5.h, 0, 0),
-                                  //       child: Text(
-                                  //         'A-',
-                                  //         style: TextStyle(
-                                  //             fontSize: 15.sp,
-                                  //             fontWeight: FontWeight.bold),
-                                  //       ),
-                                  //     ),
-                                  //   ],
-                                  // ),
-                                ],
-                              )),
-                        ),
-                      ),
+                                              var tween = Tween(
+                                                      begin: begin, end: end)
+                                                  .chain(
+                                                      CurveTween(curve: curve));
+                                              var offsetAnimation =
+                                                  animation.drive(tween);
+
+                                              return SlideTransition(
+                                                position: offsetAnimation,
+                                                child: child,
+                                              );
+                                            },
+                                          ),
+                                        );
+                                      },
+                                    )),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Expanded(
+                                        child: GestureDetector(
+                                      child: Container(
+                                        height: 65,
+                                        width: 20.w,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            border: Border.all(
+                                                color: Colors.black26)),
+                                        child: Column(
+                                          children: [
+                                            SizedBox(
+                                              height: 5,
+                                            ),
+                                            Container(
+                                              child: Image.asset(
+                                                  'images/SVGRepo_iconCarrier.png',
+                                                  height: 30),
+                                            ),
+                                            Text(
+                                              'B',
+                                              style: TextStyle(
+                                                  fontSize: 15.sp,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      onTap: () {
+                                        String blood = 'B';
+                                        Navigator.push(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation,
+                                                secondaryAnimation) {
+                                              return BloodDonor(blood: blood);
+                                            },
+                                            transitionDuration:
+                                                const Duration(seconds: 1),
+                                            transitionsBuilder: (context,
+                                                animation,
+                                                secondaryAnimation,
+                                                child) {
+                                              const begin = Offset(5.0,
+                                                  0.0); // slide in from the right
+                                              const end = Offset.zero;
+                                              const curve =
+                                                  Curves.easeInOutQuart;
+
+                                              var tween = Tween(
+                                                      begin: begin, end: end)
+                                                  .chain(
+                                                      CurveTween(curve: curve));
+                                              var offsetAnimation =
+                                                  animation.drive(tween);
+
+                                              return SlideTransition(
+                                                position: offsetAnimation,
+                                                child: child,
+                                              );
+                                            },
+                                          ),
+                                        );
+                                      },
+                                    )),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Expanded(
+                                        child: GestureDetector(
+                                      onTap: () {
+                                        String blood = 'A-';
+                                        Navigator.push(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation,
+                                                secondaryAnimation) {
+                                              return BloodDonor(
+                                                blood: blood,
+                                              );
+                                            },
+                                            transitionDuration:
+                                                const Duration(seconds: 1),
+                                            transitionsBuilder: (context,
+                                                animation,
+                                                secondaryAnimation,
+                                                child) {
+                                              const begin = Offset(5.0,
+                                                  0.0); // slide in from the right
+                                              const end = Offset.zero;
+                                              const curve =
+                                                  Curves.easeInOutQuart;
+
+                                              var tween = Tween(
+                                                      begin: begin, end: end)
+                                                  .chain(
+                                                      CurveTween(curve: curve));
+                                              var offsetAnimation =
+                                                  animation.drive(tween);
+
+                                              return SlideTransition(
+                                                position: offsetAnimation,
+                                                child: child,
+                                              );
+                                            },
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        height: 65,
+                                        width: 25.w,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          border:
+                                              Border.all(color: Colors.black26),
+                                        ),
+                                        child: Column(
+                                          children: [
+                                            SizedBox(
+                                              height: 5,
+                                            ),
+                                            Container(
+                                              child: Image.asset(
+                                                  'images/SVGRepo_iconCarrier.png',
+                                                  height: 30),
+                                            ),
+                                            Text(
+                                              'A-',
+                                              style: TextStyle(
+                                                  fontSize: 15.sp,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ))
+                                  ],
+                                ),
+                              ),
+                            ],
+                          )),
 
                     Row(
                       children: [
@@ -1190,225 +1043,668 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
 
-                    GestureDetector(
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(5.w, 0.h, 5.w, 0),
-                        child: Material(
-                          elevation: 5,
-                          shadowColor: Colors.grey,
-                          borderRadius: BorderRadius.circular(12),
-                          child: Container(
-                              height: 25.h,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: const Color(0xFFDE0A1E),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Stack(
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.fromLTRB(
-                                        0.w, 0.h, 64.w, 10.h),
-                                    child: Center(
-                                      child: CircleAvatar(
-                                        radius: 33,
-                                        backgroundImage: image != 'null' &&
-                                                image.isNotEmpty
-                                            ? NetworkImage(image)
-                                            : NetworkImage(
-                                                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnj2TWYskM8Or0ykoHKfKbf8YulsCWgTptlp1XdTjexw&s'),
-                                        // Fit the image within the CircleAvatar
-                                        backgroundColor: Colors.black54,
-                                        foregroundColor: Colors.transparent,
+                    // GestureDetector(
+                    //   child: Padding(
+                    //     padding: EdgeInsets.fromLTRB(5.w, 0.h, 5.w, 0),
+                    //     child: Material(
+                    //       elevation: 5,
+                    //       shadowColor: Colors.grey,
+                    //       borderRadius: BorderRadius.circular(12),
+                    //       child: Container(
+                    //           height: 25.h,
+                    //           decoration: BoxDecoration(
+                    //             borderRadius: BorderRadius.circular(12),
+                    //             border: Border.all(
+                    //               color: const Color(0xFFDE0A1E),
+                    //               width: 1,
+                    //             ),
+                    //           ),
+                    //           child: Stack(
+                    //             children: [
+                    //               Padding(
+                    //                 padding: EdgeInsets.fromLTRB(
+                    //                     0.w, 0.h, 64.w, 10.h),
+                    //                 child: Center(
+                    //                   child: CircleAvatar(
+                    //                     radius: 33,
+                    //                     backgroundImage: image != 'null' &&
+                    //                             image.isNotEmpty
+                    //                         ? NetworkImage(image)
+                    //                         : NetworkImage(
+                    //                             'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnj2TWYskM8Or0ykoHKfKbf8YulsCWgTptlp1XdTjexw&s'),
+                    //                     // Fit the image within the CircleAvatar
+                    //                     backgroundColor: Colors.black54,
+                    //                     foregroundColor: Colors.transparent,
 
-                                        // Set the BoxFit to cover the entire CircleAvatar
-                                      ),
-                                    ),
-                                  ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.fromLTRB(
-                                            25.w, 1.5.h, 0, 0),
-                                        child: Text(
-                                          name,
-                                          style: TextStyle(
-                                              fontSize: 13.sp,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.fromLTRB(
-                                            25.w, 1.h, 0, 0),
-                                        child: Text(
-                                          hospitaln,
-                                          style: TextStyle(
-                                              fontSize: 12.sp,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black54),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.fromLTRB(
-                                            25.w, 1.h, 3.w, 0),
-                                        child: Text(
-                                          location,
-                                          style: TextStyle(
-                                              fontSize: 12.sp,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black54),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.fromLTRB(65.w, 1.h, 0, 12.h),
-                                    child: const Icon(
-                                      Icons.bloodtype_outlined,
-                                      color: Colors.red,
-                                      size: 30,
-                                    ),
-                                  ),
-                                  Padding(
-                                      padding: EdgeInsets.fromLTRB(
-                                          75.w, 1.5.h, 0, 12.h),
-                                      child: Text(
-                                        blood,
-                                        style: TextStyle(
-                                            fontSize: 15.sp,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black45),
-                                      )),
-                                  Padding(
-                                      padding: EdgeInsets.fromLTRB(
-                                          25.w, 15.h, 0, 0.h),
-                                      child: Text(
-                                        'Time: $time, $date',
-                                        style: TextStyle(
-                                            fontSize: 11.sp,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black45),
-                                      )),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.fromLTRB(5.w, 17.h, 5.w, 0),
-                                    // ignore: prefer_const_constructors
-                                    child: Divider(
-                                      color: Colors.black26,
-                                      thickness: 2,
-                                      height: 5,
-                                    ),
-                                  ),
-                                  Row(
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.fromLTRB(
-                                            10.w, 18.h, 0, 1.h),
-                                        child: TextButton(
-                                          // ignore: prefer_const_constructors
-                                          child: Text(
-                                            'Decline',
-                                            style: TextStyle(
-                                                fontSize: 14.sp,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black45),
-                                          ),
-                                          onPressed: () {},
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.fromLTRB(
-                                            9.w, 18.h, 0.w, 9.8),
-                                        // ignore: prefer_const_constructors
-                                        child: VerticalDivider(
-                                          color: Colors.black54,
-                                          thickness: 2,
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.fromLTRB(
-                                            5.w, 18.h, 0, 1.h),
-                                        child: TextButton(
-                                          // ignore: prefer_const_constructors
-                                          child: Text(
-                                            'Donate Now',
-                                            style: TextStyle(
-                                                fontSize: 14.sp,
-                                                fontWeight: FontWeight.bold,
-                                                color: const Color(0xFFDE0A1E)),
-                                          ),
-                                          onPressed: () {
-                                            if (userType == 'donor') {
-                                              Navigator.push(
-                                                context,
-                                                PageRouteBuilder(
-                                                  pageBuilder: (context,
-                                                      animation,
-                                                      secondaryAnimation) {
-                                                    return DonateNow(
-                                                        name: name,
-                                                        image: image,
-                                                        blood: blood,
-                                                        email: email,
-                                                        hospital: hospitaln,
-                                                        location: location,
-                                                        date: date,
-                                                        time: time,
-                                                        rating: rating,
-                                                        note: note,
-                                                        id: id);
-                                                  },
-                                                  transitionDuration:
-                                                      const Duration(
-                                                          seconds: 1),
-                                                  transitionsBuilder: (context,
-                                                      animation,
-                                                      secondaryAnimation,
-                                                      child) {
-                                                    const begin = Offset(10.0,
-                                                        0.0); // slide in from the right
-                                                    const end = Offset.zero;
-                                                    const curve =
-                                                        Curves.easeInOutQuart;
+                    //                     // Set the BoxFit to cover the entire CircleAvatar
+                    //                   ),
+                    //                 ),
+                    //               ),
+                    //               Column(
+                    //                 crossAxisAlignment:
+                    //                     CrossAxisAlignment.start,
+                    //                 children: [
+                    //                   Padding(
+                    //                     padding: EdgeInsets.fromLTRB(
+                    //                         25.w, 1.5.h, 0, 0),
+                    //                     child: Text(
+                    //                       name,
+                    //                       style: TextStyle(
+                    //                           fontSize: 13.sp,
+                    //                           fontWeight: FontWeight.bold),
+                    //                     ),
+                    //                   ),
+                    //                   Padding(
+                    //                     padding: EdgeInsets.fromLTRB(
+                    //                         25.w, 1.h, 0, 0),
+                    //                     child: Text(
+                    //                       hospitaln,
+                    //                       style: TextStyle(
+                    //                           fontSize: 12.sp,
+                    //                           fontWeight: FontWeight.bold,
+                    //                           color: Colors.black54),
+                    //                     ),
+                    //                   ),
+                    //                   Padding(
+                    //                     padding: EdgeInsets.fromLTRB(
+                    //                         25.w, 1.h, 3.w, 0),
+                    //                     child: Text(
+                    //                       location,
+                    //                       style: TextStyle(
+                    //                           fontSize: 12.sp,
+                    //                           fontWeight: FontWeight.bold,
+                    //                           color: Colors.black54),
+                    //                     ),
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //               Padding(
+                    //                 padding:
+                    //                     EdgeInsets.fromLTRB(65.w, 1.h, 0, 12.h),
+                    //                 child: const Icon(
+                    //                   Icons.bloodtype_outlined,
+                    //                   color: Colors.red,
+                    //                   size: 30,
+                    //                 ),
+                    //               ),
+                    //               Padding(
+                    //                   padding: EdgeInsets.fromLTRB(
+                    //                       75.w, 1.5.h, 0, 12.h),
+                    //                   child: Text(
+                    //                     blood,
+                    //                     style: TextStyle(
+                    //                         fontSize: 15.sp,
+                    //                         fontWeight: FontWeight.bold,
+                    //                         color: Colors.black45),
+                    //                   )),
+                    //               Padding(
+                    //                   padding: EdgeInsets.fromLTRB(
+                    //                       25.w, 15.h, 0, 0.h),
+                    //                   child: Text(
+                    //                     'Time: $time, $date',
+                    //                     style: TextStyle(
+                    //                         fontSize: 11.sp,
+                    //                         fontWeight: FontWeight.bold,
+                    //                         color: Colors.black45),
+                    //                   )),
+                    //               Padding(
+                    //                 padding:
+                    //                     EdgeInsets.fromLTRB(5.w, 17.h, 5.w, 0),
+                    //                 // ignore: prefer_const_constructors
+                    //                 child: Divider(
+                    //                   color: Colors.black26,
+                    //                   thickness: 2,
+                    //                   height: 5,
+                    //                 ),
+                    //               ),
+                    //               Row(
+                    //                 children: [
+                    //                   Padding(
+                    //                     padding: EdgeInsets.fromLTRB(
+                    //                         10.w, 18.h, 0, 1.h),
+                    //                     child: TextButton(
+                    //                       // ignore: prefer_const_constructors
+                    //                       child: Text(
+                    //                         'Decline',
+                    //                         style: TextStyle(
+                    //                             fontSize: 14.sp,
+                    //                             fontWeight: FontWeight.bold,
+                    //                             color: Colors.black45),
+                    //                       ),
+                    //                       onPressed: () {},
+                    //                     ),
+                    //                   ),
+                    //                   Padding(
+                    //                     padding: EdgeInsets.fromLTRB(
+                    //                         9.w, 18.h, 0.w, 9.8),
+                    //                     // ignore: prefer_const_constructors
+                    //                     child: VerticalDivider(
+                    //                       color: Colors.black54,
+                    //                       thickness: 2,
+                    //                     ),
+                    //                   ),
+                    //                   Padding(
+                    //                     padding: EdgeInsets.fromLTRB(
+                    //                         5.w, 18.h, 0, 1.h),
+                    //                     child: TextButton(
+                    //                       // ignore: prefer_const_constructors
+                    //                       child: Text(
+                    //                         'Donate Now',
+                    //                         style: TextStyle(
+                    //                             fontSize: 14.sp,
+                    //                             fontWeight: FontWeight.bold,
+                    //                             color: const Color(0xFFDE0A1E)),
+                    //                       ),
+                    //                       onPressed: () {
+                    //                         if (userType == 'donor') {
+                    //                           Navigator.push(
+                    //                             context,
+                    //                             PageRouteBuilder(
+                    //                               pageBuilder: (context,
+                    //                                   animation,
+                    //                                   secondaryAnimation) {
+                    //                                 return DonateNow(
+                    //                                     name: name,
+                    //                                     image: image,
+                    //                                     blood: blood,
+                    //                                     email: email,
+                    //                                     hospital: hospitaln,
+                    //                                     location: location,
+                    //                                     date: date,
+                    //                                     time: time,
+                    //                                     rating: rating,
+                    //                                     note: note,
+                    //                                     id: id);
+                    //                               },
+                    //                               transitionDuration:
+                    //                                   const Duration(
+                    //                                       seconds: 1),
+                    //                               transitionsBuilder: (context,
+                    //                                   animation,
+                    //                                   secondaryAnimation,
+                    //                                   child) {
+                    //                                 const begin = Offset(10.0,
+                    //                                     0.0); // slide in from the right
+                    //                                 const end = Offset.zero;
+                    //                                 const curve =
+                    //                                     Curves.easeInOutQuart;
 
-                                                    var tween = Tween(
-                                                            begin: begin,
-                                                            end: end)
-                                                        .chain(CurveTween(
-                                                            curve: curve));
-                                                    var offsetAnimation =
-                                                        animation.drive(tween);
+                    //                                 var tween = Tween(
+                    //                                         begin: begin,
+                    //                                         end: end)
+                    //                                     .chain(CurveTween(
+                    //                                         curve: curve));
+                    //                                 var offsetAnimation =
+                    //                                     animation.drive(tween);
 
-                                                    return SlideTransition(
-                                                      position: offsetAnimation,
-                                                      child: child,
-                                                    );
-                                                  },
-                                                ),
-                                              );
-                                            } else {
-                                              EasyLoading.showError(
-                                                  'Taker is doesnot to donate any blood');
-                                            }
-                                          },
-                                        ),
-                                      )
-                                    ],
-                                  )
-                                ],
-                              )),
+                    //                                 return SlideTransition(
+                    //                                   position: offsetAnimation,
+                    //                                   child: child,
+                    //                                 );
+                    //                               },
+                    //                             ),
+                    //                           );
+                    //                         } else {
+                    //                           EasyLoading.showError(
+                    //                               'Taker is doesnot to donate any blood');
+                    //                         }
+                    //                       },
+                    //                     ),
+                    //                   )
+                    //                 ],
+                    //               )
+                    //             ],
+                    //           )),
+                    //     ),
+                    //   ),
+                    //   onTap: () {
+                    //     // ignore: avoid_print
+                    //     print('Nomi1');
+                    //   },
+                    // ),
+                    // SizedBox(
+                    //   height: 10,
+                    // ),
+
+                    if (isLoading)
+                      Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Container(
+                          height: 168,
+                          margin: EdgeInsets.symmetric(
+                              vertical: 0, horizontal: 5.w),
+                          decoration: ShapeDecoration(
+                            color: Colors.grey[300],
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
                         ),
                       ),
-                      onTap: () {
-                        // ignore: avoid_print
-                        print('Nomi1');
-                      },
-                    ),
+                    if (isLoading == false)
+                      Container(
+                        margin: EdgeInsets.fromLTRB(0.w, 0.w, 0.w, 0),
+                        child: Column(
+                          children: [
+                            Container(
+                              height: 168,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 13, vertical: 12),
+                              clipBehavior: Clip.antiAlias,
+                              decoration: ShapeDecoration(
+                                shape: RoundedRectangleBorder(
+                                  side: BorderSide(
+                                      width: 2, color: Color(0xFFDDDDDD)),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          width: 70,
+                                          height: 70,
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(40),
+                                            child: CachedNetworkImage(
+                                              fit: BoxFit.cover,
+                                              imageUrl: image.isNotEmpty
+                                                  ? image
+                                                  : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
+                                              placeholder: (context, url) =>
+                                                  const CupertinoActivityIndicator(
+                                                color: Colors.white,
+                                              ),
+                                              errorWidget:
+                                                  (context, url, error) =>
+                                                      Icon(Icons.error),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 5),
+                                        Container(
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    name,
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 18,
+                                                      fontFamily: 'Montserrat',
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      height: 0,
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 10,
+                                                  ),
+                                                  Container(
+                                                    margin: EdgeInsets.only(
+                                                        left: 15.w),
+                                                    child: CustomPaint(
+                                                      size: Size(40, 30),
+                                                      painter: BloodDropPainter(
+                                                          blood: blood),
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                              const SizedBox(height: 12),
+                                              Container(
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Container(
+                                                      width: 220,
+                                                      child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            'Hospital :',
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xFF5A5A5A),
+                                                              fontSize: 12,
+                                                              fontFamily:
+                                                                  'Montserrat',
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              height: 0.13,
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              width: 5),
+                                                          Expanded(
+                                                            child: SizedBox(
+                                                              child: Text(
+                                                                hospitaln,
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Color(
+                                                                      0xFF5A5A5A),
+                                                                  fontSize: 13,
+                                                                  fontFamily:
+                                                                      'Montserrat',
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  height: 0.13,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 15),
+                                                    Container(
+                                                      child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            'Location :',
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xFF5A5A5A),
+                                                              fontSize: 12,
+                                                              fontFamily:
+                                                                  'Montserrat',
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              height: 0.13,
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              width: 5),
+                                                          Text(
+                                                            location,
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xFF5A5A5A),
+                                                              fontSize: 13,
+                                                              fontFamily:
+                                                                  'Montserrat',
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              height: 0.13,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 15),
+                                                    Container(
+                                                      child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            'Date :',
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xFF5A5A5A),
+                                                              fontSize: 12,
+                                                              fontFamily:
+                                                                  'Montserrat',
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              height: 0.13,
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              width: 5),
+                                                          Text(
+                                                            date,
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xFF5A5A5A),
+                                                              fontSize: 13,
+                                                              fontFamily:
+                                                                  'Montserrat',
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              height: 0.13,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 15),
+                                                    Container(
+                                                      child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            'Time :',
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xFF5A5A5A),
+                                                              fontSize: 12,
+                                                              fontFamily:
+                                                                  'Montserrat',
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              height: 0.13,
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              width: 5),
+                                                          Text(
+                                                            time,
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xFF5A5A5A),
+                                                              fontSize: 13,
+                                                              fontFamily:
+                                                                  'Montserrat',
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              height: 0.13,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              const SizedBox(height: 15),
+                                              Row(
+                                                children: [
+                                                  InkWell(
+                                                    onTap: () {},
+                                                    child: Container(
+                                                      height: 30,
+                                                      width: 90,
+                                                      alignment:
+                                                          Alignment.center,
+                                                      decoration: BoxDecoration(
+                                                        color: PRIMARY_COLOR,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(5),
+                                                        border: Border.all(
+                                                          color: Colors.red,
+                                                          width: 1.0,
+                                                        ),
+                                                      ),
+                                                      child: Text(
+                                                        'Decline',
+                                                        style: TextStyle(
+                                                            fontSize: 14,
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 10,
+                                                  ),
+                                                  InkWell(
+                                                    onTap: () {
+                                                      if (userType == 'donor') {
+                                                        Navigator.push(
+                                                          context,
+                                                          PageRouteBuilder(
+                                                            pageBuilder: (context,
+                                                                animation,
+                                                                secondaryAnimation) {
+                                                              return DonateNow(
+                                                                  name: name,
+                                                                  image: image,
+                                                                  blood: blood,
+                                                                  email: email,
+                                                                  hospital:
+                                                                      hospitaln,
+                                                                  location:
+                                                                      location,
+                                                                  date: date,
+                                                                  time: time,
+                                                                  rating:
+                                                                      rating,
+                                                                  note: note,
+                                                                  id: id);
+                                                            },
+                                                            transitionDuration:
+                                                                const Duration(
+                                                                    seconds: 1),
+                                                            transitionsBuilder:
+                                                                (context,
+                                                                    animation,
+                                                                    secondaryAnimation,
+                                                                    child) {
+                                                              const begin = Offset(
+                                                                  10.0,
+                                                                  0.0); // slide in from the right
+                                                              const end =
+                                                                  Offset.zero;
+                                                              const curve = Curves
+                                                                  .easeInOutQuart;
+
+                                                              var tween = Tween(
+                                                                      begin:
+                                                                          begin,
+                                                                      end: end)
+                                                                  .chain(CurveTween(
+                                                                      curve:
+                                                                          curve));
+                                                              var offsetAnimation =
+                                                                  animation
+                                                                      .drive(
+                                                                          tween);
+
+                                                              return SlideTransition(
+                                                                position:
+                                                                    offsetAnimation,
+                                                                child: child,
+                                                              );
+                                                            },
+                                                          ),
+                                                        );
+                                                      } else {
+                                                        EasyLoading.showError(
+                                                            'Taker is doesnot to donate any blood');
+                                                      }
+                                                    },
+                                                    child: Container(
+                                                      height: 30,
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 15),
+                                                      alignment:
+                                                          Alignment.center,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(5),
+                                                        border: Border.all(
+                                                          color: Colors.red,
+                                                          width: 1.0,
+                                                        ),
+                                                      ),
+                                                      child: Text(
+                                                        'Donate Now',
+                                                        style: TextStyle(
+                                                            fontSize: 14,
+                                                            color:
+                                                                Colors.black87),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
                     SizedBox(
                       height: 10,
                     ),
@@ -2313,6 +2609,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Future.delayed(Duration(seconds: 2), () async {
       // showPath(requestbloc);
     });
+    await updateStatus(true);
   }
 
 //  Future<void> getAcceptDonation() async {
@@ -2354,4 +2651,68 @@ class _HomeScreenState extends State<HomeScreen> {
 //     print('Error: $e');
 //   }
 // }
+
+  Future<void> updateStatus(bool isActive) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String userEmail = prefs.getString('user_email') ?? '';
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: userEmail)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        String userId = querySnapshot.docs.first.id;
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .update({'status': isActive});
+        log("My Statis is $isActive");
+      }
+    } catch (e) {
+      print('Error updating status: $e');
+    }
+  }
+}
+
+class BloodDropPainter extends CustomPainter {
+  final String blood;
+
+  BloodDropPainter({required this.blood});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    Paint paint = Paint()
+      ..color = PRIMARY_COLOR
+      ..style = PaintingStyle.fill;
+
+    Path path = Path();
+    path.moveTo(size.width / 2, 0);
+    path.quadraticBezierTo(
+        size.width, size.height * 0.25, size.width / 2, size.height);
+    path.quadraticBezierTo(0, size.height * 0.25, size.width / 2, 0);
+
+    canvas.drawPath(path, paint);
+
+    // Adding text inside the blood drop
+    TextSpan span = new TextSpan(
+      style: new TextStyle(
+          color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+      text: blood,
+    );
+    TextPainter tp = new TextPainter(
+        text: span,
+        textAlign: TextAlign.center,
+        textDirection: TextDirection.ltr);
+    tp.layout();
+    tp.paint(
+        canvas,
+        new Offset(
+            size.width / 2 - tp.width / 2, size.height / 2 - tp.height / 2));
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return oldDelegate != this;
+  }
 }

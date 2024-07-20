@@ -1,5 +1,7 @@
 // ignore_for_file: file_names
 
+import 'dart:developer';
+
 import 'package:blood_donor/Provider/Profile.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Profile%20Screens/DonorCard.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Profile%20Screens/EditProfile.dart';
@@ -7,7 +9,9 @@ import 'package:blood_donor/Screens/Main%20Screen/Profile%20Screens/History.dart
 import 'package:blood_donor/Screens/Main%20Screen/Profile%20Screens/ManageAddress.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Profile%20Screens/PaymentInfo.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Profile%20Screens/RewardPoints.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,8 +25,9 @@ class AccountScreen extends StatefulWidget {
   State<AccountScreen> createState() => _AccountScreenState();
 }
 
-class _AccountScreenState extends State<AccountScreen> {
-  bool isSwitched = true;
+class _AccountScreenState extends State<AccountScreen>
+    with WidgetsBindingObserver {
+  bool? isSwitched;
   String fullname = '';
   String firstname = '';
   String lastname = '';
@@ -32,15 +37,44 @@ class _AccountScreenState extends State<AccountScreen> {
   String nammm = '';
   String id = '';
   bool active = true;
+  bool useractive = false;
+  bool availabledonor = false;
   String location = '';
+  bool checkboxslider = false;
   @override
   void initState() {
     super.initState();
-    getUserDataByEmail();
+    WidgetsBinding.instance.addObserver(this);
+    getuserData();
+    isSwitched = availabledonor;
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  getuserData() async {
+    await Future.delayed(Duration(milliseconds: 500));
+    await getUserDataByEmail();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
+      updateStatus(false);
+    } else if (state == AppLifecycleState.resumed) {
+      updateStatus(true);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final profileBloc = Provider.of<Profile>(context, listen: false);
+
     return Sizer(
       builder: (context, oreintation, deviceType) {
         return MaterialApp(
@@ -54,22 +88,26 @@ class _AccountScreenState extends State<AccountScreen> {
                   width: 100.w,
                   child: Stack(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                        child: Center(
-                          child: Consumer<Profile>(
-                            builder: (context, value, child) {
-                              // ignore: unnecessary_null_comparison
-                              if (picture != null && picture.isNotEmpty) {
-                                return CircleAvatar(
-                                    radius: 45,
-                                    backgroundImage: NetworkImage('$picture'));
-                              } else {
-                                return Container();
-                              }
-                            },
-                          ),
-                        ),
+                      Align(
+                        child: Container(
+                            height: 90,
+                            width: 90,
+                            decoration: BoxDecoration(
+                                color: Colors.grey,
+                                borderRadius: BorderRadius.circular(10)),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: CachedNetworkImage(
+                                fit: BoxFit.cover,
+                                imageUrl: picture,
+                                placeholder: (context, url) =>
+                                    const CupertinoActivityIndicator(
+                                  color: Colors.white,
+                                ),
+                                errorWidget: (context, url, error) =>
+                                    Icon(Icons.error),
+                              ),
+                            )),
                       ),
                       Row(
                         children: [
@@ -84,18 +122,19 @@ class _AccountScreenState extends State<AccountScreen> {
                                       color: Colors.white),
                                 ),
                               )),
-                          if (fullname.isNotEmpty)
+                          if (useractive)
                             Padding(
-                              padding: EdgeInsets.fromLTRB(2.w, 15.h, 0, 0),
-                              child: Container(
-                                width: 10.0,
-                                height: 10.0,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: active ? Colors.green : Colors.white,
-                                ),
-                              ),
-                            ),
+                                padding: EdgeInsets.fromLTRB(2.w, 15.h, 0, 0),
+                                child: Container(
+                                  width: 10.0,
+                                  height: 10.0,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: useractive
+                                        ? Colors.green
+                                        : Colors.white,
+                                  ),
+                                )),
                         ],
                       ),
                       if (phonenumber.isNotEmpty)
@@ -238,6 +277,8 @@ class _AccountScreenState extends State<AccountScreen> {
                   ),
                 ),
               ),
+//
+
               Row(
                 children: [
                   Padding(
@@ -249,31 +290,33 @@ class _AccountScreenState extends State<AccountScreen> {
                     ),
                   ),
                   Padding(
-                      padding: EdgeInsets.fromLTRB(5.w, 46.5.h, 0, 0.h),
-                      child: Text(
-                        'Available To Donate',
-                        style: TextStyle(
-                            fontSize: 13.sp,
-                            color: Colors.black54,
-                            fontWeight: FontWeight.bold),
-                      )),
+                    padding: EdgeInsets.fromLTRB(5.w, 46.5.h, 0, 0.h),
+                    child: Text(
+                      'Available To Donate',
+                      style: TextStyle(
+                        fontSize: 13.sp,
+                        color: Colors.black54,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  Spacer(),
                   Padding(
-                    padding: EdgeInsets.fromLTRB(18.w, 46.5.h, 0, 0.h),
+                    padding: EdgeInsets.fromLTRB(0.w, 46.5.h, 5.w, 0.h),
                     child: SlidingSwitch(
                       width: 20.w,
                       height: 4.h,
-                      value: isSwitched,
+                      value: isSwitched!,
                       onChanged: (value) {
                         setState(() {
                           isSwitched = value;
-                          active = isSwitched;
+                          updateStatusAvailble(isSwitched!);
                         });
                       },
                       animationDuration: const Duration(milliseconds: 400),
                       onTap: () {},
                       onDoubleTap: () {},
                       onSwipe: () {},
-
                       textOff: "off",
                       textOn: "on",
                       iconOff: Icons.offline_bolt,
@@ -281,13 +324,11 @@ class _AccountScreenState extends State<AccountScreen> {
                       contentSize: 14,
                       colorOn: Colors.red,
                       colorOff: const Color(0xff6682c0),
-                      // background: const Color(0xffe4e5eb),
-                      // buttonColor: const Color(0xfff7f5f7),
-                      // inactiveColor: const Color(0xff636f7b),
                     ),
                   ),
                 ],
               ),
+
               Padding(
                 padding: EdgeInsets.fromLTRB(0, 11.h, 0, 0),
                 child: Row(
@@ -595,20 +636,6 @@ class _AccountScreenState extends State<AccountScreen> {
     );
   }
 
-  // void _updateAvailability(bool availability) async {
-  //   try {
-  //     SharedPreferences prefs = await SharedPreferences.getInstance();
-  //     String userEmail = prefs.getString('user_email') ?? '';
-  //     print(userEmail);
-  //     await FirebaseFirestore.instance
-  //         .collection('users')
-  //         .doc(userEmail)
-  //         .update({'availableToDonate': availability});
-  //   } catch (e) {
-  //     print('Error updating availability: $e');
-  //   }
-  // }
-
   Future<void> getUserDataByEmail() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -630,6 +657,8 @@ class _AccountScreenState extends State<AccountScreen> {
         String blood1 = userDoc['bloodgroup'];
         String loc = userDoc['location'];
         String idd = userDoc['id'];
+        bool act = userDoc['status'];
+        bool av = userDoc['availabledonate'];
 
         setState(() {
           fullname = name + " $name1";
@@ -640,6 +669,9 @@ class _AccountScreenState extends State<AccountScreen> {
           picture = image1;
           location = loc;
           id = idd;
+          useractive = act;
+
+          availabledonor = av;
         });
 
         // await displayImage(image);
@@ -656,26 +688,47 @@ class _AccountScreenState extends State<AccountScreen> {
     }
   }
 
-  // Future<void> displayImage(String imagePath) async {
-  //   try {
-  //     // Get a reference to the image file
-  //     firebase_storage.Reference ref =
-  //         firebase_storage.FirebaseStorage.instance.ref().child(imagePath);
+  Future<void> updateStatus(bool isActive) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String userEmail = prefs.getString('user_email') ?? '';
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: userEmail)
+          .get();
 
-  //     // Get the download URL
-  //     String imageUrl = await ref.getDownloadURL();
+      if (querySnapshot.docs.isNotEmpty) {
+        String userId = querySnapshot.docs.first.id;
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .update({'status': isActive});
+        log("My Statis is $isActive");
+      }
+    } catch (e) {
+      print('Error updating status: $e');
+    }
+  }
 
-  //     // Now, you can use the imageUrl to display the image in your UI
-  //     // For example, if you're using an Image widget:
-  //     // Image.network(imageUrl);
-  //     setState(() {
-  //       picture = imageUrl;
-  //     });
+  Future<void> updateStatusAvailble(bool isActive) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String userEmail = prefs.getString('user_email') ?? '';
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: userEmail)
+          .get();
 
-  //     // If you're using a different method to display the image, replace the above line accordingly
-  //     print(imageUrl);
-  //   } catch (e) {
-  //     print('Error fetching and displaying image: $e');
-  //   }
-  // }
+      if (querySnapshot.docs.isNotEmpty) {
+        String userId = querySnapshot.docs.first.id;
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .update({'availabledonate': isActive});
+        log("My Statis is $isActive");
+      }
+    } catch (e) {
+      print('Error updating status: $e');
+    }
+  }
 }

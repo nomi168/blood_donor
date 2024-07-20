@@ -98,6 +98,7 @@ dependencies:
   cached_network_image: ^3.3.0
   syncfusion_flutter_pdfviewer: any
   change_app_package_name: ^1.2.0
+  validators: ^3.0.0
   
  
 
@@ -160,6 +161,7 @@ flutter:
    - images/applogo.jpeg
    - images/bloodsplash.png
    - images/images (1).png
+   - images/SVGRepo_iconCarrier.png
    - images/Banners/Banner1.png
    - images/Banners/Banner2.png
    - images/Banners/Login.svg

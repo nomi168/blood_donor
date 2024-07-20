@@ -24,6 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController _password = TextEditingController();
   bool showCircularProgressIndicator = false;
   final LocalAuthentication auth = LocalAuthentication();
+  bool _isFingerprintAuthenticated = false;
 
   String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
@@ -45,6 +46,58 @@ class _LoginScreenState extends State<LoginScreen> {
       return 'Password must contain at least one number and one special character';
     }
     return null;
+  }
+
+  bool? _hasBioSensorr;
+  LocalAuthentication authentication = LocalAuthentication();
+  Future<void> _checkBio() async {
+    try {
+      _hasBioSensorr = await authentication.canCheckBiometrics;
+      print(_hasBioSensorr);
+      if (_hasBioSensorr!) {
+        _getAuth();
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> _getAuth() async {
+    bool isAuth = false;
+    try {
+      isAuth = await authentication.authenticate(
+        localizedReason: 'Scan your fingerprint',
+        options: const AuthenticationOptions(
+          stickyAuth: true,
+          biometricOnly: true,
+          useErrorDialogs: true,
+        ),
+      );
+      if (isAuth) {
+        setState(() async {
+          _isFingerprintAuthenticated = true;
+          if (_isFingerprintAuthenticated) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => Dashboard()),
+              (Route<dynamic> route) => false, // Remove all existing routes
+            );
+            /* Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => mainpage(navigateFrom: "")),
+          ); */
+          } else {}
+        });
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // _checkBio();
   }
 
   @override
@@ -231,6 +284,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
+
                   // Padding(
                   //   padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
                   //   child: Material(

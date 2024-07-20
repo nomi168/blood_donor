@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:async/async.dart';
@@ -37,7 +38,7 @@ class ChatScree1 extends StatefulWidget {
   State<ChatScree1> createState() => _ChatScree1State();
 }
 
-class _ChatScree1State extends State<ChatScree1> {
+class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
   final TextEditingController _controller = TextEditingController();
   final User? user = FirebaseAuth.instance.currentUser;
   String userType = '';
@@ -49,6 +50,7 @@ class _ChatScree1State extends State<ChatScree1> {
   List<dynamic> receiverIds = [];
   List<dynamic> senderrIds = [];
   int unique_id = 0;
+  bool useractive = false;
 
   final ImagePicker _picker = ImagePicker();
   final FocusNode nosw = FocusNode();
@@ -57,6 +59,8 @@ class _ChatScree1State extends State<ChatScree1> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    // updateStatus(true);
     getUserDataByEmail();
     FirebaseMessaging.instance.requestPermission();
 
@@ -69,11 +73,31 @@ class _ChatScree1State extends State<ChatScree1> {
     });
     getMessages();
     getmessageid();
+
+    // getonline();
+  }
+
+  getonline() async {
+    await getOnlineOffline();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
+      log("My State is $state");
+      updateStatus(false);
+    } else if (state == AppLifecycleState.resumed) {
+      log("My State is $state");
+      updateStatus(true);
+    }
   }
 
   void _handleNotificationData(Map<String, dynamic> data) async {
@@ -149,15 +173,40 @@ class _ChatScree1State extends State<ChatScree1> {
                     ),
                   ),
                 ),
-              Padding(
-                  padding: EdgeInsets.fromLTRB(4.w, 0, 0, 0),
-                  child: Text(
-                    widget.name,
-                    style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black54),
-                  ))
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                      padding: EdgeInsets.fromLTRB(4.w, 0, 0, 0),
+                      child: Text(
+                        widget.name,
+                        style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black54),
+                      )),
+                  StreamBuilder<bool>(
+                    stream: getOnlineOffline(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        useractive = snapshot.data!;
+                      }
+                      return Container(
+                        alignment: Alignment.topLeft,
+                        margin: EdgeInsets.only(left: 15),
+                        child: Text(
+                          useractive ? 'Online' : 'Offline',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ],
           ),
         ),
@@ -428,6 +477,8 @@ class _ChatScree1State extends State<ChatScree1> {
           userEmail1 = email;
           localid = id;
         });
+
+        await getOnlineOffline();
         if (userType == 'donor') {
           getAcceptChatDonor(id);
         }
@@ -559,6 +610,64 @@ class _ChatScree1State extends State<ChatScree1> {
     } catch (e) {
       print('Image upload error: $e');
       return null;
+    }
+  }
+
+  Future<void> updateStatus(bool isActive) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String userEmail = prefs.getString('user_email') ?? '';
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: userEmail)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        String userId = querySnapshot.docs.first.id;
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .update({'status': isActive});
+        log("My Statis is $isActive");
+      }
+    } catch (e) {
+      print('Error updating status: $e');
+    }
+  }
+
+  Stream<bool> getOnlineOffline() {
+    try {
+      if (userType == 'donor') {
+        return FirebaseFirestore.instance
+            .collection('users')
+            .where('email', isEqualTo: widget.receiveremail)
+            .snapshots()
+            .map((snapshot) {
+          if (snapshot.docs.isNotEmpty) {
+            return snapshot.docs.first.data()?['status'] ?? false;
+          }
+          return false;
+        });
+      } else if (userType == 'taker') {
+        return FirebaseFirestore.instance
+            .collection('users')
+            .where('email', isEqualTo: widget.sendemail)
+            .snapshots()
+            .map((snapshot) {
+          if (snapshot.docs.isNotEmpty) {
+            return snapshot.docs.first.data()?['status'] ?? false;
+          }
+          return false;
+        });
+      } else {
+        print('User not found with email');
+        // Returning an empty stream to handle the else case
+        return Stream.value(false);
+      }
+    } catch (e) {
+      print('Error: $e');
+      // Returning an empty stream to handle errors
+      return Stream.value(false);
     }
   }
 }

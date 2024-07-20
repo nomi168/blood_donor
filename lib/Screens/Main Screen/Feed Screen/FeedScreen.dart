@@ -2,20 +2,24 @@
 
 import 'dart:convert';
 import 'dart:core';
+import 'dart:developer';
 
 import 'package:blood_donor/Modals/ChatRequest.dart';
 import 'package:blood_donor/Modals/Taker.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Feed%20Screen/MapOnDonator.dart';
 import 'package:blood_donor/constants.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:coupon_uikit/coupon_uikit.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:sizer/sizer.dart';
 
 class FeedScreen extends StatefulWidget {
@@ -26,7 +30,7 @@ class FeedScreen extends StatefulWidget {
   State<FeedScreen> createState() => _FeedScreenState();
 }
 
-class _FeedScreenState extends State<FeedScreen> {
+class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
   int index = 1;
   List<Taker> feedsData = [];
   List<ChatRequest> chatrequestData = [];
@@ -41,15 +45,41 @@ class _FeedScreenState extends State<FeedScreen> {
   String taker_email = '';
   String sender_id = '';
   String receiver_id = '';
+  bool isLoading = true;
   // static int takerId = 0;
 
   @override
   void initState() {
     super.initState();
-
     getTakerData();
     getChatRequestData();
     getChatRequestId();
+    WidgetsBinding.instance.addObserver(this);
+    Future.delayed(Duration(seconds: 3), () {
+      setState(() {
+        isLoading = false;
+        // Populate feedsData with actual data
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
+      log("My State is $state");
+      updateStatus(false);
+    } else if (state == AppLifecycleState.resumed) {
+      log("My State is $state");
+      updateStatus(true);
+    }
   }
 
   @override
@@ -305,143 +335,170 @@ class _FeedScreenState extends State<FeedScreen> {
               shrinkWrap: true,
               itemCount: chatrequestData.length,
               itemBuilder: (context, index) {
-                ChatRequest chat = chatrequestData[index];
-                return CouponCard(
-                  curveAxis: Axis.vertical,
-                  firstChild: Container(
+                if (isLoading) {
+                  return Shimmer.fromColors(
+                    baseColor: Colors.grey[300]!,
+                    highlightColor: Colors.grey[100]!,
+                    child: Container(
+                      height: 160,
+                      margin: EdgeInsets.symmetric(vertical: 10),
+                      decoration: ShapeDecoration(
+                        color: Colors.grey[300],
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  );
+                } else {
+                  ChatRequest chat = chatrequestData[index];
+                  return CouponCard(
+                    curveAxis: Axis.vertical,
+                    firstChild: Container(
                       // alignment: Alignment.topLeft,
                       decoration: BoxDecoration(color: Colors.grey),
-                      child: chat.senderemail.isNotEmpty
-                          ? Image.network(
-                              fit: BoxFit.cover,
-                              '${chat.senderimage}',
-                            )
-                          : Image.network(
-                              fit: BoxFit.cover,
-                              'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/991px-Placeholder_view_vector.svg.png')),
-                  secondChild: Container(
-                    decoration: const BoxDecoration(
-                      color: Colors.black26,
-                    ),
-                    padding: const EdgeInsets.only(top: 0, left: 10),
-                    child: Stack(
-                      children: [
-                        Align(
-                            alignment: Alignment.topRight,
-                            child: Container(
-                              // margin: const EdgeInsets.only(
-                              //     bottom: 1, right: 1),
-                              width: 50,
-                              height: 50,
-
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 0),
-                              decoration: BoxDecoration(
-                                color: Colors.black,
-                                borderRadius: const BorderRadius.only(
-                                  bottomLeft: Radius.circular(100),
-                                ),
-                              ),
-                            )),
-                        Container(
-                          alignment: Alignment.bottomCenter,
-                          margin: EdgeInsets.only(top: 40),
-                          child: Align(
-                            alignment: Alignment.topLeft,
-                            child: Column(
-                              // crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  chat.sendername,
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.white),
-                                ),
-                                const SizedBox(height: 2),
-                              ],
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          child: CachedNetworkImage(
+                            fit: BoxFit.cover,
+                            imageUrl: chat.senderemail.isNotEmpty
+                                ? chat.senderimage
+                                : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
+                            placeholder: (context, url) =>
+                                const CupertinoActivityIndicator(
+                              color: Colors.white,
                             ),
+                            errorWidget: (context, url, error) =>
+                                Icon(Icons.error),
                           ),
                         ),
-                        Align(
-                            alignment: Alignment.bottomLeft,
-                            child: Row(
-                              children: [
-                                ElevatedButton(
-                                  style: ButtonStyle(
-                                    shape: MaterialStateProperty.all<
-                                        RoundedRectangleBorder>(
-                                      RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                      ),
-                                    ),
-                                    backgroundColor:
-                                        MaterialStateProperty.all<Color>(
-                                            const Color(0xFFDE0A1E)),
-                                  ),
-                                  child: Text(
-                                    'Decline',
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.white),
-                                  ),
-                                  onPressed: () {},
-                                ),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                Expanded(
-                                    child: ElevatedButton(
-                                  style: ButtonStyle(
-                                    shape: MaterialStateProperty.all<
-                                        RoundedRectangleBorder>(
-                                      RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                      ),
-                                    ),
-                                    backgroundColor:
-                                        MaterialStateProperty.all<Color>(
-                                            const Color(0xFFDE0A1E)),
-                                  ),
-                                  child: Text(
-                                    'Accept',
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.white),
-                                  ),
-                                  onPressed: () async {
-                                    if (chatrequestData.length > 0) {
-                                      String recipientEmail =
-                                          chat.receiveremail;
-                                      String nam = chat.receivername;
-                                      String image1 = chat.receiverimage;
-                                      String sender = chat.senderemail;
-                                      String acceptname = chat.sendername;
-                                      String senderimage = chat.senderimage;
-                                      String senderid = chat.sender_id;
-                                      String receiverid = chat.receiver_id;
-
-                                      // Send chat request
-                                      await AcceptChat(
-                                          nam,
-                                          recipientEmail,
-                                          image1,
-                                          sender,
-                                          acceptname,
-                                          senderimage,
-                                          senderid,
-                                          receiverid);
-                                    } else {
-                                      print('Invalid index: $index');
-                                    }
-                                  },
-                                ))
-                              ],
-                            ))
-                      ],
+                      ),
                     ),
-                  ),
-                );
+                    secondChild: Container(
+                      decoration: const BoxDecoration(
+                        color: Colors.black26,
+                      ),
+                      padding: const EdgeInsets.only(top: 0, left: 10),
+                      child: Stack(
+                        children: [
+                          Align(
+                              alignment: Alignment.topRight,
+                              child: Container(
+                                // margin: const EdgeInsets.only(
+                                //     bottom: 1, right: 1),
+                                width: 50,
+                                height: 50,
+
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 0),
+                                decoration: BoxDecoration(
+                                  color: Colors.black,
+                                  borderRadius: const BorderRadius.only(
+                                    bottomLeft: Radius.circular(100),
+                                  ),
+                                ),
+                              )),
+                          Container(
+                            alignment: Alignment.bottomCenter,
+                            margin: EdgeInsets.only(top: 40),
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Column(
+                                // crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    chat.sendername,
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.white),
+                                  ),
+                                  const SizedBox(height: 2),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Align(
+                              alignment: Alignment.bottomLeft,
+                              child: Row(
+                                children: [
+                                  ElevatedButton(
+                                    style: ButtonStyle(
+                                      shape: MaterialStateProperty.all<
+                                          RoundedRectangleBorder>(
+                                        RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                        ),
+                                      ),
+                                      backgroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                              const Color(0xFFDE0A1E)),
+                                    ),
+                                    child: Text(
+                                      'Decline',
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.white),
+                                    ),
+                                    onPressed: () {},
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Expanded(
+                                      child: ElevatedButton(
+                                    style: ButtonStyle(
+                                      shape: MaterialStateProperty.all<
+                                          RoundedRectangleBorder>(
+                                        RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                        ),
+                                      ),
+                                      backgroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                              const Color(0xFFDE0A1E)),
+                                    ),
+                                    child: Text(
+                                      'Accept',
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.white),
+                                    ),
+                                    onPressed: () async {
+                                      if (chatrequestData.length > 0) {
+                                        String recipientEmail =
+                                            chat.receiveremail;
+                                        String nam = chat.receivername;
+                                        String image1 = chat.receiverimage;
+                                        String sender = chat.senderemail;
+                                        String acceptname = chat.sendername;
+                                        String senderimage = chat.senderimage;
+                                        String senderid = chat.sender_id;
+                                        String receiverid = chat.receiver_id;
+
+                                        // Send chat request
+                                        await AcceptChat(
+                                            nam,
+                                            recipientEmail,
+                                            image1,
+                                            sender,
+                                            acceptname,
+                                            senderimage,
+                                            senderid,
+                                            receiverid);
+                                      } else {
+                                        print('Invalid index: $index');
+                                      }
+                                    },
+                                  ))
+                                ],
+                              ))
+                        ],
+                      ),
+                    ),
+                  );
+                }
               },
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 1,
@@ -513,7 +570,8 @@ class _FeedScreenState extends State<FeedScreen> {
       // Query to check if senderEmail already exists
       final QuerySnapshot senderSnapshot = await _firestore
           .collection('chat_request')
-          .where('recipientEmail', isEqualTo: senderEmail)
+          .where('senderEmail', isEqualTo: senderEmail)
+          .where('recipientEmail', isEqualTo: recipientEmail)
           .get();
 
       // If senderEmail already exists, don't send chat request
@@ -759,964 +817,513 @@ class _FeedScreenState extends State<FeedScreen> {
             getTakerData();
           });
         },
-        child: feedsData.isNotEmpty
-            ? Container(
-                margin: EdgeInsets.fromLTRB(5.w, 0.w, 5.w, 0),
-                child: GridView.builder(
-                  // scrollDirection: Axis.vertical,
-                  physics: const ScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: feedsData.length,
-                  itemBuilder: (context, index) {
-                    // ignore: unused_local_variable
-                    Taker taker = feedsData[index];
-                    // notifi = feedsData[index].email;
+        child: Container(
+            margin: EdgeInsets.fromLTRB(5.w, 0.w, 5.w, 0),
+            child: GridView.builder(
+              physics: const ScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: isLoading ? 6 : feedsData.length,
+              itemBuilder: (context, index) {
+                if (isLoading) {
+                  return Shimmer.fromColors(
+                    baseColor: Colors.grey[300]!,
+                    highlightColor: Colors.grey[100]!,
+                    child: Container(
+                      height: 160,
+                      margin: EdgeInsets.symmetric(vertical: 10),
+                      decoration: ShapeDecoration(
+                        color: Colors.grey[300],
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  );
+                } else {
+                  Taker taker = feedsData[index];
+                  return Container(
+                    margin: EdgeInsets.fromLTRB(0.w, 0.w, 0.w, 0),
+                    child:
+                        // notifi = feedsData[index].email;
 
-                    return Column(
+                        Column(
                       children: [
                         Container(
-                            height: 160,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 13, vertical: 12),
-                            clipBehavior: Clip.antiAlias,
-                            decoration: ShapeDecoration(
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                    width: 1, color: Color(0xFFDDDDDD)),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
+                          height: 160,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 5, vertical: 12),
+                          clipBehavior: Clip.antiAlias,
+                          decoration: ShapeDecoration(
+                            shape: RoundedRectangleBorder(
+                              side: BorderSide(
+                                  width: 1, color: Color(0xFFDDDDDD)),
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Container(
-                                                width: 70,
-                                                height: 70,
-                                                decoration: ShapeDecoration(
-                                                  image: DecorationImage(
-                                                      image: NetworkImage(
-                                                          taker.imageURL)),
-                                                  shape: OvalBorder(),
-                                                ),
-                                              ),
-                                            ],
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: 70,
+                                      height: 70,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: CachedNetworkImage(
+                                          fit: BoxFit.cover,
+                                          imageUrl: taker.imageURL.isNotEmpty
+                                              ? taker.imageURL
+                                              : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
+                                          placeholder: (context, url) =>
+                                              const CupertinoActivityIndicator(
+                                            color: Colors.white,
                                           ),
+                                          errorWidget: (context, url, error) =>
+                                              Icon(Icons.error),
                                         ),
-                                        const SizedBox(width: 10),
-                                        Container(
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Container(
-                                                child: Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      feedsData[index].name,
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 18,
-                                                        fontFamily:
-                                                            'Montserrat',
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        height: 0,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(height: 12),
-                                                    Container(
-                                                      child: Column(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .start,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Container(
-                                                            width: 263,
-                                                            child: Row(
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .min,
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .start,
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Text(
-                                                                  'Location :',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Color(
-                                                                        0xFF5A5A5A),
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontFamily:
-                                                                        'Montserrat',
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                    height:
-                                                                        0.13,
-                                                                  ),
-                                                                ),
-                                                                const SizedBox(
-                                                                    width: 5),
-                                                                Expanded(
-                                                                  child:
-                                                                      SizedBox(
-                                                                    child: Text(
-                                                                      feedsData[
-                                                                              index]
-                                                                          .location,
-                                                                      style:
-                                                                          TextStyle(
-                                                                        color: Color(
-                                                                            0xFF5A5A5A),
-                                                                        fontSize:
-                                                                            12,
-                                                                        fontFamily:
-                                                                            'Montserrat',
-                                                                        fontWeight:
-                                                                            FontWeight.w500,
-                                                                        height:
-                                                                            0.13,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                )
-                                                              ],
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                              height: 15),
-                                                          Container(
-                                                            child: Row(
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .min,
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .start,
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Text(
-                                                                  'Blood Group :',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Color(
-                                                                        0xFF5A5A5A),
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontFamily:
-                                                                        'Montserrat',
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                    height:
-                                                                        0.13,
-                                                                  ),
-                                                                ),
-                                                                const SizedBox(
-                                                                    width: 5),
-                                                                Text(
-                                                                  feedsData[
-                                                                          index]
-                                                                      .blood,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Color(
-                                                                        0xFF5A5A5A),
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontFamily:
-                                                                        'Montserrat',
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                    height:
-                                                                        0.13,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                              height: 15),
-                                                          Container(
-                                                            child: Row(
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .min,
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .start,
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Text(
-                                                                  'Date :',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Color(
-                                                                        0xFF5A5A5A),
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontFamily:
-                                                                        'Montserrat',
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                    height:
-                                                                        0.13,
-                                                                  ),
-                                                                ),
-                                                                const SizedBox(
-                                                                    width: 5),
-                                                                Text(
-                                                                  feedsData[
-                                                                          index]
-                                                                      .date,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Color(
-                                                                        0xFF5A5A5A),
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontFamily:
-                                                                        'Montserrat',
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                    height:
-                                                                        0.13,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                              height: 15),
-                                                          Container(
-                                                            child: Row(
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .min,
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .start,
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Text(
-                                                                  'Time :',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Color(
-                                                                        0xFF5A5A5A),
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontFamily:
-                                                                        'Montserrat',
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                    height:
-                                                                        0.13,
-                                                                  ),
-                                                                ),
-                                                                const SizedBox(
-                                                                    width: 5),
-                                                                Text(
-                                                                  feedsData[
-                                                                          index]
-                                                                      .time,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Color(
-                                                                        0xFF5A5A5A),
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontFamily:
-                                                                        'Montserrat',
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                    height:
-                                                                        0.13,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              const SizedBox(height: 15),
-                                              Row(
-                                                children: [
-                                                  InkWell(
-                                                    onTap: () async {
-                                                      final FirebaseAuth _auth =
-                                                          FirebaseAuth.instance;
-                                                      final User? currentUser =
-                                                          _auth.currentUser;
-                                                      final String? userEmail =
-                                                          currentUser?.email;
-
-                                                      if (currentUser != null) {
-                                                        // Get recipient's email (for demo, you can replace this with actual recipient email)
-                                                        String recipientEmail =
-                                                            feedsData[index]
-                                                                .email;
-                                                        String rename =
-                                                            feedsData[index]
-                                                                .name;
-                                                        String recimage =
-                                                            feedsData[index]
-                                                                .imageURL;
-                                                        String id =
-                                                            feedsData[index]
-                                                                .tak_id!;
-                                                        receiver_id = id;
-
-                                                        if (userType ==
-                                                            'donor') {
-                                                          // Send chat request
-                                                          await sendChatRequest(
-                                                              userEmail!,
-                                                              recipientEmail,
-                                                              profilename,
-                                                              number,
-                                                              image,
-                                                              rename,
-                                                              recimage,
-                                                              id);
-                                                        } else {
-                                                          showCustomSnackBar(
-                                                              context,
-                                                              'Only donors can send chat requests.',
-                                                              false);
-                                                        }
-
-                                                        // Show notification or navigate to chat screen
-                                                      }
-                                                    },
-                                                    child: Container(
-                                                      height: 30,
-                                                      width: 100,
-                                                      alignment:
-                                                          Alignment.center,
-                                                      decoration: BoxDecoration(
-                                                        color: PRIMARY_COLOR,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(5),
-                                                        border: Border.all(
-                                                          color: Colors.red,
-                                                          width: 1.0,
-                                                        ),
-                                                      ),
-                                                      child: Text(
-                                                        'Request',
-                                                        style: TextStyle(
-                                                            fontSize: 14,
-                                                            color:
-                                                                Colors.white),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  SizedBox(
-                                                    width: 10,
-                                                  ),
-                                                  InkWell(
-                                                    onTap: () {
-                                                      String id =
-                                                          feedsData[index].id;
-                                                      String name =
-                                                          feedsData[index].name;
-                                                      String email =
-                                                          feedsData[index]
-                                                              .email;
-                                                      String image =
-                                                          feedsData[index]
-                                                              .imageURL;
-                                                      String blood =
-                                                          feedsData[index]
-                                                              .blood;
-                                                      String location =
-                                                          feedsData[index]
-                                                              .location;
-                                                      String hosname =
-                                                          feedsData[index]
-                                                              .hospitaname;
-                                                      String rating =
-                                                          feedsData[index]
-                                                              .rating
-                                                              .toString();
-
-                                                      String time =
-                                                          feedsData[index].time;
-                                                      String date =
-                                                          feedsData[index].date;
-                                                      String note =
-                                                          feedsData[index].note;
-                                                      String taker_id =
-                                                          feedsData[index]
-                                                              .t_id
-                                                              .toString();
-                                                      // if (userType == 'donor') {
-                                                      Navigator.of(context,
-                                                              rootNavigator:
-                                                                  true)
-                                                          .push(
-                                                        PageRouteBuilder(
-                                                          pageBuilder: (context,
-                                                              animation,
-                                                              secondaryAnimation) {
-                                                            return MapOnDonator(
-                                                              id: id,
-                                                              name: name,
-                                                              email: email,
-                                                              image: image,
-                                                              blood: blood,
-                                                              location:
-                                                                  location,
-                                                              hosname: hosname,
-                                                              rating: rating
-                                                                  .toString(),
-                                                              time: time,
-                                                              date: date,
-                                                              note: note,
-                                                            );
-                                                          },
-                                                          transitionDuration:
-                                                              const Duration(
-                                                                  seconds: 1),
-                                                          transitionsBuilder:
-                                                              (context,
-                                                                  animation,
-                                                                  secondaryAnimation,
-                                                                  child) {
-                                                            const begin = Offset(
-                                                                10.0,
-                                                                0.0); // slide in from the right
-                                                            const end =
-                                                                Offset.zero;
-                                                            const curve = Curves
-                                                                .easeInOutQuart;
-
-                                                            var tween = Tween(
-                                                                    begin:
-                                                                        begin,
-                                                                    end: end)
-                                                                .chain(CurveTween(
-                                                                    curve:
-                                                                        curve));
-                                                            var offsetAnimation =
-                                                                animation.drive(
-                                                                    tween);
-
-                                                            return SlideTransition(
-                                                              position:
-                                                                  offsetAnimation,
-                                                              child: child,
-                                                            );
-                                                          },
-                                                        ),
-                                                      );
-
-                                                      //  else {
-                                                      //   showCustomSnackBar(
-                                                      //       context,
-                                                      //       "Taker is doesnot donate any blood",
-                                                      //       false);
-                                                      // }
-                                                    },
-                                                    child: Container(
-                                                      height: 30,
-                                                      width: 100,
-                                                      alignment:
-                                                          Alignment.center,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(5),
-                                                        border: Border.all(
-                                                          color: Colors.red,
-                                                          width: 1.0,
-                                                        ),
-                                                      ),
-                                                      child: Text(
-                                                        'Donate',
-                                                        style: TextStyle(
-                                                            fontSize: 14,
-                                                            color:
-                                                                Colors.black87),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              )
-                                              // Container(
-                                              //   child: Row(
-                                              //     children: [
-                                              //       InkWell(
-                                              //         onTap: () async {
-                                              //           final FirebaseAuth
-                                              //               _auth = FirebaseAuth
-                                              //                   .instance;
-                                              //           final User?
-                                              //               currentUser =
-                                              //               _auth.currentUser;
-                                              //           final String?
-                                              //               userEmail =
-                                              //               currentUser?.email;
-
-                                              //           if (currentUser !=
-                                              //               null) {
-                                              //             // Get recipient's email (for demo, you can replace this with actual recipient email)
-                                              //             String
-                                              //                 recipientEmail =
-                                              //                 feedsData[index]
-                                              //                     .email;
-                                              //             String rename =
-                                              //                 feedsData[index]
-                                              //                     .name;
-                                              //             String recimage =
-                                              //                 feedsData[index]
-                                              //                     .imageURL;
-                                              //             String id =
-                                              //                 feedsData[index]
-                                              //                     .tak_id!;
-                                              //             receiver_id = id;
-
-                                              //             if (userType ==
-                                              //                 'donor') {
-                                              //               // Send chat request
-                                              //               await sendChatRequest(
-                                              //                   userEmail!,
-                                              //                   recipientEmail,
-                                              //                   profilename,
-                                              //                   number,
-                                              //                   image,
-                                              //                   rename,
-                                              //                   recimage,
-                                              //                   id);
-                                              //             } else {
-                                              //               showCustomSnackBar(
-                                              //                   context,
-                                              //                   'Only donors can send chat requests.',
-                                              //                   false);
-                                              //             }
-
-                                              //             // Show notification or navigate to chat screen
-                                              //           }
-                                              //         },
-                                              //         child: Container(
-                                              //           width: 100,
-                                              //           height: 30,
-                                              //           padding:
-                                              //               const EdgeInsets
-                                              //                   .symmetric(
-                                              //                   horizontal:
-                                              //                       82.15,
-                                              //                   vertical: 9.19),
-                                              //           decoration:
-                                              //               ShapeDecoration(
-                                              //             color:
-                                              //                 Color(0xFFDC1228),
-                                              //             shape:
-                                              //                 RoundedRectangleBorder(
-                                              //               borderRadius:
-                                              //                   BorderRadius
-                                              //                       .circular(
-                                              //                           4.60),
-                                              //             ),
-                                              //           ),
-                                              //           child: Text(
-                                              //             'Request',
-                                              //             style: TextStyle(
-                                              //                 fontSize: 10,
-                                              //                 color:
-                                              //                     Colors.white),
-                                              //           ),
-                                              //         ),
-                                              //       ),
-                                              //       const SizedBox(width: 6),
-                                              //       Container(
-                                              //         width: 100,
-                                              //         height: 27,
-                                              //         padding: const EdgeInsets
-                                              //             .symmetric(
-                                              //             horizontal: 82.15,
-                                              //             vertical: 9.19),
-                                              //         decoration:
-                                              //             ShapeDecoration(
-                                              //           shape:
-                                              //               RoundedRectangleBorder(
-                                              //             side: BorderSide(
-                                              //                 width: 1,
-                                              //                 color: Color(
-                                              //                     0xFFDC1228)),
-                                              //             borderRadius:
-                                              //                 BorderRadius
-                                              //                     .circular(
-                                              //                         4.60),
-                                              //           ),
-                                              //         ),
-                                              //         child: Row(
-                                              //           mainAxisSize:
-                                              //               MainAxisSize.min,
-                                              //           mainAxisAlignment:
-                                              //               MainAxisAlignment
-                                              //                   .center,
-                                              //           crossAxisAlignment:
-                                              //               CrossAxisAlignment
-                                              //                   .center,
-                                              //           children: [
-                                              //             Text(
-                                              //               'Donate',
-                                              //               textAlign: TextAlign
-                                              //                   .center,
-                                              //               style: TextStyle(
-                                              //                 color: Color(
-                                              //                     0xFF171717),
-                                              //                 fontSize: 8,
-                                              //                 fontFamily:
-                                              //                     'Montserrat',
-                                              //                 fontWeight:
-                                              //                     FontWeight
-                                              //                         .w500,
-                                              //                 height: 0.17,
-                                              //               ),
-                                              //             ),
-                                              //           ],
-                                              //         ),
-                                              //       ),
-                                              //     ],
-                                              //   ),
-                                              // ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(width: 5),
+                                    Container(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.max,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            feedsData[index].name,
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 18,
+                                              fontFamily: 'Montserrat',
+                                              fontWeight: FontWeight.w500,
+                                              height: 0,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 12),
+                                          Container(
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  width: 220,
+                                                  child: Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        'Location :',
+                                                        style: TextStyle(
+                                                          color:
+                                                              Color(0xFF5A5A5A),
+                                                          fontSize: 12,
+                                                          fontFamily:
+                                                              'Montserrat',
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          height: 0.13,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 5),
+                                                      Expanded(
+                                                        child: SizedBox(
+                                                          child: Text(
+                                                            feedsData[index]
+                                                                .location,
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xFF5A5A5A),
+                                                              fontSize: 12,
+                                                              fontFamily:
+                                                                  'Montserrat',
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              height: 0.13,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 15),
+                                                Container(
+                                                  child: Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        'Blood Group :',
+                                                        style: TextStyle(
+                                                          color:
+                                                              Color(0xFF5A5A5A),
+                                                          fontSize: 12,
+                                                          fontFamily:
+                                                              'Montserrat',
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          height: 0.13,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 5),
+                                                      Text(
+                                                        feedsData[index].blood,
+                                                        style: TextStyle(
+                                                          color:
+                                                              Color(0xFF5A5A5A),
+                                                          fontSize: 12,
+                                                          fontFamily:
+                                                              'Montserrat',
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          height: 0.13,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 15),
+                                                Container(
+                                                  child: Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        'Date :',
+                                                        style: TextStyle(
+                                                          color:
+                                                              Color(0xFF5A5A5A),
+                                                          fontSize: 12,
+                                                          fontFamily:
+                                                              'Montserrat',
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          height: 0.13,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 5),
+                                                      Text(
+                                                        feedsData[index].date,
+                                                        style: TextStyle(
+                                                          color:
+                                                              Color(0xFF5A5A5A),
+                                                          fontSize: 12,
+                                                          fontFamily:
+                                                              'Montserrat',
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          height: 0.13,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 15),
+                                                Container(
+                                                  child: Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        'Time :',
+                                                        style: TextStyle(
+                                                          color:
+                                                              Color(0xFF5A5A5A),
+                                                          fontSize: 12,
+                                                          fontFamily:
+                                                              'Montserrat',
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          height: 0.13,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 5),
+                                                      Text(
+                                                        feedsData[index].time,
+                                                        style: TextStyle(
+                                                          color:
+                                                              Color(0xFF5A5A5A),
+                                                          fontSize: 12,
+                                                          fontFamily:
+                                                              'Montserrat',
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          height: 0.13,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          const SizedBox(height: 15),
+                                          Row(
+                                            children: [
+                                              InkWell(
+                                                onTap: () async {
+                                                  final FirebaseAuth _auth =
+                                                      FirebaseAuth.instance;
+                                                  final User? currentUser =
+                                                      _auth.currentUser;
+                                                  final String? userEmail =
+                                                      currentUser?.email;
+
+                                                  if (currentUser != null) {
+                                                    // Get recipient's email (for demo, you can replace this with actual recipient email)
+                                                    String recipientEmail =
+                                                        feedsData[index].email;
+                                                    String rename =
+                                                        feedsData[index].name;
+                                                    String recimage =
+                                                        feedsData[index]
+                                                            .imageURL;
+                                                    String id = feedsData[index]
+                                                        .tak_id!;
+                                                    receiver_id = id;
+
+                                                    if (userType == 'donor') {
+                                                      // Send chat request
+                                                      await sendChatRequest(
+                                                          userEmail!,
+                                                          recipientEmail,
+                                                          profilename,
+                                                          number,
+                                                          image,
+                                                          rename,
+                                                          recimage,
+                                                          id);
+                                                    } else {
+                                                      showCustomSnackBar(
+                                                          context,
+                                                          'Only donors can send chat requests.',
+                                                          false);
+                                                    }
+
+                                                    // Show notification or navigate to chat screen
+                                                  }
+                                                },
+                                                child: Container(
+                                                  height: 30,
+                                                  width: 90,
+                                                  alignment: Alignment.center,
+                                                  decoration: BoxDecoration(
+                                                    color: PRIMARY_COLOR,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                    border: Border.all(
+                                                      color: Colors.red,
+                                                      width: 1.0,
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    'Request',
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                width: 10,
+                                              ),
+                                              InkWell(
+                                                onTap: () {
+                                                  String id =
+                                                      feedsData[index].id;
+                                                  String name =
+                                                      feedsData[index].name;
+                                                  String email =
+                                                      feedsData[index].email;
+                                                  String image =
+                                                      feedsData[index].imageURL;
+                                                  String blood =
+                                                      feedsData[index].blood;
+                                                  String location =
+                                                      feedsData[index].location;
+                                                  String hosname =
+                                                      feedsData[index]
+                                                          .hospitaname;
+                                                  String rating =
+                                                      feedsData[index]
+                                                          .rating
+                                                          .toString();
+
+                                                  String time =
+                                                      feedsData[index].time;
+                                                  String date =
+                                                      feedsData[index].date;
+                                                  String note =
+                                                      feedsData[index].note;
+                                                  String taker_id =
+                                                      feedsData[index]
+                                                          .t_id
+                                                          .toString();
+                                                  // if (userType == 'donor') {
+                                                  Navigator.of(context,
+                                                          rootNavigator: true)
+                                                      .push(
+                                                    PageRouteBuilder(
+                                                      pageBuilder: (context,
+                                                          animation,
+                                                          secondaryAnimation) {
+                                                        return MapOnDonator(
+                                                          id: id,
+                                                          name: name,
+                                                          email: email,
+                                                          image: image,
+                                                          blood: blood,
+                                                          location: location,
+                                                          hosname: hosname,
+                                                          rating:
+                                                              rating.toString(),
+                                                          time: time,
+                                                          date: date,
+                                                          note: note,
+                                                        );
+                                                      },
+                                                      transitionDuration:
+                                                          const Duration(
+                                                              seconds: 1),
+                                                      transitionsBuilder:
+                                                          (context,
+                                                              animation,
+                                                              secondaryAnimation,
+                                                              child) {
+                                                        const begin = Offset(
+                                                            10.0,
+                                                            0.0); // slide in from the right
+                                                        const end = Offset.zero;
+                                                        const curve = Curves
+                                                            .easeInOutQuart;
+
+                                                        var tween = Tween(
+                                                                begin: begin,
+                                                                end: end)
+                                                            .chain(CurveTween(
+                                                                curve: curve));
+                                                        var offsetAnimation =
+                                                            animation
+                                                                .drive(tween);
+
+                                                        return SlideTransition(
+                                                          position:
+                                                              offsetAnimation,
+                                                          child: child,
+                                                        );
+                                                      },
+                                                    ),
+                                                  );
+
+                                                  //  else {
+                                                  //   showCustomSnackBar(
+                                                  //       context,
+                                                  //       "Taker is doesnot donate any blood",
+                                                  //       false);
+                                                  // }
+                                                },
+                                                child: Container(
+                                                  height: 30,
+                                                  width: 90,
+                                                  alignment: Alignment.center,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                    border: Border.all(
+                                                      color: Colors.red,
+                                                      width: 1.0,
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    'Donate',
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Colors.black87),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            )),
+                            ],
+                          ),
+                        ),
                       ],
+                    ),
+                  );
+                }
+              },
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 1,
+                childAspectRatio: 1.0,
+                crossAxisSpacing: 5.0,
+                mainAxisSpacing: 5,
+                mainAxisExtent: 170,
+              ),
+            )));
+  }
 
-                      // Column(
-                      //   crossAxisAlignment: CrossAxisAlignment.start,
-                      //   children: [
-                      //     Row(
-                      //       crossAxisAlignment: CrossAxisAlignment.start,
-                      //       mainAxisAlignment: MainAxisAlignment.start,
-                      //       children: [
-                      //         Container(
-                      //             width: 100,
-                      //             height: 201,
-                      //             color: Colors.amber,
-                      //             child: Container(
-                      //               alignment: Alignment.topCenter,
-                      //               padding:
-                      //                   EdgeInsets.fromLTRB(2.w, 2.h, 2.w, 0),
-                      //               child: CircleAvatar(
-                      //                   radius: 36,
-                      //                   backgroundImage:
-                      //                       NetworkImage(taker.imageURL)),
-                      //             )),
-                      //         Expanded(
-                      //             child: Container(
-                      //           height: 201,
-                      //           child: Column(
-                      //               crossAxisAlignment:
-                      //                   CrossAxisAlignment.start,
-                      //               children: [
-                      //                 Container(
-                      //                     margin: EdgeInsets.only(
-                      //                         left: 10, top: 10),
-                      //                     child: Text(
-                      //                       feedsData[index].name,
-                      //                       style: TextStyle(
-                      //                           fontSize: 15.sp,
-                      //                           fontWeight: FontWeight.bold,
-                      //                           color: const Color(0xFF353535)),
-                      //                     )),
-                      //                 Row(
-                      //                   crossAxisAlignment:
-                      //                       CrossAxisAlignment.start,
-                      //                   children: [
-                      //                     Container(
-                      //                       margin: EdgeInsets.only(left: 10),
-                      //                       child: Text(
-                      //                         // ignore: unnecessary_string_interpolations
-                      //                         'location:',
-                      //                         style: TextStyle(
-                      //                             fontSize: 12.sp,
-                      //                             fontWeight: FontWeight.bold,
-                      //                             color: Colors.black54),
-                      //                       ),
-                      //                     ),
-                      //                     Expanded(
-                      //                       child: Padding(
-                      //                         padding: EdgeInsets.fromLTRB(
-                      //                             2.w, 0.h, 0, 0),
-                      //                         child: Text(
-                      //                           // ignore: unnecessary_string_interpolations
-                      //                           feedsData[index].location,
-                      //                           style: TextStyle(
-                      //                               fontSize: 12.sp,
-                      //                               fontWeight: FontWeight.bold,
-                      //                               color: Colors.black54),
-                      //                         ),
-                      //                       ),
-                      //                     )
-                      //                   ],
-                      //                 )
-                      //               ]),
-                      //         ))
-                      //       ],
-                      //     )
+  Future<void> updateStatus(bool isActive) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String userEmail = prefs.getString('user_email') ?? '';
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: userEmail)
+          .get();
 
-                      //     // Padding(
-                      //     //     padding: EdgeInsets.fromLTRB(30.w, 6.h, 0, 0),
-                      //     //     child: Text(
-                      //     //       feedsData[index].hospitaname,
-                      //     //       style: TextStyle(
-                      //     //           fontSize: 12.sp,
-                      //     //           fontWeight: FontWeight.bold,
-                      //     //           color: Colors.black54),
-                      //     //     )),
-
-                      //     // Row(
-                      //     //   children: [
-                      //     //     Padding(
-                      //     //       padding: EdgeInsets.fromLTRB(30.w, 18.h, 0, 0),
-                      //     //       child: Text(
-                      //     //         feedsData[index].time,
-                      //     //         style: TextStyle(
-                      //     //             fontSize: 12.sp,
-                      //     //             fontWeight: FontWeight.bold,
-                      //     //             color: Colors.black54),
-                      //     //       ),
-                      //     //     ),
-                      //     //     Padding(
-                      //     //       padding: EdgeInsets.fromLTRB(2.w, 18.h, 0, 0),
-                      //     //       child: Text(
-                      //     //         feedsData[index].date,
-                      //     //         style: TextStyle(
-                      //     //             fontSize: 12.sp,
-                      //     //             fontWeight: FontWeight.bold,
-                      //     //             color: Colors.black54),
-                      //     //       ),
-                      //     //     ),
-                      //     //   ],
-                      //     // ),
-                      //     // Padding(
-                      //     //   padding: EdgeInsets.fromLTRB(75.w, 2.5.h, 0, 0),
-                      //     //   child: Text(
-                      //     //     feedsData[index].blood,
-                      //     //     style: TextStyle(
-                      //     //         fontSize: 15.sp,
-                      //     //         fontWeight: FontWeight.bold,
-                      //     //         color: const Color(0xFFDE0A1E)),
-                      //     //   ),
-                      //     // ),
-                      //     // Padding(
-                      //     //   padding: EdgeInsets.fromLTRB(5.w, 21.h, 5.w, 0),
-                      //     //   child: const Divider(
-                      //     //     height: 1,
-                      //     //     color: Colors.black87,
-                      //     //     thickness: 1,
-                      //     //   ),
-                      //     // ),
-                      //     // Padding(
-                      //     //     padding: EdgeInsets.fromLTRB(7.w, 20.h, 5.w, 0),
-                      //     //     child: TextButton(
-                      //     //       child: Text(
-                      //     //         'Request',
-                      //     //         style: TextStyle(
-                      //     //             fontSize: 15.sp, color: Colors.black54),
-                      //     //       ),
-                      //     //       onPressed: () async {
-                      //     //         final FirebaseAuth _auth =
-                      //     //             FirebaseAuth.instance;
-                      //     //         final User? currentUser = _auth.currentUser;
-                      //     //         final String? userEmail = currentUser?.email;
-
-                      //     //         if (currentUser != null) {
-                      //     //           // Get recipient's email (for demo, you can replace this with actual recipient email)
-                      //     //           String recipientEmail =
-                      //     //               feedsData[index].email;
-                      //     //           String rename = feedsData[index].name;
-                      //     //           String recimage = feedsData[index].imageURL;
-                      //     //           String id = feedsData[index].tak_id!;
-                      //     //           receiver_id = id;
-
-                      //     //           if (userType == 'donor') {
-                      //     //             // Send chat request
-                      //     //             await sendChatRequest(
-                      //     //                 userEmail!,
-                      //     //                 recipientEmail,
-                      //     //                 profilename,
-                      //     //                 number,
-                      //     //                 image,
-                      //     //                 rename,
-                      //     //                 recimage,
-                      //     //                 id);
-                      //     //           } else {
-                      //     //             showCustomSnackBar(
-                      //     //                 context,
-                      //     //                 'Only donors can send chat requests.',
-                      //     //                 false);
-                      //     //           }
-
-                      //     //           // Show notification or navigate to chat screen
-                      //     //         }
-                      //     //       },
-                      //     //     )),
-                      //     // Padding(
-                      //     //     padding: EdgeInsets.fromLTRB(50.w, 20.h, 5.w, 0),
-                      //     //     child: TextButton(
-                      //     //       child: Text(
-                      //     //         'Donate',
-                      //     //         style: TextStyle(
-                      //     //             fontSize: 15.sp,
-                      //     //             color: const Color(0xFFDE0A1E)),
-                      //     //       ),
-                      //     //       onPressed: () {
-                      //     //         String id = feedsData[index].id;
-                      //     //         String name = feedsData[index].name;
-                      //     //         String email = feedsData[index].email;
-                      //     //         String image = feedsData[index].imageURL;
-                      //     //         String blood = feedsData[index].blood;
-                      //     //         String location = feedsData[index].location;
-                      //     //         String hosname = feedsData[index].hospitaname;
-                      //     //         String rating =
-                      //     //             feedsData[index].rating.toString();
-
-                      //     //         String time = feedsData[index].time;
-                      //     //         String date = feedsData[index].date;
-                      //     //         String note = feedsData[index].note;
-                      //     //         String taker_id =
-                      //     //             feedsData[index].t_id.toString();
-                      //     //         // if (userType == 'donor') {
-                      //     //         Navigator.of(context, rootNavigator: true)
-                      //     //             .push(
-                      //     //           PageRouteBuilder(
-                      //     //             pageBuilder: (context, animation,
-                      //     //                 secondaryAnimation) {
-                      //     //               return MapOnDonator(
-                      //     //                 id: id,
-                      //     //                 name: name,
-                      //     //                 email: email,
-                      //     //                 image: image,
-                      //     //                 blood: blood,
-                      //     //                 location: location,
-                      //     //                 hosname: hosname,
-                      //     //                 rating: rating.toString(),
-                      //     //                 time: time,
-                      //     //                 date: date,
-                      //     //                 note: note,
-                      //     //               );
-                      //     //             },
-                      //     //             transitionDuration:
-                      //     //                 const Duration(seconds: 1),
-                      //     //             transitionsBuilder: (context, animation,
-                      //     //                 secondaryAnimation, child) {
-                      //     //               const begin = Offset(10.0,
-                      //     //                   0.0); // slide in from the right
-                      //     //               const end = Offset.zero;
-                      //     //               const curve = Curves.easeInOutQuart;
-
-                      //     //               var tween = Tween(
-                      //     //                       begin: begin, end: end)
-                      //     //                   .chain(CurveTween(curve: curve));
-                      //     //               var offsetAnimation =
-                      //     //                   animation.drive(tween);
-
-                      //     //               return SlideTransition(
-                      //     //                 position: offsetAnimation,
-                      //     //                 child: child,
-                      //     //               );
-                      //     //             },
-                      //     //           ),
-                      //     //         );
-
-                      //     //         //  else {
-                      //     //         //   showCustomSnackBar(
-                      //     //         //       context,
-                      //     //         //       "Taker is doesnot donate any blood",
-                      //     //         //       false);
-                      //     //         // }
-                      //     //       },
-                      //     //     )),
-                      //   ],
-                      // ),
-                    );
-                  },
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 1,
-                    childAspectRatio: 1.0,
-                    crossAxisSpacing: 5.0,
-                    mainAxisSpacing: 5,
-                    mainAxisExtent: 210,
-                  ),
-                ),
-              )
-            : Center(
-                child: Text(
-                  'No Feeds Found',
-                  style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold),
-                ),
-              ));
+      if (querySnapshot.docs.isNotEmpty) {
+        String userId = querySnapshot.docs.first.id;
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .update({'status': isActive});
+        log("My Statis is $isActive");
+      }
+    } catch (e) {
+      print('Error updating status: $e');
+    }
   }
 }
 
@@ -1809,5 +1416,19 @@ class _CoupanCardState extends State<CoupanCard> {
         ),
       ),
     );
+  }
+}
+
+class MyRequest extends StatefulWidget {
+  const MyRequest({super.key});
+
+  @override
+  State<MyRequest> createState() => _MyRequestState();
+}
+
+class _MyRequestState extends State<MyRequest> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold();
   }
 }
