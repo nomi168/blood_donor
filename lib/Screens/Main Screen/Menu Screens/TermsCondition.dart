@@ -36,108 +36,102 @@ class _TermsConditionScreenState extends State<TermsConditionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Sizer(builder: (context, orientation, deviceType) {
-      return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(
-          body: Column(
+    return Scaffold(
+      body: Column(
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(2.w, 5.h, 0, 0),
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.arrow_back_ios_new,
-                        size: 30,
-                      ),
-                      onPressed: () {
-                        Navigator.pop(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder:
-                                (context, animation, secondaryAnimation) {
-                              return const MenuScreen();
-                            },
-                            transitionDuration: const Duration(seconds: 1),
-                            transitionsBuilder: (context, animation,
-                                secondaryAnimation, child) {
-                              const begin =
-                                  Offset(-10.0, 0.0); // slide in from the left
-                              const end = Offset.zero;
-                              const curve = Curves.easeInOutQuart;
-
-                              var tween = Tween(begin: begin, end: end)
-                                  .chain(CurveTween(curve: curve));
-                              var offsetAnimation = animation.drive(tween);
-
-                              return SlideTransition(
-                                position: offsetAnimation,
-                                child: child,
-                              );
-                            },
-                          ),
-                        );
-                      },
-                    ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(2.w, 5.h, 0, 0),
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.arrow_back_ios_new,
+                    size: 30,
                   ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(16.w, 5.h, 0, 0),
-                    child: Text(
-                      'Terms & Condition',
-                      style: TextStyle(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black54),
-                    ),
-                  )
-                ],
+                  onPressed: () {
+                    Navigator.pop(
+                      context,
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) {
+                          return const MenuScreen();
+                        },
+                        transitionDuration: const Duration(seconds: 1),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                          const begin =
+                              Offset(-10.0, 0.0); // slide in from the left
+                          const end = Offset.zero;
+                          const curve = Curves.easeInOutQuart;
+
+                          var tween = Tween(begin: begin, end: end)
+                              .chain(CurveTween(curve: curve));
+                          var offsetAnimation = animation.drive(tween);
+
+                          return SlideTransition(
+                            position: offsetAnimation,
+                            child: child,
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
               ),
-              SizedBox(
-                height: 10,
-              ),
-              buildCheckBoxRow('Eligibility', eligibility, (value) {
-                // setState(() {
-                //   // eligibilityChecked = value!;
-                // });
-              }),
-              SizedBox(
-                height: 15,
-              ),
-              buildCheckBoxRow('Privacy Policy', privacy_policy, (value) {
-                // setState(() {
-                //   privacyPolicyChecked = value!;
-                // });
-              }),
-              SizedBox(
-                height: 15,
-              ),
-              buildCheckBoxRow('Donation Process', donation_process, (value) {
-                // setState(() {
-                //   donationProcessChecked = value!;
-                // });
-              }),
-              SizedBox(
-                height: 15,
-              ),
-              buildCheckBoxRow('Safety', safety, (value) {
-                // setState(() {
-                //   safetyChecked = value!;
-                // });
-              }),
-              SizedBox(
-                height: 15,
-              ),
-              buildCheckBoxRow('Hygiene', hygience, (value) {
-                // setState(() {
-                //   hygieneChecked = value!;
-                // });
-              }),
+              Padding(
+                padding: EdgeInsets.fromLTRB(16.w, 5.h, 0, 0),
+                child: Text(
+                  'Terms & Condition',
+                  style: TextStyle(
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54),
+                ),
+              )
             ],
           ),
-        ),
-      );
-    });
+          SizedBox(
+            height: 10,
+          ),
+          buildCheckBoxRow('Eligibility', eligibility, (value) {
+            // setState(() {
+            //   // eligibilityChecked = value!;
+            // });
+          }),
+          SizedBox(
+            height: 15,
+          ),
+          buildCheckBoxRow('Privacy Policy', privacy_policy, (value) {
+            // setState(() {
+            //   privacyPolicyChecked = value!;
+            // });
+          }),
+          SizedBox(
+            height: 15,
+          ),
+          buildCheckBoxRow('Donation Process', donation_process, (value) {
+            // setState(() {
+            //   donationProcessChecked = value!;
+            // });
+          }),
+          SizedBox(
+            height: 15,
+          ),
+          buildCheckBoxRow('Safety', safety, (value) {
+            // setState(() {
+            //   safetyChecked = value!;
+            // });
+          }),
+          SizedBox(
+            height: 15,
+          ),
+          buildCheckBoxRow('Hygiene', hygience, (value) {
+            // setState(() {
+            //   hygieneChecked = value!;
+            // });
+          }),
+        ],
+      ),
+    );
   }
 
   Widget buildCheckBoxRow(

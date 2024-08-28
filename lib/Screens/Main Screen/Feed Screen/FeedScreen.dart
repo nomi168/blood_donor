@@ -84,96 +84,91 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return Sizer(builder: (context, orientation, deviceType) {
-      return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(
-          resizeToAvoidBottomInset: true,
-          backgroundColor: const Color(0xFFFFFFFF),
-          body: Column(
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      backgroundColor: const Color(0xFFFFFFFF),
+      body: Column(
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Material(
-                      child: Container(
-                        padding: EdgeInsets.fromLTRB(5.w, 5.h, 0, 0),
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            elevation: 7,
-                            shadowColor: const Color(0x00e3e3e3),
-                            backgroundColor: index == 1
-                                ? const Color(0xFFDE0A1E)
-                                : const Color(0xFFFFFFFF),
-                            minimumSize: Size(double.infinity, 6.h),
-                          ),
-                          child: Text(
-                            'Feed',
-                            style: TextStyle(
-                              color: index == 1
-                                  ? const Color(0xFFFFFFFF)
-                                  : const Color(0xFF353535),
-                            ),
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              index = 1;
-                            });
-                          },
+              Expanded(
+                child: Material(
+                  child: Container(
+                    padding: EdgeInsets.fromLTRB(5.w, 5.h, 0, 0),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        elevation: 7,
+                        shadowColor: const Color(0x00e3e3e3),
+                        backgroundColor: index == 1
+                            ? const Color(0xFFDE0A1E)
+                            : const Color(0xFFFFFFFF),
+                        minimumSize: Size(double.infinity, 6.h),
+                      ),
+                      child: Text(
+                        'Feed',
+                        style: TextStyle(
+                          color: index == 1
+                              ? const Color(0xFFFFFFFF)
+                              : const Color(0xFF353535),
                         ),
                       ),
+                      onPressed: () {
+                        setState(() {
+                          index = 1;
+                        });
+                      },
                     ),
                   ),
-                  Expanded(
-                    child: Material(
-                      child: Container(
-                        padding: EdgeInsets.fromLTRB(1.w, 5.h, 5.w, 0),
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            elevation: 7,
-                            shadowColor: const Color(0x00e3e3e3),
-                            backgroundColor: index == 2
-                                ? const Color(0xFFDE0A1E)
-                                : const Color(0xFFFFFFFF),
-                            minimumSize: Size(double.infinity, 6.h),
-                          ),
-                          child: Text(
-                            'Request',
-                            style: TextStyle(
-                              color: index == 2
-                                  ? const Color(0xFFFFFFFF)
-                                  : const Color(0xFF353535),
-                            ),
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              index = 2;
-                            });
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
               Expanded(
-                child: index == 1
-                    ? FeedButton()
-                    : index == 2
-                        ? RequestButton()
-                        : Container(), // Add more conditions as needed
+                child: Material(
+                  child: Container(
+                    padding: EdgeInsets.fromLTRB(1.w, 5.h, 5.w, 0),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        elevation: 7,
+                        shadowColor: const Color(0x00e3e3e3),
+                        backgroundColor: index == 2
+                            ? const Color(0xFFDE0A1E)
+                            : const Color(0xFFFFFFFF),
+                        minimumSize: Size(double.infinity, 6.h),
+                      ),
+                      child: Text(
+                        'Request',
+                        style: TextStyle(
+                          color: index == 2
+                              ? const Color(0xFFFFFFFF)
+                              : const Color(0xFF353535),
+                        ),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          index = 2;
+                        });
+                      },
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
-        ),
-      );
-    });
+          Expanded(
+            child: index == 1
+                ? FeedButton()
+                : index == 2
+                    ? RequestButton()
+                    : Container(), // Add more conditions as needed
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> getTakerData() async {
@@ -817,137 +812,134 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
             getTakerData();
           });
         },
-        child: Container(
-            margin: EdgeInsets.fromLTRB(5.w, 0.w, 5.w, 0),
-            child: GridView.builder(
-              physics: const ScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: isLoading ? 6 : feedsData.length,
-              itemBuilder: (context, index) {
-                if (isLoading) {
-                  return Shimmer.fromColors(
-                    baseColor: Colors.grey[300]!,
-                    highlightColor: Colors.grey[100]!,
-                    child: Container(
-                      height: 160,
-                      margin: EdgeInsets.symmetric(vertical: 10),
-                      decoration: ShapeDecoration(
-                        color: Colors.grey[300],
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ),
-                  );
-                } else {
-                  Taker taker = feedsData[index];
-                  return Container(
-                    margin: EdgeInsets.fromLTRB(0.w, 0.w, 0.w, 0),
-                    child:
-                        // notifi = feedsData[index].email;
-
-                        Column(
-                      children: [
-                        Container(
+        child: feedsData.isEmpty
+            ? Center(
+                child: Text(
+                  "No data found",
+                  style: TextStyle(fontSize: 15, color: Colors.black),
+                ),
+              )
+            : Container(
+                margin: EdgeInsets.fromLTRB(5.w, 0.w, 5.w, 0),
+                child: GridView.builder(
+                  physics: const ScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: isLoading ? 6 : feedsData.length,
+                  itemBuilder: (context, index) {
+                    if (isLoading) {
+                      return Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Container(
                           height: 160,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 5, vertical: 12),
-                          clipBehavior: Clip.antiAlias,
+                          margin: EdgeInsets.symmetric(vertical: 10),
                           decoration: ShapeDecoration(
+                            color: Colors.grey[300],
                             shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                  width: 1, color: Color(0xFFDDDDDD)),
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: 70,
-                                      height: 70,
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(10),
-                                        child: CachedNetworkImage(
-                                          fit: BoxFit.cover,
-                                          imageUrl: taker.imageURL.isNotEmpty
-                                              ? taker.imageURL
-                                              : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
-                                          placeholder: (context, url) =>
-                                              const CupertinoActivityIndicator(
-                                            color: Colors.white,
-                                          ),
-                                          errorWidget: (context, url, error) =>
-                                              Icon(Icons.error),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 5),
-                                    Container(
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            feedsData[index].name,
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 18,
-                                              fontFamily: 'Montserrat',
-                                              fontWeight: FontWeight.w500,
-                                              height: 0,
+                        ),
+                      );
+                    } else {
+                      Taker taker = feedsData[index];
+                      return Container(
+                        margin: EdgeInsets.fromLTRB(0.w, 0.w, 0.w, 0),
+                        child:
+                            // notifi = feedsData[index].email;
+
+                            Column(
+                          children: [
+                            Container(
+                              height: 160,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 5, vertical: 12),
+                              clipBehavior: Clip.antiAlias,
+                              decoration: ShapeDecoration(
+                                shape: RoundedRectangleBorder(
+                                  side: BorderSide(
+                                      width: 1, color: Color(0xFFDDDDDD)),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          width: 70,
+                                          height: 70,
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            child: CachedNetworkImage(
+                                              fit: BoxFit.cover,
+                                              imageUrl: taker
+                                                      .imageURL.isNotEmpty
+                                                  ? taker.imageURL
+                                                  : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
+                                              placeholder: (context, url) =>
+                                                  const CupertinoActivityIndicator(
+                                                color: Colors.white,
+                                              ),
+                                              errorWidget:
+                                                  (context, url, error) =>
+                                                      Icon(Icons.error),
                                             ),
                                           ),
-                                          const SizedBox(height: 12),
-                                          Container(
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Container(
-                                                  width: 220,
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        'Location :',
-                                                        style: TextStyle(
-                                                          color:
-                                                              Color(0xFF5A5A5A),
-                                                          fontSize: 12,
-                                                          fontFamily:
-                                                              'Montserrat',
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          height: 0.13,
-                                                        ),
-                                                      ),
-                                                      const SizedBox(width: 5),
-                                                      Expanded(
-                                                        child: SizedBox(
-                                                          child: Text(
-                                                            feedsData[index]
-                                                                .location,
+                                        ),
+                                        const SizedBox(width: 5),
+                                        Container(
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                feedsData[index].name,
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 18,
+                                                  fontFamily: 'Montserrat',
+                                                  fontWeight: FontWeight.w500,
+                                                  height: 0,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 12),
+                                              Container(
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Container(
+                                                      width: 220,
+                                                      child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            'Location :',
                                                             style: TextStyle(
                                                               color: Color(
                                                                   0xFF5A5A5A),
@@ -960,348 +952,400 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
                                                               height: 0.13,
                                                             ),
                                                           ),
-                                                        ),
-                                                      )
-                                                    ],
-                                                  ),
+                                                          const SizedBox(
+                                                              width: 5),
+                                                          Expanded(
+                                                            child: SizedBox(
+                                                              child: Text(
+                                                                feedsData[index]
+                                                                    .location,
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Color(
+                                                                      0xFF5A5A5A),
+                                                                  fontSize: 12,
+                                                                  fontFamily:
+                                                                      'Montserrat',
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  height: 0.13,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 15),
+                                                    Container(
+                                                      child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            'Blood Group :',
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xFF5A5A5A),
+                                                              fontSize: 12,
+                                                              fontFamily:
+                                                                  'Montserrat',
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              height: 0.13,
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              width: 5),
+                                                          Text(
+                                                            feedsData[index]
+                                                                .blood,
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xFF5A5A5A),
+                                                              fontSize: 12,
+                                                              fontFamily:
+                                                                  'Montserrat',
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              height: 0.13,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 15),
+                                                    Container(
+                                                      child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            'Date :',
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xFF5A5A5A),
+                                                              fontSize: 12,
+                                                              fontFamily:
+                                                                  'Montserrat',
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              height: 0.13,
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              width: 5),
+                                                          Text(
+                                                            feedsData[index]
+                                                                .date,
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xFF5A5A5A),
+                                                              fontSize: 12,
+                                                              fontFamily:
+                                                                  'Montserrat',
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              height: 0.13,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 15),
+                                                    Container(
+                                                      child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            'Time :',
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xFF5A5A5A),
+                                                              fontSize: 12,
+                                                              fontFamily:
+                                                                  'Montserrat',
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              height: 0.13,
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              width: 5),
+                                                          Text(
+                                                            feedsData[index]
+                                                                .time,
+                                                            style: TextStyle(
+                                                              color: Color(
+                                                                  0xFF5A5A5A),
+                                                              fontSize: 12,
+                                                              fontFamily:
+                                                                  'Montserrat',
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              height: 0.13,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
-                                                const SizedBox(height: 15),
-                                                Container(
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        'Blood Group :',
-                                                        style: TextStyle(
-                                                          color:
-                                                              Color(0xFF5A5A5A),
-                                                          fontSize: 12,
-                                                          fontFamily:
-                                                              'Montserrat',
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          height: 0.13,
-                                                        ),
-                                                      ),
-                                                      const SizedBox(width: 5),
-                                                      Text(
-                                                        feedsData[index].blood,
-                                                        style: TextStyle(
-                                                          color:
-                                                              Color(0xFF5A5A5A),
-                                                          fontSize: 12,
-                                                          fontFamily:
-                                                              'Montserrat',
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          height: 0.13,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 15),
-                                                Container(
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        'Date :',
-                                                        style: TextStyle(
-                                                          color:
-                                                              Color(0xFF5A5A5A),
-                                                          fontSize: 12,
-                                                          fontFamily:
-                                                              'Montserrat',
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          height: 0.13,
-                                                        ),
-                                                      ),
-                                                      const SizedBox(width: 5),
-                                                      Text(
-                                                        feedsData[index].date,
-                                                        style: TextStyle(
-                                                          color:
-                                                              Color(0xFF5A5A5A),
-                                                          fontSize: 12,
-                                                          fontFamily:
-                                                              'Montserrat',
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          height: 0.13,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 15),
-                                                Container(
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        'Time :',
-                                                        style: TextStyle(
-                                                          color:
-                                                              Color(0xFF5A5A5A),
-                                                          fontSize: 12,
-                                                          fontFamily:
-                                                              'Montserrat',
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          height: 0.13,
-                                                        ),
-                                                      ),
-                                                      const SizedBox(width: 5),
-                                                      Text(
-                                                        feedsData[index].time,
-                                                        style: TextStyle(
-                                                          color:
-                                                              Color(0xFF5A5A5A),
-                                                          fontSize: 12,
-                                                          fontFamily:
-                                                              'Montserrat',
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          height: 0.13,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          const SizedBox(height: 15),
-                                          Row(
-                                            children: [
-                                              InkWell(
-                                                onTap: () async {
-                                                  final FirebaseAuth _auth =
-                                                      FirebaseAuth.instance;
-                                                  final User? currentUser =
-                                                      _auth.currentUser;
-                                                  final String? userEmail =
-                                                      currentUser?.email;
+                                              ),
+                                              const SizedBox(height: 15),
+                                              Row(
+                                                children: [
+                                                  InkWell(
+                                                    onTap: () async {
+                                                      final FirebaseAuth _auth =
+                                                          FirebaseAuth.instance;
+                                                      final User? currentUser =
+                                                          _auth.currentUser;
+                                                      final String? userEmail =
+                                                          currentUser?.email;
 
-                                                  if (currentUser != null) {
-                                                    // Get recipient's email (for demo, you can replace this with actual recipient email)
-                                                    String recipientEmail =
-                                                        feedsData[index].email;
-                                                    String rename =
-                                                        feedsData[index].name;
-                                                    String recimage =
-                                                        feedsData[index]
-                                                            .imageURL;
-                                                    String id = feedsData[index]
-                                                        .tak_id!;
-                                                    receiver_id = id;
+                                                      if (currentUser != null) {
+                                                        // Get recipient's email (for demo, you can replace this with actual recipient email)
+                                                        String recipientEmail =
+                                                            feedsData[index]
+                                                                .email;
+                                                        String rename =
+                                                            feedsData[index]
+                                                                .name;
+                                                        String recimage =
+                                                            feedsData[index]
+                                                                .imageURL;
+                                                        String id =
+                                                            feedsData[index]
+                                                                .tak_id!;
+                                                        receiver_id = id;
 
-                                                    if (userType == 'donor') {
-                                                      // Send chat request
-                                                      await sendChatRequest(
-                                                          userEmail!,
-                                                          recipientEmail,
-                                                          profilename,
-                                                          number,
-                                                          image,
-                                                          rename,
-                                                          recimage,
-                                                          id);
-                                                    } else {
-                                                      showCustomSnackBar(
-                                                          context,
-                                                          'Only donors can send chat requests.',
-                                                          false);
-                                                    }
+                                                        if (userType ==
+                                                            'donor') {
+                                                          // Send chat request
+                                                          await sendChatRequest(
+                                                              userEmail!,
+                                                              recipientEmail,
+                                                              profilename,
+                                                              number,
+                                                              image,
+                                                              rename,
+                                                              recimage,
+                                                              id);
+                                                        } else {
+                                                          showCustomSnackBar(
+                                                              context,
+                                                              'Only donors can send chat requests.',
+                                                              false);
+                                                        }
 
-                                                    // Show notification or navigate to chat screen
-                                                  }
-                                                },
-                                                child: Container(
-                                                  height: 30,
-                                                  width: 90,
-                                                  alignment: Alignment.center,
-                                                  decoration: BoxDecoration(
-                                                    color: PRIMARY_COLOR,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5),
-                                                    border: Border.all(
-                                                      color: Colors.red,
-                                                      width: 1.0,
+                                                        // Show notification or navigate to chat screen
+                                                      }
+                                                    },
+                                                    child: Container(
+                                                      height: 30,
+                                                      width: 90,
+                                                      alignment:
+                                                          Alignment.center,
+                                                      decoration: BoxDecoration(
+                                                        color: PRIMARY_COLOR,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(5),
+                                                        border: Border.all(
+                                                          color: Colors.red,
+                                                          width: 1.0,
+                                                        ),
+                                                      ),
+                                                      child: Text(
+                                                        'Request',
+                                                        style: TextStyle(
+                                                            fontSize: 14,
+                                                            color:
+                                                                Colors.white),
+                                                      ),
                                                     ),
                                                   ),
-                                                  child: Text(
-                                                    'Request',
-                                                    style: TextStyle(
-                                                        fontSize: 14,
-                                                        color: Colors.white),
+                                                  SizedBox(
+                                                    width: 10,
                                                   ),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                width: 10,
-                                              ),
-                                              InkWell(
-                                                onTap: () {
-                                                  String id =
-                                                      feedsData[index].id;
-                                                  String name =
-                                                      feedsData[index].name;
-                                                  String email =
-                                                      feedsData[index].email;
-                                                  String image =
-                                                      feedsData[index].imageURL;
-                                                  String blood =
-                                                      feedsData[index].blood;
-                                                  String location =
-                                                      feedsData[index].location;
-                                                  String hosname =
-                                                      feedsData[index]
-                                                          .hospitaname;
-                                                  String rating =
-                                                      feedsData[index]
-                                                          .rating
-                                                          .toString();
+                                                  InkWell(
+                                                    onTap: () {
+                                                      String id =
+                                                          feedsData[index].id;
+                                                      String name =
+                                                          feedsData[index].name;
+                                                      String email =
+                                                          feedsData[index]
+                                                              .email;
+                                                      String image =
+                                                          feedsData[index]
+                                                              .imageURL;
+                                                      String blood =
+                                                          feedsData[index]
+                                                              .blood;
+                                                      String location =
+                                                          feedsData[index]
+                                                              .location;
+                                                      String hosname =
+                                                          feedsData[index]
+                                                              .hospitaname;
+                                                      String rating =
+                                                          feedsData[index]
+                                                              .rating
+                                                              .toString();
 
-                                                  String time =
-                                                      feedsData[index].time;
-                                                  String date =
-                                                      feedsData[index].date;
-                                                  String note =
-                                                      feedsData[index].note;
-                                                  String taker_id =
-                                                      feedsData[index]
-                                                          .t_id
-                                                          .toString();
-                                                  // if (userType == 'donor') {
-                                                  Navigator.of(context,
-                                                          rootNavigator: true)
-                                                      .push(
-                                                    PageRouteBuilder(
-                                                      pageBuilder: (context,
-                                                          animation,
-                                                          secondaryAnimation) {
-                                                        return MapOnDonator(
-                                                          id: id,
-                                                          name: name,
-                                                          email: email,
-                                                          image: image,
-                                                          blood: blood,
-                                                          location: location,
-                                                          hosname: hosname,
-                                                          rating:
-                                                              rating.toString(),
-                                                          time: time,
-                                                          date: date,
-                                                          note: note,
-                                                        );
-                                                      },
-                                                      transitionDuration:
-                                                          const Duration(
-                                                              seconds: 1),
-                                                      transitionsBuilder:
-                                                          (context,
+                                                      String time =
+                                                          feedsData[index].time;
+                                                      String date =
+                                                          feedsData[index].date;
+                                                      String note =
+                                                          feedsData[index].note;
+                                                      String taker_id =
+                                                          feedsData[index]
+                                                              .t_id
+                                                              .toString();
+                                                      // if (userType == 'donor') {
+                                                      Navigator.of(context,
+                                                              rootNavigator:
+                                                                  true)
+                                                          .push(
+                                                        PageRouteBuilder(
+                                                          pageBuilder: (context,
                                                               animation,
-                                                              secondaryAnimation,
-                                                              child) {
-                                                        const begin = Offset(
-                                                            10.0,
-                                                            0.0); // slide in from the right
-                                                        const end = Offset.zero;
-                                                        const curve = Curves
-                                                            .easeInOutQuart;
+                                                              secondaryAnimation) {
+                                                            return MapOnDonator(
+                                                              id: id,
+                                                              name: name,
+                                                              email: email,
+                                                              image: image,
+                                                              blood: blood,
+                                                              location:
+                                                                  location,
+                                                              hosname: hosname,
+                                                              rating: rating
+                                                                  .toString(),
+                                                              time: time,
+                                                              date: date,
+                                                              note: note,
+                                                            );
+                                                          },
+                                                          transitionDuration:
+                                                              const Duration(
+                                                                  seconds: 1),
+                                                          transitionsBuilder:
+                                                              (context,
+                                                                  animation,
+                                                                  secondaryAnimation,
+                                                                  child) {
+                                                            const begin = Offset(
+                                                                10.0,
+                                                                0.0); // slide in from the right
+                                                            const end =
+                                                                Offset.zero;
+                                                            const curve = Curves
+                                                                .easeInOutQuart;
 
-                                                        var tween = Tween(
-                                                                begin: begin,
-                                                                end: end)
-                                                            .chain(CurveTween(
-                                                                curve: curve));
-                                                        var offsetAnimation =
-                                                            animation
-                                                                .drive(tween);
+                                                            var tween = Tween(
+                                                                    begin:
+                                                                        begin,
+                                                                    end: end)
+                                                                .chain(CurveTween(
+                                                                    curve:
+                                                                        curve));
+                                                            var offsetAnimation =
+                                                                animation.drive(
+                                                                    tween);
 
-                                                        return SlideTransition(
-                                                          position:
-                                                              offsetAnimation,
-                                                          child: child,
-                                                        );
-                                                      },
-                                                    ),
-                                                  );
+                                                            return SlideTransition(
+                                                              position:
+                                                                  offsetAnimation,
+                                                              child: child,
+                                                            );
+                                                          },
+                                                        ),
+                                                      );
 
-                                                  //  else {
-                                                  //   showCustomSnackBar(
-                                                  //       context,
-                                                  //       "Taker is doesnot donate any blood",
-                                                  //       false);
-                                                  // }
-                                                },
-                                                child: Container(
-                                                  height: 30,
-                                                  width: 90,
-                                                  alignment: Alignment.center,
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5),
-                                                    border: Border.all(
-                                                      color: Colors.red,
-                                                      width: 1.0,
+                                                      //  else {
+                                                      //   showCustomSnackBar(
+                                                      //       context,
+                                                      //       "Taker is doesnot donate any blood",
+                                                      //       false);
+                                                      // }
+                                                    },
+                                                    child: Container(
+                                                      height: 30,
+                                                      width: 90,
+                                                      alignment:
+                                                          Alignment.center,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(5),
+                                                        border: Border.all(
+                                                          color: Colors.red,
+                                                          width: 1.0,
+                                                        ),
+                                                      ),
+                                                      child: Text(
+                                                        'Donate',
+                                                        style: TextStyle(
+                                                            fontSize: 14,
+                                                            color:
+                                                                Colors.black87),
+                                                      ),
                                                     ),
                                                   ),
-                                                  child: Text(
-                                                    'Donate',
-                                                    style: TextStyle(
-                                                        fontSize: 14,
-                                                        color: Colors.black87),
-                                                  ),
-                                                ),
-                                              ),
+                                                ],
+                                              )
                                             ],
-                                          )
-                                        ],
-                                      ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  );
-                }
-              },
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 1,
-                childAspectRatio: 1.0,
-                crossAxisSpacing: 5.0,
-                mainAxisSpacing: 5,
-                mainAxisExtent: 170,
-              ),
-            )));
+                      );
+                    }
+                  },
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 1,
+                    childAspectRatio: 1.0,
+                    crossAxisSpacing: 5.0,
+                    mainAxisSpacing: 5,
+                    mainAxisExtent: 170,
+                  ),
+                )));
   }
 
   Future<void> updateStatus(bool isActive) async {

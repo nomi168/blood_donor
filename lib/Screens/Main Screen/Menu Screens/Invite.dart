@@ -66,100 +66,94 @@ class _InviteScreenState extends State<InviteScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Sizer(builder: (context, orientation, deviceType) {
-      return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(
-          body: Column(children: [
-            Row(
-              children: [
-                Padding(
-                  padding: EdgeInsets.fromLTRB(3.w, 4.h, 0, 0),
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.arrow_back_ios,
-                      size: 27,
-                      color: Colors.black54,
-                    ),
-                    onPressed: () {
-                      Navigator.pop(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) {
-                            return const MenuScreen();
-                          },
-                          transitionDuration: const Duration(seconds: 1),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            const begin =
-                                Offset(-10.0, 0.0); // slide in from the left
-                            const end = Offset.zero;
-                            const curve = Curves.easeInOutQuart;
-
-                            var tween = Tween(begin: begin, end: end)
-                                .chain(CurveTween(curve: curve));
-                            var offsetAnimation = animation.drive(tween);
-
-                            return SlideTransition(
-                              position: offsetAnimation,
-                              child: child,
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                Padding(
-                    padding: EdgeInsets.fromLTRB(28.w, 4.h, 0, 0),
-                    child: Text(
-                      'Invite',
-                      style: TextStyle(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black54),
-                    ))
-              ],
-            ),
+    return Scaffold(
+      body: Column(children: [
+        Row(
+          children: [
             Padding(
-              padding: EdgeInsets.all(8.0),
-              child: TextField(
-                onChanged: (value) => _filterContacts(value),
-                decoration: InputDecoration(
-                  hintText: 'Search Contacts',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
+              padding: EdgeInsets.fromLTRB(3.w, 4.h, 0, 0),
+              child: IconButton(
+                icon: const Icon(
+                  Icons.arrow_back_ios,
+                  size: 27,
+                  color: Colors.black54,
                 ),
-              ),
-            ),
-            Expanded(
-              child: _filteredContacts.isEmpty
-                  ? Center(child: Text('No contacts found'))
-                  : ListView.builder(
-                      itemCount: _filteredContacts.length,
-                      itemBuilder: (context, index) {
-                        Contact contact = _filteredContacts[index];
-                        return ListTile(
-                          title: Text(contact.displayName ?? 'No Name'),
-                          subtitle: Text(contact.phones!.isNotEmpty
-                              ? contact.phones!.first.value!
-                              : 'No Phone Number'),
-                          trailing: IconButton(
-                            icon: Icon(Icons.message),
-                            onPressed: contact.phones!.isNotEmpty
-                                ? () => _sendSMS(contact.phones!.first.value!)
-                                : null,
-                          ),
+                onPressed: () {
+                  Navigator.pop(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) {
+                        return const MenuScreen();
+                      },
+                      transitionDuration: const Duration(seconds: 1),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        const begin =
+                            Offset(-10.0, 0.0); // slide in from the left
+                        const end = Offset.zero;
+                        const curve = Curves.easeInOutQuart;
+
+                        var tween = Tween(begin: begin, end: end)
+                            .chain(CurveTween(curve: curve));
+                        var offsetAnimation = animation.drive(tween);
+
+                        return SlideTransition(
+                          position: offsetAnimation,
+                          child: child,
                         );
                       },
                     ),
+                  );
+                },
+              ),
             ),
-          ]),
+            Padding(
+                padding: EdgeInsets.fromLTRB(28.w, 4.h, 0, 0),
+                child: Text(
+                  'Invite',
+                  style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54),
+                ))
+          ],
         ),
-      );
-    });
+        Padding(
+          padding: EdgeInsets.all(8.0),
+          child: TextField(
+            onChanged: (value) => _filterContacts(value),
+            decoration: InputDecoration(
+              hintText: 'Search Contacts',
+              prefixIcon: Icon(Icons.search),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: _filteredContacts.isEmpty
+              ? Center(child: Text('No contacts found'))
+              : ListView.builder(
+                  itemCount: _filteredContacts.length,
+                  itemBuilder: (context, index) {
+                    Contact contact = _filteredContacts[index];
+                    return ListTile(
+                      title: Text(contact.displayName ?? 'No Name'),
+                      subtitle: Text(contact.phones!.isNotEmpty
+                          ? contact.phones!.first.value!
+                          : 'No Phone Number'),
+                      trailing: IconButton(
+                        icon: Icon(Icons.message),
+                        onPressed: contact.phones!.isNotEmpty
+                            ? () => _sendSMS(contact.phones!.first.value!)
+                            : null,
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ]),
+    );
   }
 }

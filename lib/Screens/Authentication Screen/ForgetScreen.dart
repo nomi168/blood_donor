@@ -34,158 +34,145 @@ class _ForgetScreenState extends State<ForgetScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Sizer(
-      builder: (context, orientation, deviceType) {
-        return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            home: Scaffold(
-                backgroundColor: Colors.white,
-                body: Form(
-                    key: _formkey,
-                    child: ListView(children: [
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(0.w, 0, 0.w, 0.h),
-                        child: Center(
-                            child: Image.network(
-                                'https://wallpapercave.com/wp/wp4323467.jpg')),
+    return Scaffold(
+        backgroundColor: Colors.white,
+        body: Form(
+            key: _formkey,
+            child: ListView(children: [
+              Padding(
+                padding: EdgeInsets.fromLTRB(0.w, 0, 0.w, 0.h),
+                child: Center(
+                    child: Image.network(
+                        'https://wallpapercave.com/wp/wp4323467.jpg')),
+              ),
+              Padding(
+                  padding: EdgeInsets.fromLTRB(0.w, 5.h, 0, 0),
+                  child: Center(
+                    child: Text(
+                      'Forget Password',
+                      style: TextStyle(
+                          fontSize: 20.sp, fontWeight: FontWeight.bold),
+                    ),
+                  )),
+              Padding(
+                padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
+                child: Material(
+                  elevation: 7.0,
+                  borderRadius: BorderRadius.circular(10.0),
+                  child: TextFormField(
+                    controller: pass,
+                    obscureText: _obscureText, // Set to true to obscure text
+                    decoration: InputDecoration(
+                      label: const Text('New Password'),
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 16.0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: const BorderSide(color: Colors.grey),
                       ),
-                      Padding(
-                          padding: EdgeInsets.fromLTRB(0.w, 5.h, 0, 0),
-                          child: Center(
-                            child: Text(
-                              'Forget Password',
-                              style: TextStyle(
-                                  fontSize: 20.sp, fontWeight: FontWeight.bold),
-                            ),
-                          )),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
-                        child: Material(
-                          elevation: 7.0,
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: const BorderSide(color: Colors.blue),
+                      ),
+                      hintText: 'New Password',
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureText
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscureText = !_obscureText;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
+                child: Material(
+                  elevation: 7.0, // Add shadow/elevation
+                  borderRadius:
+                      BorderRadius.circular(10.0), // Add border radius
+                  child: TextFormField(
+                    obscureText: _obscureText1,
+                    controller: cpass,
+                    decoration: InputDecoration(
+                      label: const Text('Confirm Password'),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16.0), // Adjust padding
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: const BorderSide(
+                            color: Colors.grey), // Border color
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureText1
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscureText1 = !_obscureText1;
+                          });
+                        },
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: const BorderSide(color: Colors.blue),
+                        // Border color when focused
+                      ),
+                      hintText: 'Confirm Password',
+                    ),
+                    validator: validatePassword,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
+                child: Material(
+                  elevation: 10.0,
+                  shadowColor: Colors.black,
+                  borderRadius: BorderRadius.circular(10.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_formkey.currentState?.validate() ?? false) {
+                        if (pass.text == cpass.text) {
+                          ForgetPassword();
+                        } else {
+                          _showAlertDialog2(context);
+                        }
+                      }
+                    },
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0),
-                          child: TextFormField(
-                            controller: pass,
-                            obscureText:
-                                _obscureText, // Set to true to obscure text
-                            decoration: InputDecoration(
-                              label: const Text('New Password'),
-                              contentPadding:
-                                  const EdgeInsets.symmetric(horizontal: 16.0),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide:
-                                    const BorderSide(color: Colors.grey),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide:
-                                    const BorderSide(color: Colors.blue),
-                              ),
-                              hintText: 'New Password',
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscureText
-                                      ? Icons.visibility_off
-                                      : Icons.visibility,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _obscureText = !_obscureText;
-                                  });
-                                },
-                              ),
-                            ),
-                          ),
                         ),
                       ),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
-                        child: Material(
-                          elevation: 7.0, // Add shadow/elevation
-                          borderRadius:
-                              BorderRadius.circular(10.0), // Add border radius
-                          child: TextFormField(
-                            obscureText: _obscureText1,
-                            controller: cpass,
-                            decoration: InputDecoration(
-                              label: const Text('Confirm Password'),
-                              contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16.0), // Adjust padding
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: const BorderSide(
-                                    color: Colors.grey), // Border color
-                              ),
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscureText1
-                                      ? Icons.visibility_off
-                                      : Icons.visibility,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _obscureText1 = !_obscureText1;
-                                  });
-                                },
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide:
-                                    const BorderSide(color: Colors.blue),
-                                // Border color when focused
-                              ),
-                              hintText: 'Confirm Password',
-                            ),
-                            validator: validatePassword,
-                          ),
-                        ),
+                      padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                        // ignore: prefer_const_constructors
+                        EdgeInsets.symmetric(vertical: 13.5, horizontal: 0),
                       ),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
-                        child: Material(
-                          elevation: 10.0,
-                          shadowColor: Colors.black,
-                          borderRadius: BorderRadius.circular(10.0),
-                          child: ElevatedButton(
-                            onPressed: () {
-                              if (_formkey.currentState?.validate() ?? false) {
-                                if (pass.text == cpass.text) {
-                                  ForgetPassword();
-                                } else {
-                                  _showAlertDialog2(context);
-                                }
-                              }
-                            },
-                            style: ButtonStyle(
-                              shape: MaterialStateProperty.all<
-                                  RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                              ),
-                              padding:
-                                  MaterialStateProperty.all<EdgeInsetsGeometry>(
-                                // ignore: prefer_const_constructors
-                                EdgeInsets.symmetric(
-                                    vertical: 13.5, horizontal: 0),
-                              ),
-                              backgroundColor: MaterialStateProperty.all<Color>(
-                                  Colors.red), // Change button color
-                            ),
-                            child: Text(
-                              'Continue',
-                              style: TextStyle(
-                                fontSize: 12.sp, // Adjust the font size
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                          Colors.red), // Change button color
+                    ),
+                    child: Text(
+                      'Continue',
+                      style: TextStyle(
+                        fontSize: 12.sp, // Adjust the font size
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
-                    ]))));
-      },
-    );
+                    ),
+                  ),
+                ),
+              ),
+            ])));
   }
 
   // ignore: non_constant_identifier_names

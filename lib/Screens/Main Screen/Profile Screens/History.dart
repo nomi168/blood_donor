@@ -28,183 +28,177 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Sizer(builder: (context, orientation, deviceType) {
-      return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(
-          body: Column(children: [
-            Row(
-              children: [
-                Padding(
-                  padding: EdgeInsets.fromLTRB(3.w, 4.h, 0, 0),
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.arrow_back_ios,
-                      size: 27,
-                      color: Colors.black54,
+    return Scaffold(
+      body: Column(children: [
+        Row(
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(3.w, 4.h, 0, 0),
+              child: IconButton(
+                icon: const Icon(
+                  Icons.arrow_back_ios,
+                  size: 27,
+                  color: Colors.black54,
+                ),
+                onPressed: () {
+                  Navigator.pop(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) {
+                        return const AccountScreen();
+                      },
+                      transitionDuration: const Duration(seconds: 1),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        const begin =
+                            Offset(-10.0, 0.0); // slide in from the left
+                        const end = Offset.zero;
+                        const curve = Curves.easeInOutQuart;
+
+                        var tween = Tween(begin: begin, end: end)
+                            .chain(CurveTween(curve: curve));
+                        var offsetAnimation = animation.drive(tween);
+
+                        return SlideTransition(
+                          position: offsetAnimation,
+                          child: child,
+                        );
+                      },
                     ),
-                    onPressed: () {
-                      Navigator.pop(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) {
-                            return const AccountScreen();
-                          },
-                          transitionDuration: const Duration(seconds: 1),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            const begin =
-                                Offset(-10.0, 0.0); // slide in from the left
-                            const end = Offset.zero;
-                            const curve = Curves.easeInOutQuart;
-
-                            var tween = Tween(begin: begin, end: end)
-                                .chain(CurveTween(curve: curve));
-                            var offsetAnimation = animation.drive(tween);
-
-                            return SlideTransition(
-                              position: offsetAnimation,
-                              child: child,
-                            );
-                          },
+                  );
+                },
+              ),
+            ),
+            Padding(
+                padding: EdgeInsets.fromLTRB(18.w, 4.h, 0, 0),
+                child: Text(
+                  'History Log',
+                  style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54),
+                ))
+          ],
+        ),
+        FutureBuilder<List<HistoryLog>>(
+          future: getChatRequestData(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return Center(child: Text('No history found'));
+            } else {
+              return SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(5.w, 0.w, 5.w, 0),
+                  child: GridView.builder(
+                    scrollDirection: Axis.vertical,
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      HistoryLog his = snapshot.data![index];
+                      return CouponCard(
+                        curveAxis: Axis.vertical,
+                        firstChild: Container(
+                          decoration: BoxDecoration(color: Colors.grey),
+                          child: userType == 'donor'
+                              ? Image.network(
+                                  fit: BoxFit.cover,
+                                  '${his.takerimage}',
+                                )
+                              : userType == 'taker'
+                                  ? Image.network(
+                                      fit: BoxFit.cover,
+                                      '${his.donorimage}',
+                                    )
+                                  : Image.network(
+                                      fit: BoxFit.cover,
+                                      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/991px-Placeholder_view_vector.svg.png',
+                                    ),
+                        ),
+                        secondChild: Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.black26,
+                          ),
+                          padding: const EdgeInsets.only(top: 0, left: 10),
+                          child: Stack(
+                            children: [
+                              Align(
+                                  alignment: Alignment.bottomRight,
+                                  child: Container(
+                                    width: 50,
+                                    height: 50,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 0),
+                                    decoration: BoxDecoration(
+                                      color: PRIMARY_COLOR,
+                                      borderRadius: const BorderRadius.only(
+                                        topLeft: Radius.circular(100),
+                                      ),
+                                    ),
+                                  )),
+                              Container(
+                                alignment: Alignment.bottomCenter,
+                                margin: EdgeInsets.only(top: 20, left: 20),
+                                child: Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        his.donorname ?? his.takername!,
+                                        style: TextStyle(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w400,
+                                            color: Colors.white),
+                                      ),
+                                      const SizedBox(height: 2),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                alignment: Alignment.bottomCenter,
+                                margin: EdgeInsets.only(top: 50, left: 20),
+                                child: Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        his.donoremail ?? his.takerblood!,
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w400,
+                                            color: PRIMARY_COLOR),
+                                      ),
+                                      const SizedBox(height: 2),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 1,
+                      childAspectRatio: 1.0,
+                      crossAxisSpacing: 5.0,
+                      mainAxisSpacing: 5,
+                      mainAxisExtent: 120,
+                    ),
                   ),
                 ),
-                Padding(
-                    padding: EdgeInsets.fromLTRB(18.w, 4.h, 0, 0),
-                    child: Text(
-                      'History Log',
-                      style: TextStyle(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black54),
-                    ))
-              ],
-            ),
-            FutureBuilder<List<HistoryLog>>(
-              future: getChatRequestData(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('No history found'));
-                } else {
-                  return SingleChildScrollView(
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(5.w, 0.w, 5.w, 0),
-                      child: GridView.builder(
-                        scrollDirection: Axis.vertical,
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (context, index) {
-                          HistoryLog his = snapshot.data![index];
-                          return CouponCard(
-                            curveAxis: Axis.vertical,
-                            firstChild: Container(
-                              decoration: BoxDecoration(color: Colors.grey),
-                              child: userType == 'donor'
-                                  ? Image.network(
-                                      fit: BoxFit.cover,
-                                      '${his.takerimage}',
-                                    )
-                                  : userType == 'taker'
-                                      ? Image.network(
-                                          fit: BoxFit.cover,
-                                          '${his.donorimage}',
-                                        )
-                                      : Image.network(
-                                          fit: BoxFit.cover,
-                                          'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/991px-Placeholder_view_vector.svg.png',
-                                        ),
-                            ),
-                            secondChild: Container(
-                              decoration: const BoxDecoration(
-                                color: Colors.black26,
-                              ),
-                              padding: const EdgeInsets.only(top: 0, left: 10),
-                              child: Stack(
-                                children: [
-                                  Align(
-                                      alignment: Alignment.bottomRight,
-                                      child: Container(
-                                        width: 50,
-                                        height: 50,
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10, vertical: 0),
-                                        decoration: BoxDecoration(
-                                          color: PRIMARY_COLOR,
-                                          borderRadius: const BorderRadius.only(
-                                            topLeft: Radius.circular(100),
-                                          ),
-                                        ),
-                                      )),
-                                  Container(
-                                    alignment: Alignment.bottomCenter,
-                                    margin: EdgeInsets.only(top: 20, left: 20),
-                                    child: Align(
-                                      alignment: Alignment.topLeft,
-                                      child: Column(
-                                        children: [
-                                          Text(
-                                            his.donorname ?? his.takername!,
-                                            style: TextStyle(
-                                                fontSize: 17,
-                                                fontWeight: FontWeight.w400,
-                                                color: Colors.white),
-                                          ),
-                                          const SizedBox(height: 2),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    alignment: Alignment.bottomCenter,
-                                    margin: EdgeInsets.only(top: 50, left: 20),
-                                    child: Align(
-                                      alignment: Alignment.topLeft,
-                                      child: Column(
-                                        children: [
-                                          Text(
-                                            his.donoremail ?? his.takerblood!,
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w400,
-                                                color: PRIMARY_COLOR),
-                                          ),
-                                          const SizedBox(height: 2),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 1,
-                          childAspectRatio: 1.0,
-                          crossAxisSpacing: 5.0,
-                          mainAxisSpacing: 5,
-                          mainAxisExtent: 120,
-                        ),
-                      ),
-                    ),
-                  );
-                }
-              },
-            ),
-          ]),
+              );
+            }
+          },
         ),
-      );
-    });
+      ]),
+    );
   }
 
   Future<List<HistoryLog>> getChatRequestData() async {

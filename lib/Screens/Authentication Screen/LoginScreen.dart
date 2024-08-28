@@ -102,235 +102,223 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Sizer(
-      builder: (context, orientation, deviceType) {
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          home: Scaffold(
-            backgroundColor: Colors.white,
-            body: Form(
-              key: _formKey,
-              child: ListView(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(0.w, 1.h, 0.w, 0.h),
-                    child: Center(
-                        child: SvgPicture.asset('images/Banners/Login.svg')),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(0.w, 5.h, 0, 0),
-                    child: Center(
-                      child: Text(
-                        'Login',
-                        style: TextStyle(
-                            fontSize: 20.sp, fontWeight: FontWeight.bold),
-                      ),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(0.w, 1.h, 0.w, 0.h),
+              child:
+                  Center(child: SvgPicture.asset('images/Banners/Login.svg')),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(0.w, 5.h, 0, 0),
+              child: Center(
+                child: Text(
+                  'Login',
+                  style:
+                      TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
+              child: Material(
+                elevation: 2.5,
+                borderRadius: BorderRadius.circular(10.0),
+                child: TextFormField(
+                  controller: _email,
+                  decoration: InputDecoration(
+                    label: const Text(
+                      'Email',
+                      style: TextStyle(fontSize: 15, color: Colors.black45),
+                    ),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 16.0),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: const BorderSide(color: Colors.grey),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: const BorderSide(color: Colors.white),
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
-                    child: Material(
-                      elevation: 2.5,
-                      borderRadius: BorderRadius.circular(10.0),
-                      child: TextFormField(
-                        controller: _email,
-                        decoration: InputDecoration(
-                          label: const Text(
-                            'Email',
-                            style:
-                                TextStyle(fontSize: 15, color: Colors.black45),
-                          ),
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 16.0),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                            borderSide: const BorderSide(color: Colors.grey),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                            borderSide: const BorderSide(color: Colors.white),
-                          ),
-                        ),
-                        validator: validateEmail,
-                      ),
+                  validator: validateEmail,
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
+              child: Material(
+                elevation: 2.5,
+                borderRadius: BorderRadius.circular(10.0),
+                child: TextFormField(
+                  controller: _password,
+                  decoration: InputDecoration(
+                    label: const Text(
+                      'Password',
+                      style: TextStyle(fontSize: 15, color: Colors.black45),
+                    ),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 16.0),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: const BorderSide(color: Colors.grey),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: const BorderSide(color: Colors.blue),
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
-                    child: Material(
-                      elevation: 2.5,
-                      borderRadius: BorderRadius.circular(10.0),
-                      child: TextFormField(
-                        controller: _password,
-                        decoration: InputDecoration(
-                          label: const Text(
-                            'Password',
-                            style:
-                                TextStyle(fontSize: 15, color: Colors.black45),
-                          ),
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 16.0),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                            borderSide: const BorderSide(color: Colors.grey),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                            borderSide: const BorderSide(color: Colors.blue),
-                          ),
-                        ),
-                        validator: validatePassword,
-                      ),
-                    ),
+                  validator: validatePassword,
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(62.w, 0, 0, 0),
+              child: TextButton(
+                child: Text(
+                  'Forget Password',
+                  style: TextStyle(
+                    fontSize: 10.sp,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFFDE0A1E),
+                    fontStyle: FontStyle.italic,
                   ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(62.w, 0, 0, 0),
-                    child: TextButton(
-                      child: Text(
-                        'Forget Password',
-                        style: TextStyle(
-                          fontSize: 10.sp,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFFDE0A1E),
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder:
-                                (context, animation, secondaryAnimation) {
-                              return const OTPForgetScreen();
-                            },
-                            transitionDuration: const Duration(seconds: 1),
-                            transitionsBuilder: (context, animation,
-                                secondaryAnimation, child) {
-                              const begin = Offset(10.0, 0.0);
-                              const end = Offset.zero;
-                              const curve = Curves.easeInOutQuart;
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) {
+                        return const OTPForgetScreen();
+                      },
+                      transitionDuration: const Duration(seconds: 1),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        const begin = Offset(10.0, 0.0);
+                        const end = Offset.zero;
+                        const curve = Curves.easeInOutQuart;
 
-                              var tween = Tween(begin: begin, end: end)
-                                  .chain(CurveTween(curve: curve));
-                              var offsetAnimation = animation.drive(tween);
+                        var tween = Tween(begin: begin, end: end)
+                            .chain(CurveTween(curve: curve));
+                        var offsetAnimation = animation.drive(tween);
 
-                              return SlideTransition(
-                                position: offsetAnimation,
-                                child: child,
-                              );
-                            },
-                          ),
+                        return SlideTransition(
+                          position: offsetAnimation,
+                          child: child,
                         );
                       },
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(5.w, 0.h, 5.w, 0),
-                    child: Material(
-                      elevation: 3.5,
-                      shadowColor: Colors.black,
-                      borderRadius: BorderRadius.circular(10.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            showCircularProgressIndicator = true;
-                          });
-                          if (_formKey.currentState?.validate() ?? false) {
-                            loginToFirestore();
-                          } else {
-                            setState(() {
-                              showCircularProgressIndicator = false;
-                            });
-                          }
-                        },
-                        style: ButtonStyle(
-                          shape:
-                              MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                          ),
-                          padding:
-                              MaterialStateProperty.all<EdgeInsetsGeometry>(
-                            EdgeInsets.symmetric(vertical: 13.5, horizontal: 0),
-                          ),
-                          backgroundColor: MaterialStateProperty.all<Color>(
-                              const Color(0xFFDE0A1E)),
-                        ),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            if (showCircularProgressIndicator)
-                              const SizedBox(
-                                height: 22.0,
-                                width: 22.0,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.0,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white),
-                                ),
-                              ),
-                            if (!showCircularProgressIndicator)
-                              Text(
-                                'Continue',
-                                style: TextStyle(
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // Padding(
-                  //   padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
-                  //   child: Material(
-                  //     elevation: 3.5,
-                  //     shadowColor: Colors.black,
-                  //     borderRadius: BorderRadius.circular(10.0),
-                  //     child: ElevatedButton(
-                  //       onPressed: () {
-                  //         authenticateWithFingerprint();
-                  //       },
-                  //       style: ButtonStyle(
-                  //         shape:
-                  //             MaterialStateProperty.all<RoundedRectangleBorder>(
-                  //           RoundedRectangleBorder(
-                  //             borderRadius: BorderRadius.circular(10.0),
-                  //           ),
-                  //         ),
-                  //         padding:
-                  //             MaterialStateProperty.all<EdgeInsetsGeometry>(
-                  //           EdgeInsets.symmetric(vertical: 13.5, horizontal: 0),
-                  //         ),
-                  //         backgroundColor: MaterialStateProperty.all<Color>(
-                  //             const Color(0xFFDE0A1E)),
-                  //       ),
-                  //       child: Stack(
-                  //         alignment: Alignment.center,
-                  //         children: [
-                  //           Text(
-                  //             'Login with Fingerprint',
-                  //             style: TextStyle(
-                  //               fontSize: 12.sp,
-                  //               fontWeight: FontWeight.bold,
-                  //               color: Colors.white,
-                  //             ),
-                  //           ),
-                  //         ],
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-                ],
+                  );
+                },
               ),
             ),
-          ),
-        );
-      },
+            Padding(
+              padding: EdgeInsets.fromLTRB(5.w, 0.h, 5.w, 0),
+              child: Material(
+                elevation: 3.5,
+                shadowColor: Colors.black,
+                borderRadius: BorderRadius.circular(10.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      showCircularProgressIndicator = true;
+                    });
+                    if (_formKey.currentState?.validate() ?? false) {
+                      loginToFirestore();
+                    } else {
+                      setState(() {
+                        showCircularProgressIndicator = false;
+                      });
+                    }
+                  },
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                    padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                      EdgeInsets.symmetric(vertical: 13.5, horizontal: 0),
+                    ),
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                        const Color(0xFFDE0A1E)),
+                  ),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      if (showCircularProgressIndicator)
+                        const SizedBox(
+                          height: 22.0,
+                          width: 22.0,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.0,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        ),
+                      if (!showCircularProgressIndicator)
+                        Text(
+                          'Continue',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // Padding(
+            //   padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
+            //   child: Material(
+            //     elevation: 3.5,
+            //     shadowColor: Colors.black,
+            //     borderRadius: BorderRadius.circular(10.0),
+            //     child: ElevatedButton(
+            //       onPressed: () {
+            //         authenticateWithFingerprint();
+            //       },
+            //       style: ButtonStyle(
+            //         shape:
+            //             MaterialStateProperty.all<RoundedRectangleBorder>(
+            //           RoundedRectangleBorder(
+            //             borderRadius: BorderRadius.circular(10.0),
+            //           ),
+            //         ),
+            //         padding:
+            //             MaterialStateProperty.all<EdgeInsetsGeometry>(
+            //           EdgeInsets.symmetric(vertical: 13.5, horizontal: 0),
+            //         ),
+            //         backgroundColor: MaterialStateProperty.all<Color>(
+            //             const Color(0xFFDE0A1E)),
+            //       ),
+            //       child: Stack(
+            //         alignment: Alignment.center,
+            //         children: [
+            //           Text(
+            //             'Login with Fingerprint',
+            //             style: TextStyle(
+            //               fontSize: 12.sp,
+            //               fontWeight: FontWeight.bold,
+            //               color: Colors.white,
+            //             ),
+            //           ),
+            //         ],
+            //       ),
+            //     ),
+            //   ),
+            // ),
+          ],
+        ),
+      ),
     );
   }
 

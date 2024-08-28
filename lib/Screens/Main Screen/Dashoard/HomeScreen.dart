@@ -1344,17 +1344,31 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                             children: [
                                               Row(
                                                 children: [
-                                                  Text(
-                                                    name,
-                                                    style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 18,
-                                                      fontFamily: 'Montserrat',
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      height: 0,
-                                                    ),
-                                                  ),
+                                                  name.isNotEmpty
+                                                      ? Text(
+                                                          name,
+                                                          style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 18,
+                                                            fontFamily:
+                                                                'Montserrat',
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            height: 0,
+                                                          ),
+                                                        )
+                                                      : Text(
+                                                          "N/A",
+                                                          style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 18,
+                                                            fontFamily:
+                                                                'Montserrat',
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            height: 0,
+                                                          ),
+                                                        ),
                                                   SizedBox(
                                                     width: 10,
                                                   ),

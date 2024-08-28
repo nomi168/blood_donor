@@ -10,6 +10,7 @@ import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -26,6 +27,13 @@ void main() async {
     print("Notification body: ${message.notification?.body}");
     // Handle the received notification
   });
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent, // Set the status bar color
+    // statusBarBrightness: Brightness.light, // For iOS
+    statusBarIconBrightness: Brightness.dark, // For Android
+    // systemNavigationBarColor: Colors.blue, // Set the navigation bar color
+    systemNavigationBarIconBrightness: Brightness.dark, // For Android
+  ));
   FirebaseMessaging.onBackgroundMessage(_fireaseMessagingBackgroundHandler);
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? userUid = prefs.getString('user_uid');

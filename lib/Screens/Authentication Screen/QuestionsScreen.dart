@@ -82,549 +82,546 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Sizer(builder: (context, orientation, deviceType) {
-      return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(
-          backgroundColor: Colors.white,
-          body: Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 5.h, 0, 0),
-                child: Text(
-                  'Questionnaires',
-                  style: TextStyle(
-                      fontSize: 17.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black),
-                ),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(5.w, 5.h, 0, 0),
+              child: Text(
+                'Questionnaires',
+                style: TextStyle(
+                    fontSize: 17.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black),
               ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 1.h, 5.w, 0),
-                child: Text(
-                  'Fill up the following Questionnaires and become a donor',
-                  style: TextStyle(
-                      fontSize: 10.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black54),
-                ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(5.w, 1.h, 5.w, 0),
+              child: Text(
+                'Fill up the following Questionnaires and become a donor',
+                style: TextStyle(
+                    fontSize: 10.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black54),
               ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 1.5.h, 5.w, 0),
-                child: Material(
-                  elevation: 5,
-                  shadowColor: Colors.grey,
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    height: 10.h,
-                    width: 100.w,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.red,
-                        width: 1,
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(5.w, 1.5.h, 5.w, 0),
+              child: Material(
+                elevation: 5,
+                shadowColor: Colors.grey,
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  height: 10.h,
+                  width: 100.w,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.red,
+                      width: 1,
+                    ),
+                  ),
+                  child: Stack(children: [
+                    Padding(
+                      // ignore: prefer_const_constructors
+                      padding: EdgeInsets.fromLTRB(5.w, 1.h, 37.w, 0),
+                      child: Text(
+                        'Do you have diabetes?',
+                        style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
                       ),
                     ),
-                    child: Stack(children: [
-                      Padding(
-                        // ignore: prefer_const_constructors
-                        padding: EdgeInsets.fromLTRB(5.w, 1.h, 37.w, 0),
-                        child: Text(
-                          'Do you have diabetes?',
-                          style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                              child: Padding(
-                            // ignore: prefer_const_constructors
-                            padding: EdgeInsets.fromLTRB(0.w, 3.h, 0.w, 0.h),
-                            child: RadioListTile<String>(
-                              title: const Text('Yes'),
-                              value: 'Yes',
-                              activeColor: PRIMARY_COLOR,
-                              groupValue: Q1,
-                              onChanged: (value) {
-                                setState(() {
-                                  Q1 = value!;
-                                  flag = true;
-                                });
-                              },
-                            ),
-                          )),
-                          Expanded(
-                              child: Padding(
-                            // ignore: prefer_const_constructors
-                            padding: EdgeInsets.fromLTRB(0.w, 3.h, 0.w, 0.h),
-                            child: RadioListTile<String>(
-                              title: const Text('No'),
-                              value: 'No',
-                              activeColor: PRIMARY_COLOR,
-                              groupValue: Q1,
-                              onChanged: (value) {
-                                setState(() {
-                                  Q1 = value!;
-                                });
-                              },
-                            ),
-                          )),
-                        ],
-                      )
-                    ]),
-                  ),
+                    Row(
+                      children: [
+                        Expanded(
+                            child: Padding(
+                          // ignore: prefer_const_constructors
+                          padding: EdgeInsets.fromLTRB(0.w, 3.h, 0.w, 0.h),
+                          child: RadioListTile<String>(
+                            title: const Text('Yes'),
+                            value: 'Yes',
+                            activeColor: PRIMARY_COLOR,
+                            groupValue: Q1,
+                            onChanged: (value) {
+                              setState(() {
+                                Q1 = value!;
+                                flag = true;
+                              });
+                            },
+                          ),
+                        )),
+                        Expanded(
+                            child: Padding(
+                          // ignore: prefer_const_constructors
+                          padding: EdgeInsets.fromLTRB(0.w, 3.h, 0.w, 0.h),
+                          child: RadioListTile<String>(
+                            title: const Text('No'),
+                            value: 'No',
+                            activeColor: PRIMARY_COLOR,
+                            groupValue: Q1,
+                            onChanged: (value) {
+                              setState(() {
+                                Q1 = value!;
+                              });
+                            },
+                          ),
+                        )),
+                      ],
+                    )
+                  ]),
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 1.5.h, 5.w, 0),
-                child: Material(
-                  elevation: 5,
-                  shadowColor: Colors.grey,
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    height: 12.h,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.red,
-                        width: 1,
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(5.w, 1.5.h, 5.w, 0),
+              child: Material(
+                elevation: 5,
+                shadowColor: Colors.grey,
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  height: 12.h,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.red,
+                      width: 1,
+                    ),
+                  ),
+                  child: Stack(children: [
+                    Padding(
+                      // ignore: prefer_const_constructors
+                      padding: EdgeInsets.fromLTRB(5.w, 1.h, 0.w, 0),
+                      child: Text(
+                        'Have you ever had problems with your heart or lungs?',
+                        style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
                       ),
                     ),
-                    child: Stack(children: [
-                      Padding(
-                        // ignore: prefer_const_constructors
-                        padding: EdgeInsets.fromLTRB(5.w, 1.h, 0.w, 0),
-                        child: Text(
-                          'Have you ever had problems with your heart or lungs?',
-                          style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                              child: Padding(
-                            // ignore: prefer_const_constructors
-                            padding: EdgeInsets.fromLTRB(0.w, 5.h, 0.w, 0.h),
-                            child: RadioListTile<String>(
-                              title: const Text('Yes'),
-                              value: 'Yes',
-                              activeColor: PRIMARY_COLOR,
-                              groupValue: Q2,
-                              onChanged: (value) {
-                                setState(() {
-                                  Q2 = value!;
-                                  flag = true;
-                                });
-                              },
-                            ),
-                          )),
-                          Expanded(
-                              child: Padding(
-                            // ignore: prefer_const_constructors
-                            padding: EdgeInsets.fromLTRB(0.w, 5.h, 10.w, 0),
-                            child: RadioListTile<String>(
-                              title: const Text('No'),
-                              value: 'No',
-                              activeColor: PRIMARY_COLOR,
-                              groupValue: Q2,
-                              onChanged: (value) {
-                                setState(() {
-                                  Q2 = value!;
-                                });
-                              },
-                            ),
-                          )),
-                        ],
-                      )
-                    ]),
-                  ),
+                    Row(
+                      children: [
+                        Expanded(
+                            child: Padding(
+                          // ignore: prefer_const_constructors
+                          padding: EdgeInsets.fromLTRB(0.w, 5.h, 0.w, 0.h),
+                          child: RadioListTile<String>(
+                            title: const Text('Yes'),
+                            value: 'Yes',
+                            activeColor: PRIMARY_COLOR,
+                            groupValue: Q2,
+                            onChanged: (value) {
+                              setState(() {
+                                Q2 = value!;
+                                flag = true;
+                              });
+                            },
+                          ),
+                        )),
+                        Expanded(
+                            child: Padding(
+                          // ignore: prefer_const_constructors
+                          padding: EdgeInsets.fromLTRB(0.w, 5.h, 10.w, 0),
+                          child: RadioListTile<String>(
+                            title: const Text('No'),
+                            value: 'No',
+                            activeColor: PRIMARY_COLOR,
+                            groupValue: Q2,
+                            onChanged: (value) {
+                              setState(() {
+                                Q2 = value!;
+                              });
+                            },
+                          ),
+                        )),
+                      ],
+                    )
+                  ]),
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 1.5.h, 5.w, 0),
-                child: Material(
-                  elevation: 5,
-                  shadowColor: Colors.grey,
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    height: 11.h,
-                    width: 100.w,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.red,
-                        width: 1,
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(5.w, 1.5.h, 5.w, 0),
+              child: Material(
+                elevation: 5,
+                shadowColor: Colors.grey,
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  height: 11.h,
+                  width: 100.w,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.red,
+                      width: 1,
+                    ),
+                  ),
+                  child: Stack(children: [
+                    Padding(
+                      // ignore: prefer_const_constructors
+                      padding: EdgeInsets.fromLTRB(5.w, 1.h, 0.w, 0),
+                      child: Text(
+                        'In the last 28 days do you have had COVID-19?',
+                        style: TextStyle(
+                            fontSize: 11.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
                       ),
                     ),
-                    child: Stack(children: [
-                      Padding(
-                        // ignore: prefer_const_constructors
-                        padding: EdgeInsets.fromLTRB(5.w, 1.h, 0.w, 0),
-                        child: Text(
-                          'In the last 28 days do you have had COVID-19?',
-                          style: TextStyle(
-                              fontSize: 11.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                              child: Padding(
-                            // ignore: prefer_const_constructors
-                            padding: EdgeInsets.fromLTRB(0.w, 3.h, 0.w, 1.h),
-                            child: RadioListTile<String>(
-                              title: const Text('Yes'),
-                              value: 'Yes',
-                              activeColor: PRIMARY_COLOR,
-                              groupValue: Q3,
-                              onChanged: (value) {
-                                setState(() {
-                                  Q3 = value!;
-                                });
-                              },
-                            ),
-                          )),
-                          Expanded(
-                              child: Padding(
-                            // ignore: prefer_const_constructors
-                            padding: EdgeInsets.fromLTRB(0.w, 3.h, 10.w, 1.h),
-                            child: RadioListTile<String>(
-                              title: const Text('No'),
-                              value: 'No',
-                              activeColor: PRIMARY_COLOR,
-                              groupValue: Q3,
-                              onChanged: (value) {
-                                setState(() {
-                                  Q3 = value!;
-                                });
-                              },
-                            ),
-                          )),
-                        ],
-                      )
-                    ]),
-                  ),
+                    Row(
+                      children: [
+                        Expanded(
+                            child: Padding(
+                          // ignore: prefer_const_constructors
+                          padding: EdgeInsets.fromLTRB(0.w, 3.h, 0.w, 1.h),
+                          child: RadioListTile<String>(
+                            title: const Text('Yes'),
+                            value: 'Yes',
+                            activeColor: PRIMARY_COLOR,
+                            groupValue: Q3,
+                            onChanged: (value) {
+                              setState(() {
+                                Q3 = value!;
+                              });
+                            },
+                          ),
+                        )),
+                        Expanded(
+                            child: Padding(
+                          // ignore: prefer_const_constructors
+                          padding: EdgeInsets.fromLTRB(0.w, 3.h, 10.w, 1.h),
+                          child: RadioListTile<String>(
+                            title: const Text('No'),
+                            value: 'No',
+                            activeColor: PRIMARY_COLOR,
+                            groupValue: Q3,
+                            onChanged: (value) {
+                              setState(() {
+                                Q3 = value!;
+                              });
+                            },
+                          ),
+                        )),
+                      ],
+                    )
+                  ]),
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 1.5.h, 5.w, 0),
-                child: Material(
-                  elevation: 5,
-                  shadowColor: Colors.grey,
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    height: 12.h,
-                    width: 100.w,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.red,
-                        width: 1,
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(5.w, 1.5.h, 5.w, 0),
+              child: Material(
+                elevation: 5,
+                shadowColor: Colors.grey,
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  height: 12.h,
+                  width: 100.w,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.red,
+                      width: 1,
+                    ),
+                  ),
+                  child: Stack(children: [
+                    Padding(
+                      // ignore: prefer_const_constructors
+                      padding: EdgeInsets.fromLTRB(5.w, 1.h, 0.w, 0),
+                      child: Text(
+                        'Have you ever had a positive test for the HIV/AIDS virus?',
+                        style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
                       ),
                     ),
-                    child: Stack(children: [
-                      Padding(
-                        // ignore: prefer_const_constructors
-                        padding: EdgeInsets.fromLTRB(5.w, 1.h, 0.w, 0),
-                        child: Text(
-                          'Have you ever had a positive test for the HIV/AIDS virus?',
-                          style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                              child: Padding(
-                            // ignore: prefer_const_constructors
-                            padding: EdgeInsets.fromLTRB(0.w, 5.h, 0.w, 1.h),
-                            child: RadioListTile<String>(
-                              title: const Text('Yes'),
-                              value: 'Yes',
-                              activeColor: PRIMARY_COLOR,
-                              groupValue: Q4,
-                              onChanged: (value) {
-                                setState(() {
-                                  Q4 = value!;
-                                  flag = true;
-                                });
-                              },
-                            ),
-                          )),
-                          Expanded(
-                              child: Padding(
-                            // ignore: prefer_const_constructors
-                            padding: EdgeInsets.fromLTRB(0.w, 5.h, 10.w, 1.h),
-                            child: RadioListTile<String>(
-                              title: const Text('No'),
-                              value: 'No',
-                              activeColor: PRIMARY_COLOR,
-                              groupValue: Q4,
-                              onChanged: (value) {
-                                setState(() {
-                                  Q4 = value!;
-                                });
-                              },
-                            ),
-                          )),
-                        ],
-                      )
-                    ]),
-                  ),
+                    Row(
+                      children: [
+                        Expanded(
+                            child: Padding(
+                          // ignore: prefer_const_constructors
+                          padding: EdgeInsets.fromLTRB(0.w, 5.h, 0.w, 1.h),
+                          child: RadioListTile<String>(
+                            title: const Text('Yes'),
+                            value: 'Yes',
+                            activeColor: PRIMARY_COLOR,
+                            groupValue: Q4,
+                            onChanged: (value) {
+                              setState(() {
+                                Q4 = value!;
+                                flag = true;
+                              });
+                            },
+                          ),
+                        )),
+                        Expanded(
+                            child: Padding(
+                          // ignore: prefer_const_constructors
+                          padding: EdgeInsets.fromLTRB(0.w, 5.h, 10.w, 1.h),
+                          child: RadioListTile<String>(
+                            title: const Text('No'),
+                            value: 'No',
+                            activeColor: PRIMARY_COLOR,
+                            groupValue: Q4,
+                            onChanged: (value) {
+                              setState(() {
+                                Q4 = value!;
+                              });
+                            },
+                          ),
+                        )),
+                      ],
+                    )
+                  ]),
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 1.5.h, 5.w, 0),
-                child: Material(
-                  elevation: 5,
-                  shadowColor: Colors.grey,
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    height: 9.h,
-                    width: 100.w,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.red,
-                        width: 1,
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(5.w, 1.5.h, 5.w, 0),
+              child: Material(
+                elevation: 5,
+                shadowColor: Colors.grey,
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  height: 9.h,
+                  width: 100.w,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.red,
+                      width: 1,
+                    ),
+                  ),
+                  child: Stack(children: [
+                    Padding(
+                      // ignore: prefer_const_constructors
+                      padding: EdgeInsets.fromLTRB(5.w, 1.h, 0.w, 0),
+                      child: Text(
+                        'Have you ever had cancer?',
+                        style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
                       ),
                     ),
-                    child: Stack(children: [
-                      Padding(
-                        // ignore: prefer_const_constructors
-                        padding: EdgeInsets.fromLTRB(5.w, 1.h, 0.w, 0),
-                        child: Text(
-                          'Have you ever had cancer?',
-                          style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                              child: Padding(
-                            // ignore: prefer_const_constructors
-                            padding: EdgeInsets.fromLTRB(1.w, 2.5.h, 0.w, 1.h),
-                            child: RadioListTile<String>(
-                              title: const Text('Yes'),
-                              value: 'Yes',
-                              groupValue: Q5,
-                              activeColor: PRIMARY_COLOR,
-                              onChanged: (value) {
-                                setState(() {
-                                  Q5 = value!;
-                                  flag = true;
-                                });
-                              },
-                            ),
-                          )),
-                          Expanded(
-                              child: Padding(
-                            // ignore: prefer_const_constructors
-                            padding: EdgeInsets.fromLTRB(0.w, 2.5.h, 10.w, 1.h),
-                            child: RadioListTile<String>(
-                              title: const Text('No'),
-                              value: 'No',
-                              groupValue: Q5,
-                              activeColor: PRIMARY_COLOR,
-                              onChanged: (value) {
-                                setState(() {
-                                  Q5 = value!;
-                                });
-                              },
-                            ),
-                          )),
-                        ],
-                      )
-                    ]),
-                  ),
+                    Row(
+                      children: [
+                        Expanded(
+                            child: Padding(
+                          // ignore: prefer_const_constructors
+                          padding: EdgeInsets.fromLTRB(1.w, 2.5.h, 0.w, 1.h),
+                          child: RadioListTile<String>(
+                            title: const Text('Yes'),
+                            value: 'Yes',
+                            groupValue: Q5,
+                            activeColor: PRIMARY_COLOR,
+                            onChanged: (value) {
+                              setState(() {
+                                Q5 = value!;
+                                flag = true;
+                              });
+                            },
+                          ),
+                        )),
+                        Expanded(
+                            child: Padding(
+                          // ignore: prefer_const_constructors
+                          padding: EdgeInsets.fromLTRB(0.w, 2.5.h, 10.w, 1.h),
+                          child: RadioListTile<String>(
+                            title: const Text('No'),
+                            value: 'No',
+                            groupValue: Q5,
+                            activeColor: PRIMARY_COLOR,
+                            onChanged: (value) {
+                              setState(() {
+                                Q5 = value!;
+                              });
+                            },
+                          ),
+                        )),
+                      ],
+                    )
+                  ]),
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 1.5.h, 5.w, 0),
-                child: Material(
-                  elevation: 5,
-                  shadowColor: Colors.grey,
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    height: 11.h,
-                    width: 100.w,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.red,
-                        width: 1,
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(5.w, 1.5.h, 5.w, 0),
+              child: Material(
+                elevation: 5,
+                shadowColor: Colors.grey,
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  height: 11.h,
+                  width: 100.w,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.red,
+                      width: 1,
+                    ),
+                  ),
+                  child: Stack(children: [
+                    Padding(
+                      // ignore: prefer_const_constructors
+                      padding: EdgeInsets.fromLTRB(5.w, 1.h, 0.w, 0),
+                      child: Text(
+                        'In the last 3 months have you had a vaccination',
+                        style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
                       ),
                     ),
-                    child: Stack(children: [
-                      Padding(
-                        // ignore: prefer_const_constructors
-                        padding: EdgeInsets.fromLTRB(5.w, 1.h, 0.w, 0),
-                        child: Text(
-                          'In the last 3 months have you had a vaccination',
-                          style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                              child: Padding(
-                            // ignore: prefer_const_constructors
-                            padding: EdgeInsets.fromLTRB(1.w, 4.5.h, 0.w, 1.h),
-                            child: RadioListTile<String>(
-                              title: const Text('Yes'),
-                              value: 'Yes',
-                              activeColor: PRIMARY_COLOR,
-                              groupValue: Q6,
-                              onChanged: (value) {
-                                setState(() {
-                                  Q6 = value!;
-                                });
-                              },
-                            ),
-                          )),
-                          Expanded(
-                              child: Padding(
-                            // ignore: prefer_const_constructors
-                            padding: EdgeInsets.fromLTRB(0.w, 4.5.h, 10.w, 1.h),
-                            child: RadioListTile<String>(
-                              title: const Text('No'),
-                              value: 'No',
-                              activeColor: PRIMARY_COLOR,
-                              groupValue: Q6,
-                              onChanged: (value) {
-                                setState(() {
-                                  Q6 = value!;
-                                });
-                              },
-                            ),
-                          )),
-                        ],
-                      )
-                    ]),
-                  ),
+                    Row(
+                      children: [
+                        Expanded(
+                            child: Padding(
+                          // ignore: prefer_const_constructors
+                          padding: EdgeInsets.fromLTRB(1.w, 4.5.h, 0.w, 1.h),
+                          child: RadioListTile<String>(
+                            title: const Text('Yes'),
+                            value: 'Yes',
+                            activeColor: PRIMARY_COLOR,
+                            groupValue: Q6,
+                            onChanged: (value) {
+                              setState(() {
+                                Q6 = value!;
+                              });
+                            },
+                          ),
+                        )),
+                        Expanded(
+                            child: Padding(
+                          // ignore: prefer_const_constructors
+                          padding: EdgeInsets.fromLTRB(0.w, 4.5.h, 10.w, 1.h),
+                          child: RadioListTile<String>(
+                            title: const Text('No'),
+                            value: 'No',
+                            activeColor: PRIMARY_COLOR,
+                            groupValue: Q6,
+                            onChanged: (value) {
+                              setState(() {
+                                Q6 = value!;
+                              });
+                            },
+                          ),
+                        )),
+                      ],
+                    )
+                  ]),
                 ),
               ),
-              Row(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(2.w, 0.h, 0.w, 0),
-                    child: Checkbox(
-                      value: type == 'Yes',
-                      checkColor: Colors.white,
-                      focusColor: Colors.red,
-                      activeColor: Colors.red,
+            ),
+            Row(
+              children: [
+                Padding(
+                  padding: EdgeInsets.fromLTRB(2.w, 0.h, 0.w, 0),
+                  child: Checkbox(
+                    value: type == 'Yes',
+                    checkColor: Colors.white,
+                    focusColor: Colors.red,
+                    activeColor: Colors.red,
 
-                      // Check if ttype is 'donor'
-                      onChanged: (bool? value) {
+                    // Check if ttype is 'donor'
+                    onChanged: (bool? value) {
+                      setState(() {
+                        type = value == true ? 'Yes' : '';
+
+                        // Update ttype based on checkbox state
+                      });
+                    },
+                  ),
+                ),
+                Text(
+                  'By clicking, you agree to our terms and codition',
+                  style:
+                      TextStyle(fontSize: 10.sp, fontWeight: FontWeight.bold),
+                )
+              ],
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(5.w, 0.h, 5.w, 0),
+              child: Material(
+                elevation: 10.0,
+                shadowColor: Colors.black,
+                borderRadius: BorderRadius.circular(10.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (type == 'Yes') {
+                      if (Q1.isNotEmpty &&
+                          Q2.isNotEmpty &&
+                          Q3.isNotEmpty &&
+                          Q4.isNotEmpty &&
+                          Q5.isNotEmpty &&
+                          Q6.isNotEmpty) {
                         setState(() {
-                          type = value == true ? 'Yes' : '';
-
-                          // Update ttype based on checkbox state
+                          showCircularProgressIndicator = true;
                         });
-                      },
-                    ),
-                  ),
-                  Text(
-                    'By clicking, you agree to our terms and codition',
-                    style:
-                        TextStyle(fontSize: 10.sp, fontWeight: FontWeight.bold),
-                  )
-                ],
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 0.h, 5.w, 0),
-                child: Material(
-                  elevation: 10.0,
-                  shadowColor: Colors.black,
-                  borderRadius: BorderRadius.circular(10.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (type == 'Yes') {
-                        if (Q1.isNotEmpty &&
-                            Q2.isNotEmpty &&
-                            Q3.isNotEmpty &&
-                            Q4.isNotEmpty &&
-                            Q5.isNotEmpty &&
-                            Q6.isNotEmpty) {
-                          setState(() {
-                            showCircularProgressIndicator = true;
-                          });
-                          if (Q1 == 'Yes' ||
-                              Q2 == 'Yes' ||
-                              Q4 == 'Yes' ||
-                              Q5 == 'Yes') {
-                            _showAlertDialog4(context);
-                          } else {
-                            _uploadImage();
-                          }
+                        if (Q1 == 'Yes' ||
+                            Q2 == 'Yes' ||
+                            Q4 == 'Yes' ||
+                            Q5 == 'Yes') {
+                          _showAlertDialog4(context);
                         } else {
-                          _showAlertDialog6(context);
+                          _uploadImage();
                         }
                       } else {
-                        _showAlertDialog5(context);
+                        _showAlertDialog6(context);
                       }
-                    },
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
+                    } else {
+                      _showAlertDialog5(context);
+                    }
+                  },
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                    padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                      // ignore: prefer_const_constructors
+                      EdgeInsets.symmetric(vertical: 13.5, horizontal: 35.w),
+                    ),
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                        const Color(0xFFDE0A1E)), // Change button color
+                  ),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      if (showCircularProgressIndicator)
+                        const SizedBox(
+                          height: 20.0,
+                          width: 20.0,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.0,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
                         ),
-                      ),
-                      padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                        // ignore: prefer_const_constructors
-                        EdgeInsets.symmetric(vertical: 13.5, horizontal: 35.w),
-                      ),
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                          const Color(0xFFDE0A1E)), // Change button color
-                    ),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        if (showCircularProgressIndicator)
-                          const SizedBox(
-                            height: 20.0,
-                            width: 20.0,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.0,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
+                      if (!showCircularProgressIndicator)
+                        Text(
+                          'Continue',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
                           ),
-                        if (!showCircularProgressIndicator)
-                          Text(
-                            'Continue',
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                      ],
-                    ),
+                        ),
+                    ],
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      );
-    });
+      ),
+    );
   }
 
   void _showAlertDialog4(BuildContext context) {
@@ -783,6 +780,8 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
           'password': widget.password,
           'image': picture,
           'type': 'donor',
+          'status': false,
+          'availabledonate': false
         });
 
         await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -909,6 +908,8 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
           'password': widget.password,
           'image': picture,
           'type': 'taker',
+          'status': false,
+          'availabledonate': false
         });
 
         await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -955,6 +956,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
       // Handle error and show a proper error message to the user
     }
   }
+  
 
   void _userAddLocations(String name, String location, String image) async {
     try {

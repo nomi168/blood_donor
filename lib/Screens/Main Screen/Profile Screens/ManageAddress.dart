@@ -20,10 +20,7 @@ class _ManageAddressScreenState extends State<ManageAddressScreen> {
   TextEditingController travel = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    return Sizer(builder: (context, oreientation, deviceType) {
-      return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(
+    return Scaffold(
           body: Column(children: [
             Row(
               children: [
@@ -308,9 +305,8 @@ class _ManageAddressScreenState extends State<ManageAddressScreen> {
               ),
             )
           ]),
-        ),
-      );
-    });
+        );
+      
   }
 
   void _addAddressHome() async {
