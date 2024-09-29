@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
@@ -7,6 +8,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:googleapis_auth/auth_io.dart' as auth;
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -287,7 +291,7 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
                           if (userType == 'donor') {
                             await getmessageid();
                             unique_id++;
-
+                            _controller.clear();
                             await sendMessage(
                               widget.sender_id,
                               widget.receiver_id,
@@ -295,11 +299,12 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
                               widget.receiveremail,
                               _controller.text,
                             );
-                            _controller.clear();
+                            await sendNotificationsToUser(widget.receiveremail);
                           }
                           if (userType == 'taker') {
                             await getmessageid();
                             unique_id++;
+                            _controller.clear();
 
                             await sendMessage(
                               widget.sender_id,
@@ -308,7 +313,7 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
                               widget.sendemail,
                               _controller.text,
                             );
-                            _controller.clear();
+                            await sendNotificationsToUser(widget.sendemail);
                           }
                         }
                       }
@@ -670,4 +675,78 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
       return Stream.value(false);
     }
   }
+
+  Future<void> sendNotificationsToUser(String email) async {
+    String projectId = 'blood-app-8f4c2';
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: email)
+        .get();
+    if (querySnapshot.docs.isNotEmpty) {
+      DocumentSnapshot userDoc = querySnapshot.docs.first;
+      String deviceToken = userDoc['deviceToken'];
+      String name = userDoc['firstname'] + " " + userDoc['lastname'];
+
+      // Prepare notification data (v1 API format)
+      var data = {
+        'message': {
+          'token': deviceToken,
+          'notification': {
+            'title': 'New Blood Request',
+            'body': 'You have a new message from $name',
+          },
+          'data': {'type': 'request_notification', 'id': 'Nomi12345'}
+        }
+      };
+
+      // Generate OAuth2 token using service account
+      var jsonString = await rootBundle.loadString('images/json/key1.json');
+      var clientCredentials =
+          auth.ServiceAccountCredentials.fromJson(jsonString);
+      // var clientCredentials = auth.ServiceAccountCredentials.fromJson(
+      //     await File('images/json/key.json').readAsString());
+      var scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
+      var client =
+          await auth.clientViaServiceAccount(clientCredentials, scopes);
+
+      var response = await http.post(
+        Uri.parse(
+            'https://fcm.googleapis.com/v1/projects/$projectId/messages:send'),
+        headers: {
+          'Authorization': 'Bearer ${client.credentials.accessToken.data}',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(data),
+      );
+      print("Notification ${client.credentials.accessToken.data}");
+
+      if (response.statusCode == 200) {
+        print('Notification sent successfully to user: ${userDoc.id}');
+      } else {
+        print(
+            'Failed to send notification to user: ${userDoc.id}. Status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
+      }
+    }
+  }
+//   Future<String> getAccessToken() async {
+//   // Load your service account credentials from the JSON key file
+//   var serviceAccount = ServiceAccountCredentials.fromJson({
+//     // Your service account details from the JSON file
+//     // Example structure:
+//     // 'type': 'service_account',
+//     // 'project_id': 'YOUR_PROJECT_ID',
+//     // 'private_key_id': 'YOUR_PRIVATE_KEY_ID',
+//     // 'private_key': 'YOUR_PRIVATE_KEY',
+//     // ...
+//   });
+
+//   var scopes = ['https://www.googleapis.com/auth/cloud-platform'];
+
+//   // Request the OAuth2 access token
+//   var authClient = await clientViaServiceAccount(serviceAccount, scopes);
+//   var token = authClient.credentials.accessToken;
+
+//   return token.data;
+// }
 }

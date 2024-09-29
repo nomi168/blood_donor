@@ -15,6 +15,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
+import 'Faqs_ui.dart';
+import 'privacy_policy_ui.dart';
+
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
 
@@ -99,6 +102,126 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
                           pageBuilder:
                               (context, animation, secondaryAnimation) {
                             return const TermsConditionScreen();
+                          },
+                          transitionDuration: const Duration(seconds: 1),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            const begin =
+                                Offset(10.0, 0.0); // slide in from the right
+                            const end = Offset.zero;
+                            const curve = Curves.easeInOutQuart;
+
+                            var tween = Tween(begin: begin, end: end)
+                                .chain(CurveTween(curve: curve));
+                            var offsetAnimation = animation.drive(tween);
+
+                            return SlideTransition(
+                              position: offsetAnimation,
+                              child: child,
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  )),
+            ],
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(0, 3.h, 0, 0),
+          child: Row(
+            children: [
+              Padding(
+                padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0),
+                child: Icon(
+                  Icons.question_mark,
+                  color: Colors.red,
+                  size: 30,
+                ),
+              ),
+              Padding(
+                  padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0.h),
+                  child: Text(
+                    'FAQs',
+                    style: TextStyle(
+                        fontSize: 13.sp,
+                        color: Colors.black54,
+                        fontWeight: FontWeight.bold),
+                  )),
+              Padding(
+                  padding: EdgeInsets.fromLTRB(55.5.w, 0.h, 0, 0.h),
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.arrow_forward_ios,
+                      size: 28,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) {
+                            return const FAQs();
+                          },
+                          transitionDuration: const Duration(seconds: 1),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            const begin =
+                                Offset(10.0, 0.0); // slide in from the right
+                            const end = Offset.zero;
+                            const curve = Curves.easeInOutQuart;
+
+                            var tween = Tween(begin: begin, end: end)
+                                .chain(CurveTween(curve: curve));
+                            var offsetAnimation = animation.drive(tween);
+
+                            return SlideTransition(
+                              position: offsetAnimation,
+                              child: child,
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  )),
+            ],
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(0, 3.h, 0, 0),
+          child: Row(
+            children: [
+              Padding(
+                padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0),
+                child: Icon(
+                  Icons.privacy_tip,
+                  color: Colors.red,
+                  size: 30,
+                ),
+              ),
+              Padding(
+                  padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0.h),
+                  child: Text(
+                    'Privacy & Policy',
+                    style: TextStyle(
+                        fontSize: 13.sp,
+                        color: Colors.black54,
+                        fontWeight: FontWeight.bold),
+                  )),
+              Padding(
+                  padding: EdgeInsets.fromLTRB(33.w, 0.h, 0, 0.h),
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.arrow_forward_ios,
+                      size: 28,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) {
+                            return const PrivacyPolicy();
                           },
                           transitionDuration: const Duration(seconds: 1),
                           transitionsBuilder:

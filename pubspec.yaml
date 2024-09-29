@@ -99,6 +99,8 @@ dependencies:
   syncfusion_flutter_pdfviewer: any
   change_app_package_name: ^1.2.0
   validators: ^3.0.0
+  lottie: ^3.0.0
+  googleapis_auth: ^1.4.1
   
  
 
@@ -168,6 +170,9 @@ flutter:
    - images/Banners/1.jpeg
    - images/Banners/2.jpeg
    - images/Banners/3.jpeg
+   - images/lottie/
+   - images/pdf/
+   - images/json/
    
 
 

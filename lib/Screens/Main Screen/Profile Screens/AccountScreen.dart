@@ -73,8 +73,6 @@ class _AccountScreenState extends State<AccountScreen>
 
   @override
   Widget build(BuildContext context) {
-    final profileBloc = Provider.of<Profile>(context, listen: false);
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(children: [

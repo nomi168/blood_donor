@@ -15,7 +15,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:googleapis_auth/auth_io.dart' as auth;
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -602,6 +604,7 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
 
   void SendRequest(String email) async {
     try {
+      String projectId = 'blood-app-8f4c2';
       // Fetch all users from Firestore who are donors
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('users')
@@ -618,30 +621,37 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
 
         print("Device Token $deviceToken");
 
-        // Prepare notification data
         var data = {
-          'to': deviceToken,
-          'priority': 'high',
-          'notification': {
-            'title': 'Chat Request',
-            'body': 'You have a new Chat Request.'
-          },
-          'data': {
-            'type': 'request_notification',
-            'id': 'Nomi12345'
-          } // Additional data if needed
+          'message': {
+            'token': deviceToken,
+            'notification': {
+              'title': 'New Blood Request',
+              'body': 'You have a new  from request $name',
+            },
+            'data': {'type': 'request_notification', 'id': 'Nomi12345'}
+          }
         };
 
-        // Send notification to the device
+        // Generate OAuth2 token using service account
+        var jsonString = await rootBundle.loadString('images/json/key1.json');
+        var clientCredentials =
+            auth.ServiceAccountCredentials.fromJson(jsonString);
+        // var clientCredentials = auth.ServiceAccountCredentials.fromJson(
+        //     await File('images/json/key.json').readAsString());
+        var scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
+        var client =
+            await auth.clientViaServiceAccount(clientCredentials, scopes);
+
         var response = await http.post(
-          Uri.parse('https://fcm.googleapis.com/fcm/send'),
-          body: jsonEncode(data),
+          Uri.parse(
+              'https://fcm.googleapis.com/v1/projects/$projectId/messages:send'),
           headers: {
-            'Content-Type': 'application/json; charset=UTF-8',
-            'Authorization':
-                'key=AAAAhM4yLBU:APA91bFYi77T3adopH4ZKF6BwWAMjq0v-zrcByWIs_SukIolxTfIEXBwJLOzxF5GaYiT3xn03Y3gbQ-XWzkESGKMR1awLL3JPoc2x5dHh0uxmi-HSZ8xAHIEcQ0fF6XJ5j6KiYsyDzvU'
+            'Authorization': 'Bearer ${client.credentials.accessToken.data}',
+            'Content-Type': 'application/json',
           },
+          body: jsonEncode(data),
         );
+        print("Notification ${client.credentials.accessToken.data}");
 
         // Check response status
         if (response.statusCode == 200) {
@@ -718,6 +728,7 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
 
   void AcceptRequest(String email) async {
     try {
+      String projectId = 'blood-app-8f4c2';
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? iddd = await prefs.getString('chat_id');
 
@@ -735,29 +746,36 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
         print("Device Token $deviceToken");
 
         // Prepare notification data
+
         var data = {
-          'to': deviceToken,
-          'priority': 'high',
-          'notification': {
-            'title': 'Request Accept',
-            'body': 'You have in Chat.',
-            'chat_id': '$iddd'
-          },
-          'data': {
-            'type': 'request_notification',
-            'id': 'Nomi12345'
-          } // Additional data if needed
+          'message': {
+            'token': deviceToken,
+            'notification': {
+              'title': 'Request Accept',
+              'body': 'You have in Chat.',
+            },
+            'data': {'type': 'request_notification', 'id': 'Nomi12345'}
+          }
         };
 
         // Send notification to the device
+        var jsonString = await rootBundle.loadString('images/json/key1.json');
+        var clientCredentials =
+            auth.ServiceAccountCredentials.fromJson(jsonString);
+        // var clientCredentials = auth.ServiceAccountCredentials.fromJson(
+        //     await File('images/json/key.json').readAsString());
+        var scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
+        var client =
+            await auth.clientViaServiceAccount(clientCredentials, scopes);
+
         var response = await http.post(
-          Uri.parse('https://fcm.googleapis.com/fcm/send'),
-          body: jsonEncode(data),
+          Uri.parse(
+              'https://fcm.googleapis.com/v1/projects/$projectId/messages:send'),
           headers: {
-            'Content-Type': 'application/json; charset=UTF-8',
-            'Authorization':
-                'key=AAAAhM4yLBU:APA91bFYi77T3adopH4ZKF6BwWAMjq0v-zrcByWIs_SukIolxTfIEXBwJLOzxF5GaYiT3xn03Y3gbQ-XWzkESGKMR1awLL3JPoc2x5dHh0uxmi-HSZ8xAHIEcQ0fF6XJ5j6KiYsyDzvU'
+            'Authorization': 'Bearer ${client.credentials.accessToken.data}',
+            'Content-Type': 'application/json',
           },
+          body: jsonEncode(data),
         );
 
         // Check response status

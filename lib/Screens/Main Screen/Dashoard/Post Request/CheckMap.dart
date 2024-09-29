@@ -6,12 +6,15 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:googleapis_auth/auth_io.dart' as auth;
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
@@ -415,9 +418,20 @@ class _CheckMapState extends State<CheckMap> {
         Location takerLocation =
             (await locationFromAddress(widget.takerlocation)).first;
 
+        // Get the file path for saving the data
+        Directory directory = await getApplicationDocumentsDirectory();
+        File donorFile = File('${directory.path}/nearby_donors.txt');
+
+        // Ensure file exists
+        if (!await donorFile.exists()) {
+          await donorFile.create();
+        }
+
         // Iterate over each donor document
         for (var doc in donorSnapshot.docs) {
           String donorLocation = doc['donor_location'];
+          String donorId =
+              doc['user_id']; // Assuming you have donor_id or some identifier
 
           // Convert donorLocation to latitude and longitude
           List<Location> locations = await locationFromAddress(donorLocation);
@@ -448,6 +462,102 @@ class _CheckMapState extends State<CheckMap> {
 
               // Add to nearby donors list for notification
               nearbyDonors.add(donorLocation);
+
+              // Add donor details to the file
+              await donorFile.writeAsString(
+                'Donor ID: $donorId, Location: $donorLocation, Distance: ${distanceInKm.toStringAsFixed(2)} km\n',
+                mode: FileMode.append,
+              );
+            }
+          }
+        }
+        if (nearbyDonors.isEmpty) {
+          for (var doc in donorSnapshot.docs) {
+            String donorLocation = doc['donor_location'];
+            String donorId =
+                doc['user_id']; // Assuming you have donor_id or some identifier
+
+            // Convert donorLocation to latitude and longitude
+            List<Location> locations = await locationFromAddress(donorLocation);
+            if (locations.isNotEmpty) {
+              Location loc = locations.first;
+
+              // Add marker for donor location
+              newMarkers.add(Marker(
+                markerId: MarkerId(donorLocation),
+                position: LatLng(loc.latitude, loc.longitude),
+                infoWindow: InfoWindow(title: donorLocation),
+              ));
+
+              // Calculate distance between taker location and donor location
+              double distanceInMeters = Geolocator.distanceBetween(
+                  takerLocation.latitude,
+                  takerLocation.longitude,
+                  loc.latitude,
+                  loc.longitude);
+
+              double distanceInKm = distanceInMeters / 1000;
+
+              // Check if the distance is within 5 km
+              if (distanceInKm <= 10) {
+                receiverIds.add(donorLocation);
+                receiverLocs.add(
+                    {'latitude': loc.latitude, 'longitude': loc.longitude});
+
+                // Add to nearby donors list for notification
+                nearbyDonors.add(donorLocation);
+
+                // Add donor details to the file
+                await donorFile.writeAsString(
+                  'Donor ID: $donorId, Location: $donorLocation, Distance: ${distanceInKm.toStringAsFixed(2)} km\n',
+                  mode: FileMode.append,
+                );
+              }
+            }
+          }
+        }
+        if (nearbyDonors.isEmpty) {
+          for (var doc in donorSnapshot.docs) {
+            String donorLocation = doc['donor_location'];
+            String donorId =
+                doc['user_id']; // Assuming you have donor_id or some identifier
+
+            // Convert donorLocation to latitude and longitude
+            List<Location> locations = await locationFromAddress(donorLocation);
+            if (locations.isNotEmpty) {
+              Location loc = locations.first;
+
+              // Add marker for donor location
+              newMarkers.add(Marker(
+                markerId: MarkerId(donorLocation),
+                position: LatLng(loc.latitude, loc.longitude),
+                infoWindow: InfoWindow(title: donorLocation),
+              ));
+
+              // Calculate distance between taker location and donor location
+              double distanceInMeters = Geolocator.distanceBetween(
+                  takerLocation.latitude,
+                  takerLocation.longitude,
+                  loc.latitude,
+                  loc.longitude);
+
+              double distanceInKm = distanceInMeters / 1000;
+
+              // Check if the distance is within 5 km
+              if (distanceInKm <= 20) {
+                receiverIds.add(donorLocation);
+                receiverLocs.add(
+                    {'latitude': loc.latitude, 'longitude': loc.longitude});
+
+                // Add to nearby donors list for notification
+                nearbyDonors.add(donorLocation);
+
+                // Add donor details to the file
+                await donorFile.writeAsString(
+                  'Donor ID: $donorId, Location: $donorLocation, Distance: ${distanceInKm.toStringAsFixed(2)} km\n',
+                  mode: FileMode.append,
+                );
+              }
             }
           }
         }
@@ -485,8 +595,7 @@ class _CheckMapState extends State<CheckMap> {
           markers = newMarkers;
         });
 
-        // Send notifications to nearby donors
-        // Implement this function as needed
+        print('Nearby donors saved to file.');
       } else {
         print('No donors found.');
       }
@@ -494,6 +603,102 @@ class _CheckMapState extends State<CheckMap> {
       print('Error: $e');
     }
   }
+
+  // Future<void> getDonorLocation1() async {
+  //   try {
+  //     // Fetch all donor locations from Firestore
+  //     QuerySnapshot donorSnapshot =
+  //         await FirebaseFirestore.instance.collection('donor_location').get();
+
+  //     if (donorSnapshot.docs.isNotEmpty) {
+  //       List<String> receiverIds = [];
+  //       List<Map<String, double>> receiverLocs = [];
+  //       Set<Marker> newMarkers = {};
+
+  //       // Get taker location from the widget
+  //       List<String> extraLocations = ["${widget.takerlocation}"];
+  //       Location takerLocation =
+  //           (await locationFromAddress(widget.takerlocation)).first;
+
+  //       // Iterate over each donor document
+  //       for (var doc in donorSnapshot.docs) {
+  //         String donorLocation = doc['donor_location'];
+
+  //         // Convert donorLocation to latitude and longitude
+  //         List<Location> locations = await locationFromAddress(donorLocation);
+  //         if (locations.isNotEmpty) {
+  //           Location loc = locations.first;
+
+  //           // Add marker for donor location
+  //           newMarkers.add(Marker(
+  //             markerId: MarkerId(donorLocation),
+  //             position: LatLng(loc.latitude, loc.longitude),
+  //             infoWindow: InfoWindow(title: donorLocation),
+  //           ));
+
+  //           // Calculate distance between taker location and donor location
+  //           double distanceInMeters = Geolocator.distanceBetween(
+  //               takerLocation.latitude,
+  //               takerLocation.longitude,
+  //               loc.latitude,
+  //               loc.longitude);
+
+  //           double distanceInKm = distanceInMeters / 1000;
+
+  //           // Check if the distance is within 5 km
+  //           if (distanceInKm <= 5) {
+  //             receiverIds.add(donorLocation);
+  //             receiverLocs
+  //                 .add({'latitude': loc.latitude, 'longitude': loc.longitude});
+
+  //             // Add to nearby donors list for notification
+  //             nearbyDonors.add(donorLocation);
+  //           }
+  //         }
+  //       }
+
+  //       // Process the extra locations (taker location)
+  //       for (String extraLocation in extraLocations) {
+  //         List<Location> locations = await locationFromAddress(extraLocation);
+  //         if (locations.isNotEmpty) {
+  //           Location loc = locations.first;
+  //           receiverLocs
+  //               .add({'latitude': loc.latitude, 'longitude': loc.longitude});
+
+  //           // Add marker for taker location
+  //           newMarkers.add(Marker(
+  //             markerId: MarkerId(extraLocation),
+  //             position: LatLng(loc.latitude, loc.longitude),
+  //             infoWindow: InfoWindow(title: extraLocation),
+  //           ));
+
+  //           // Animate camera to the taker location
+  //           final GoogleMapController controller = await _controller.future;
+  //           controller.animateCamera(
+  //             CameraUpdate.newLatLngZoom(
+  //               LatLng(loc.latitude, loc.longitude),
+  //               10.0, // Adjust zoom level as needed
+  //             ),
+  //           );
+  //         }
+  //       }
+
+  //       // Update state with receiver information and markers
+  //       setState(() {
+  //         receiverIds = receiverIds;
+  //         receiverLocations = receiverLocs;
+  //         markers = newMarkers;
+  //       });
+
+  //       // Send notifications to nearby donors
+  //       // Implement this function as needed
+  //     } else {
+  //       print('No donors found.');
+  //     }
+  //   } catch (e) {
+  //     print('Error: $e');
+  //   }
+  // }
 
 // Implement the notification function
   void notifyNearbyDonors(List<String> nearbyDonors) {
@@ -507,6 +712,7 @@ class _CheckMapState extends State<CheckMap> {
       List<String> nearbyLocations) async {
     try {
       showLoader("Please Wait!");
+      String projectId = 'blood-app-8f4c2';
 
       List<String> list = [];
       List<String> nonDuplicateList = [];
@@ -541,27 +747,36 @@ class _CheckMapState extends State<CheckMap> {
           String deviceToken = userDoc['deviceToken'];
           String userEmail = userDoc['email'];
 
-          // Prepare notification data
           var data = {
-            'to': deviceToken,
-            'priority': 'high',
-            'notification': {
-              'title': 'New Blood Request',
-              'body':
-                  'You have a new blood request from ${widget.fullname} for blood ${widget.blood}.'
-            },
-            'data': {'type': 'request_notification', 'id': 'Nomi12345'}
+            'message': {
+              'token': deviceToken,
+              'notification': {
+                'title': 'New Blood Request',
+                'body':
+                    'You have a new blood request from ${widget.fullname} for blood ${widget.blood}.'
+              },
+              'data': {'type': 'request_notification', 'id': 'Nomi12345'}
+            }
           };
 
-          // Send notification to the device
+          // Generate OAuth2 token using service account
+          var jsonString = await rootBundle.loadString('images/json/key1.json');
+          var clientCredentials =
+              auth.ServiceAccountCredentials.fromJson(jsonString);
+          // var clientCredentials = auth.ServiceAccountCredentials.fromJson(
+          //     await File('images/json/key.json').readAsString());
+          var scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
+          var client =
+              await auth.clientViaServiceAccount(clientCredentials, scopes);
+
           var response = await http.post(
-            Uri.parse('https://fcm.googleapis.com/fcm/send'),
-            body: jsonEncode(data),
+            Uri.parse(
+                'https://fcm.googleapis.com/v1/projects/$projectId/messages:send'),
             headers: {
-              'Content-Type': 'application/json; charset=UTF-8',
-              'Authorization':
-                  'key=AAAAhM4yLBU:APA91bFYi77T3adopH4ZKF6BwWAMjq0v-zrcByWIs_SukIolxTfIEXBwJLOzxF5GaYiT3xn03Y3gbQ-XWzkESGKMR1awLL3JPoc2x5dHh0uxmi-HSZ8xAHIEcQ0fF6XJ5j6KiYsyDzvU'
+              'Authorization': 'Bearer ${client.credentials.accessToken.data}',
+              'Content-Type': 'application/json',
             },
+            body: jsonEncode(data),
           );
 
           // Check response status

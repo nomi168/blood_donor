@@ -1755,7 +1755,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                     Container(
                                       width: 40.w,
                                       margin: EdgeInsets.all(5.w),
-                                      color: Colors.red,
                                       height: 25.h,
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(20),
@@ -2315,7 +2314,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         setState(() {});
         print(profilename);
         _goToCurrentLocation();
-        getNotificationToken();
+        await getNotificationToken();
       } else {
         // No user found with the specified email
         print('User not found with email: $userEmail');

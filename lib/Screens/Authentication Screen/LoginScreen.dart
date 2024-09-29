@@ -170,7 +170,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
-                      borderSide: const BorderSide(color: Colors.blue),
+                      borderSide: const BorderSide(color: Colors.white),
                     ),
                   ),
                   validator: validatePassword,
