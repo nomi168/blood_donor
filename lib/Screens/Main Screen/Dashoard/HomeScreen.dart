@@ -69,9 +69,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Set<Circle> circles = {};
 
   final List<String> images = [
-    'images/Banners/1.jpeg',
     'images/Banners/2.jpeg',
-    'images/Banners/3.jpeg'
+    'images/Banners/3.jpeg',
+    'images/Banners/4.jpg',
+    'images/Banners/5.jpg',
   ];
 
   TextEditingController fromController = TextEditingController();

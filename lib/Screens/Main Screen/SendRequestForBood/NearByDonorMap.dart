@@ -1,6 +1,7 @@
 // ignore_for_file: non_constant_identifier_names, file_names
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:blood_donor/Json%20Data/GoogleMapDark.dart';
 import 'package:blood_donor/Screens/Main%20Screen/SendRequestForBood/RecievedDonor.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:sizer/sizer.dart';
 
 class NearByDonorMap extends StatefulWidget {
@@ -19,6 +21,7 @@ class NearByDonorMap extends StatefulWidget {
   final String blood;
   final String date;
   final String time;
+  final String location;
 
   const NearByDonorMap(
       {super.key,
@@ -29,7 +32,8 @@ class NearByDonorMap extends StatefulWidget {
       required this.rating,
       required this.date,
       required this.time,
-      required this.id});
+      required this.id,
+      required this.location});
 
   @override
   State<NearByDonorMap> createState() => _NearByDonorMapState();
@@ -46,6 +50,7 @@ class _NearByDonorMapState extends State<NearByDonorMap> {
 
   Set<Polygon> polygons = {};
   Set<Circle> circles = {};
+  Set<Polyline> polylines = {};
   TextEditingController fromController = TextEditingController();
   TextEditingController toController = TextEditingController();
   bool isLightMode = false;
@@ -54,7 +59,7 @@ class _NearByDonorMapState extends State<NearByDonorMap> {
   void initState() {
     super.initState();
     _getCurrentLocation();
-    toController.text = widget.Name;
+    toController.text = widget.location;
     print('Nomi is here ${widget.Name}');
   }
 
@@ -66,7 +71,9 @@ class _NearByDonorMapState extends State<NearByDonorMap> {
           actions: [
             // IconButton to show path
             IconButton(
-              onPressed: showPath,
+              onPressed: () {
+                showPath(widget.location);
+              },
               icon: const Icon(Icons.directions),
             ),
             Padding(
@@ -97,8 +104,8 @@ class _NearByDonorMapState extends State<NearByDonorMap> {
               child: GoogleMap(
                 mapType: isLightMode ? MapType.normal : MapType.hybrid,
                 initialCameraPosition: _kGooglePlex,
-                polygons: polygons,
-                circles: circles,
+                polylines: Set<Polyline>.of(polylines),
+                circles: Set<Circle>.of(circles),
                 onMapCreated: (GoogleMapController controller) {
                   _controller.complete(controller);
                 },
@@ -304,6 +311,7 @@ class _NearByDonorMapState extends State<NearByDonorMap> {
         fromController.text =
             "${position.latitude.toString()}, ${position.longitude.toString()}";
       });
+      await showPath(widget.location);
     } catch (e) {
       // ignore: avoid_print
       print("Error: $e");
@@ -314,92 +322,154 @@ class _NearByDonorMapState extends State<NearByDonorMap> {
     _getCurrentLocation();
   }
 
-  Future<void> showPath() async {
+  Future<void> showPath(String location) async {
     try {
       String from = fromController.text;
-      String to = toController.text;
-      print('Nomi $to');
+      String to = location;
 
+      // Fetch locations for 'from' and 'to'
       List<Location> fromLocations = await locationFromAddress(from);
       List<Location> toLocations = await locationFromAddress(to);
 
       if (fromLocations.isNotEmpty && toLocations.isNotEmpty) {
         Location fromLocation = fromLocations.first;
 
-        // Let the user choose the correct "To" location from multiple results
+        // Allow user to choose the correct destination from multiple results
         Location? toLocation = await _chooseLocation(toLocations);
 
         if (toLocation != null) {
-          // ignore: unused_local_variable
           final GoogleMapController controller = await _controller.future;
 
           LatLng fromLatLng =
               LatLng(fromLocation.latitude, fromLocation.longitude);
           LatLng toLatLng = LatLng(toLocation.latitude, toLocation.longitude);
 
-          // ignore: unused_local_variable
-          LatLngBounds bounds = LatLngBounds(
-            southwest: fromLatLng,
-            northeast: toLatLng,
-          );
+          // Fetch the directions from Google Directions API
+          String url =
+              "https://maps.googleapis.com/maps/api/directions/json?origin=${fromLocation.latitude},${fromLocation.longitude}&destination=${toLocation.latitude},${toLocation.longitude}&key=AIzaSyAn6fh8krl1H-wflk6gHJ2aWoFEGAuaseI";
 
-          // ignore: unused_local_variable
-          Polyline polyline = Polyline(
-            polylineId: const PolylineId('Path'),
-            color: Colors.red,
-            points: [fromLatLng, toLatLng],
-          );
+          var response = await http.get(Uri.parse(url));
+          Map<String, dynamic> data = jsonDecode(response.body);
 
-          setState(() {
-            circles.clear();
-            circles.add(Circle(
-              circleId: const CircleId('CurrentLocationCircle'),
-              center: fromLatLng,
-              radius: 120.0,
-              fillColor: Colors.blue.withOpacity(0.3),
-              strokeColor: Colors.blue,
-              strokeWidth: 10,
-            ));
-            circles.add(Circle(
-              circleId: const CircleId('DestinationCircle'),
-              center: toLatLng,
-              radius: 120.0,
-              fillColor: Colors.green.withOpacity(0.3),
-              strokeColor: Colors.green,
-              strokeWidth: 10,
-            ));
-            polygons.clear();
-            polygons.add(Polygon(
-              polygonId: const PolygonId('PathPolygon'),
-              points: [fromLatLng, toLatLng],
-              fillColor: const Color(0xFFDE0A1E).withOpacity(0.5),
-              strokeWidth: 2,
-              strokeColor: const Color(0xFFDE0A1E),
-            ));
-          });
+          if (data['routes'] != null && data['routes'].isNotEmpty) {
+            var points = data['routes'][0]['overview_polyline']['points'];
+            List<LatLng> polylineCoordinates = _decodePolyline(points);
 
-          // ignore: await_only_futures
-          double distance = await Geolocator.distanceBetween(
-            fromLocation.latitude,
-            fromLocation.longitude,
-            toLocation.latitude,
-            toLocation.longitude,
-          );
+            print('Decoded Polyline Points: $polylineCoordinates');
 
-          double distanceInKm = distance / 1000;
+            setState(() {
+              // Clear previous polylines and circles
+              polylines.clear();
+              circles.clear();
 
-          // ignore: use_build_context_synchronously
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Distance: ${distanceInKm.toStringAsFixed(2)} km'),
-            ),
-          );
+              // Add polyline following the road
+              polylines.add(Polyline(
+                polylineId: const PolylineId('Path'),
+                color: Colors.blue.shade500,
+                width: 5,
+                points: polylineCoordinates,
+              ));
+
+              // Add circles for the start and end points
+              circles.add(Circle(
+                circleId: const CircleId('CurrentLocationCircle'),
+                center: fromLatLng,
+                radius: 120.0,
+                fillColor: Colors.blue.withOpacity(0.3),
+                strokeColor: Colors.blue,
+                strokeWidth: 10,
+              ));
+              circles.add(Circle(
+                circleId: const CircleId('DestinationCircle'),
+                center: toLatLng,
+                radius: 120.0,
+                fillColor: Colors.green.withOpacity(0.3),
+                strokeColor: Colors.green,
+                strokeWidth: 10,
+              ));
+            });
+
+            // Animate the camera to fit both points
+            LatLngBounds bounds = LatLngBounds(
+              southwest: LatLng(
+                fromLocation.latitude < toLocation.latitude
+                    ? fromLocation.latitude
+                    : toLocation.latitude,
+                fromLocation.longitude < toLocation.longitude
+                    ? fromLocation.longitude
+                    : toLocation.longitude,
+              ),
+              northeast: LatLng(
+                fromLocation.latitude > toLocation.latitude
+                    ? fromLocation.latitude
+                    : toLocation.latitude,
+                fromLocation.longitude > toLocation.longitude
+                    ? fromLocation.longitude
+                    : toLocation.longitude,
+              ),
+            );
+            controller
+                .animateCamera(CameraUpdate.newLatLngBounds(bounds, 50.0));
+
+            double distance = await Geolocator.distanceBetween(
+              fromLocation.latitude,
+              fromLocation.longitude,
+              toLocation.latitude,
+              toLocation.longitude,
+            );
+
+            double distanceInKm = distance / 1000;
+
+            // Show distance in Snackbar
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content:
+                    Text('Distance: ${distanceInKm.toStringAsFixed(2)} km'),
+              ),
+            );
+          } else {
+            print('No route found');
+          }
         }
       }
     } catch (e) {
-      // ignore: avoid_print
       print("Error: $e");
     }
+  }
+
+  List<LatLng> _decodePolyline(String polyline) {
+    List<LatLng> polylineCoordinates = [];
+    int index = 0;
+    int len = polyline.length;
+    int lat = 0;
+    int lng = 0;
+
+    while (index < len) {
+      int shift = 0;
+      int result = 0;
+      int b;
+      do {
+        b = polyline.codeUnitAt(index++) - 63;
+        result |= (b & 0x1F) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      lat += dlat;
+
+      shift = 0;
+      result = 0;
+      do {
+        b = polyline.codeUnitAt(index++) - 63;
+        result |= (b & 0x1F) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      lng += dlng;
+
+      LatLng point = LatLng((lat / 1E5).toDouble(), (lng / 1E5).toDouble());
+      polylineCoordinates.add(point);
+    }
+    return polylineCoordinates;
   }
 
   Future<Location?> _chooseLocation(List<Location> locations) async {
@@ -522,7 +592,7 @@ class _NearByDonorMapState extends State<NearByDonorMap> {
                 child: ElevatedButton(
                   onPressed: () {
                     int id = widget.id;
-                    String location = widget.Name;
+                    String location = widget.location;
                     String name = widget.name;
                     String blood = widget.blood;
                     String image = widget.image;

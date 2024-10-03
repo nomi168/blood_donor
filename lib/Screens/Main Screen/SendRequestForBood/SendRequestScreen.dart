@@ -24,6 +24,7 @@ class _SendRequestScreenState extends State<SendRequestScreen> {
   TextEditingController blood = TextEditingController();
   TextEditingController note = TextEditingController();
   TextEditingController address = TextEditingController();
+  TextEditingController location = TextEditingController();
   File? _pickedImage;
   final GlobalKey<FormState> _form = GlobalKey<FormState>();
   String? _imageUrl;
@@ -74,6 +75,13 @@ class _SendRequestScreenState extends State<SendRequestScreen> {
   String? validateHospital(String? value) {
     if (value == null || value.isEmpty) {
       return 'Hospital is required';
+    }
+    return null; // Indicates a valid location
+  }
+
+  String? validateLocation(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Address is required';
     }
     return null; // Indicates a valid location
   }
@@ -161,6 +169,35 @@ class _SendRequestScreenState extends State<SendRequestScreen> {
                         hintText: 'Search Hospital',
                       ),
                       validator: validateHospital,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
+                  child: Material(
+                    elevation: 7.0, // Add shadow/elevation
+                    borderRadius:
+                        BorderRadius.circular(10.0), // Add border radius
+                    child: TextFormField(
+                      controller: location,
+                      decoration: InputDecoration(
+                        label: const Text('Address'),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16.0), // Adjust padding
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: const BorderSide(
+                              color: Colors.grey), // Border color
+                        ),
+                        suffixIcon: const Icon(Icons.local_hospital),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: const BorderSide(
+                              color: Colors.blue), // Border color when focused
+                        ),
+                        hintText: 'Enter Address',
+                      ),
+                      validator: validateLocation,
                     ),
                   ),
                 ),
@@ -445,6 +482,7 @@ class _SendRequestScreenState extends State<SendRequestScreen> {
         'file': _imageUrl,
         'note': note.text,
         'blood': blood.text,
+        'location': location.text
       });
 
       String Name = hospital.text;
@@ -452,9 +490,7 @@ class _SendRequestScreenState extends State<SendRequestScreen> {
         context,
         PageRouteBuilder(
           pageBuilder: (context, animation, secondaryAnimation) {
-            return MapScreen(
-              Name: Name,
-            );
+            return MapScreen(Name: Name, location: location.text);
           },
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             const begin = Offset(10.0, 0.0); // slide in from the right

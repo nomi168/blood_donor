@@ -8,6 +8,7 @@ class AcceptDonator {
   final String time;
   final String date;
   final String email;
+  final String locaion;
 
   AcceptDonator(
       {required this.id,
@@ -18,5 +19,6 @@ class AcceptDonator {
       required this.rating,
       required this.time,
       required this.date,
-      required this.email});
+      required this.email,
+      required this.locaion});
 }

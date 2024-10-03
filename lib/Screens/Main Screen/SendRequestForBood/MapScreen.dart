@@ -11,7 +11,6 @@ import 'package:blood_donor/Screens/Main%20Screen/SendRequestForBood/NearByDonor
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:draggable_bottom_sheet/draggable_bottom_sheet.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -21,8 +20,9 @@ import 'package:sizer/sizer.dart';
 class MapScreen extends StatefulWidget {
   // ignore: non_constant_identifier_names
   final String Name;
+  final String location;
   // ignore: non_constant_identifier_names
-  const MapScreen({super.key, required this.Name});
+  const MapScreen({super.key, required this.Name, required this.location});
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -40,6 +40,7 @@ class _MapScreenState extends State<MapScreen> {
   // Set<Polygon> polygons = {};
   Set<Polygon> polygons = HashSet<Polygon>();
   Set<Circle> circles = {};
+  Set<Polyline> polylines = {};
   final Set<Marker> _markers = {};
   TextEditingController fromController = TextEditingController();
   TextEditingController toController = TextEditingController();
@@ -61,7 +62,7 @@ class _MapScreenState extends State<MapScreen> {
     super.initState();
 
     _getCurrentLocation();
-    toController.text = widget.Name;
+    toController.text = widget.location;
     // ignore: avoid_print
     print(widget.Name);
     getAcceptDonationWithHighestRating();
@@ -84,7 +85,9 @@ class _MapScreenState extends State<MapScreen> {
             Padding(
                 padding: EdgeInsets.fromLTRB(0.w, 0, 0, 0),
                 child: IconButton(
-                  onPressed: _goToCurrentLocation,
+                  onPressed: () {
+                    showPath(widget.location);
+                  },
                   icon: const Icon(
                     Icons.my_location,
                     size: 35,
@@ -146,6 +149,7 @@ class _MapScreenState extends State<MapScreen> {
         fromController.text =
             "${position.latitude.toString()}, ${position.longitude.toString()}";
       });
+      await showPath(widget.location);
     } catch (e) {
       // ignore: avoid_print
       print("Error: $e");
@@ -156,50 +160,154 @@ class _MapScreenState extends State<MapScreen> {
     _getCurrentLocation();
   }
 
-  Future<void> showPath() async {
+  Future<void> showPath(String location) async {
     try {
-      String to = toController.text;
       String from = fromController.text;
+      String to = location;
 
+      // Fetch locations for 'from' and 'to'
       List<Location> fromLocations = await locationFromAddress(from);
       List<Location> toLocations = await locationFromAddress(to);
 
       if (fromLocations.isNotEmpty && toLocations.isNotEmpty) {
         Location fromLocation = fromLocations.first;
-        Location toLocation = toLocations.first;
 
-        final String apiKey =
-            "AIzaSyDt9_n1OFp-s3aVJbr0ZsEAjaZPt-FoPaw"; // Replace with your actual API key
-        String url =
-            "https://maps.googleapis.com/maps/api/directions/json?origin=${fromLocation.latitude},${fromLocation.longitude}&destination=${toLocation.latitude},${toLocation.longitude}&key=$apiKey";
-        final response = await http.get(Uri.parse(url));
+        // Allow user to choose the correct destination from multiple results
+        Location? toLocation = await _chooseLocation(toLocations);
 
-        if (response.statusCode == 200) {
-          final directions = json.decode(response.body);
-          List<dynamic> routes = directions['routes'];
-          if (routes.isNotEmpty) {
-            List<LatLng> points = _decodePolyline(
-                directions['routes'][0]['overview_polyline']['points']);
+        if (toLocation != null) {
+          final GoogleMapController controller = await _controller.future;
+
+          LatLng fromLatLng =
+              LatLng(fromLocation.latitude, fromLocation.longitude);
+          LatLng toLatLng = LatLng(toLocation.latitude, toLocation.longitude);
+
+          // Fetch the directions from Google Directions API
+          String url =
+              "https://maps.googleapis.com/maps/api/directions/json?origin=${fromLocation.latitude},${fromLocation.longitude}&destination=${toLocation.latitude},${toLocation.longitude}&key=AIzaSyAn6fh8krl1H-wflk6gHJ2aWoFEGAuaseI";
+
+          var response = await http.get(Uri.parse(url));
+          Map<String, dynamic> data = jsonDecode(response.body);
+
+          if (data['routes'] != null && data['routes'].isNotEmpty) {
+            var points = data['routes'][0]['overview_polyline']['points'];
+            List<LatLng> polylineCoordinates = _decodePolyline(points);
+
+            print('Decoded Polyline Points: $polylineCoordinates');
+
             setState(() {
-              polyline = points;
+              // Clear previous polylines and circles
+              polylines.clear();
+              circles.clear();
+
+              // Add polyline following the road
+              polylines.add(Polyline(
+                polylineId: const PolylineId('Path'),
+                color: Colors.blue.shade500,
+                width: 5,
+                points: polylineCoordinates,
+              ));
+
+              // Add circles for the start and end points
+              circles.add(Circle(
+                circleId: const CircleId('CurrentLocationCircle'),
+                center: fromLatLng,
+                radius: 120.0,
+                fillColor: Colors.blue.withOpacity(0.3),
+                strokeColor: Colors.blue,
+                strokeWidth: 10,
+              ));
+              circles.add(Circle(
+                circleId: const CircleId('DestinationCircle'),
+                center: toLatLng,
+                radius: 120.0,
+                fillColor: Colors.green.withOpacity(0.3),
+                strokeColor: Colors.green,
+                strokeWidth: 10,
+              ));
             });
+
+            // Animate the camera to fit both points
+            LatLngBounds bounds = LatLngBounds(
+              southwest: LatLng(
+                fromLocation.latitude < toLocation.latitude
+                    ? fromLocation.latitude
+                    : toLocation.latitude,
+                fromLocation.longitude < toLocation.longitude
+                    ? fromLocation.longitude
+                    : toLocation.longitude,
+              ),
+              northeast: LatLng(
+                fromLocation.latitude > toLocation.latitude
+                    ? fromLocation.latitude
+                    : toLocation.latitude,
+                fromLocation.longitude > toLocation.longitude
+                    ? fromLocation.longitude
+                    : toLocation.longitude,
+              ),
+            );
+            controller
+                .animateCamera(CameraUpdate.newLatLngBounds(bounds, 50.0));
+
+            double distance = await Geolocator.distanceBetween(
+              fromLocation.latitude,
+              fromLocation.longitude,
+              toLocation.latitude,
+              toLocation.longitude,
+            );
+
+            double distanceInKm = distance / 1000;
+
+            // Show distance in Snackbar
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content:
+                    Text('Distance: ${distanceInKm.toStringAsFixed(2)} km'),
+              ),
+            );
           } else {
-            print("No routes found for the provided locations.");
+            print('No route found');
           }
-        } else {
-          throw "Failed to fetch directions";
         }
       }
     } catch (e) {
-      print('Error: $e');
+      print("Error: $e");
     }
   }
 
-  List<LatLng> _decodePolyline(String encoded) {
-    List<PointLatLng> decoded = PolylinePoints().decodePolyline(encoded);
-    return decoded
-        .map((point) => LatLng(point.latitude, point.longitude))
-        .toList();
+  List<LatLng> _decodePolyline(String polyline) {
+    List<LatLng> polylineCoordinates = [];
+    int index = 0;
+    int len = polyline.length;
+    int lat = 0;
+    int lng = 0;
+
+    while (index < len) {
+      int shift = 0;
+      int result = 0;
+      int b;
+      do {
+        b = polyline.codeUnitAt(index++) - 63;
+        result |= (b & 0x1F) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      lat += dlat;
+
+      shift = 0;
+      result = 0;
+      do {
+        b = polyline.codeUnitAt(index++) - 63;
+        result |= (b & 0x1F) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      lng += dlng;
+
+      LatLng point = LatLng((lat / 1E5).toDouble(), (lng / 1E5).toDouble());
+      polylineCoordinates.add(point);
+    }
+    return polylineCoordinates;
   }
 
   // Future<void> showPath() async {
@@ -817,6 +925,7 @@ class _MapScreenState extends State<MapScreen> {
                       String rating = feedsData[index].rating;
                       String date = feedsData[index].date;
                       String time = feedsData[index].time;
+                      String location = feedsData[index].locaion;
 
                       Navigator.push(
                         context,
@@ -831,7 +940,8 @@ class _MapScreenState extends State<MapScreen> {
                                 blood: blood,
                                 rating: rating,
                                 date: date,
-                                time: time);
+                                time: time,
+                                location: location);
                           },
                           transitionsBuilder:
                               (context, animation, secondaryAnimation, child) {
@@ -959,15 +1069,8 @@ class _MapScreenState extends State<MapScreen> {
         target: sourceLocation,
         zoom: 10.0,
       ),
-      polylines: {
-        Polyline(
-          polylineId: PolylineId('route'),
-          points: polyline,
-          color: Colors.blue, // Adjust polyline color if needed
-          width: 4,
-        ),
-      },
-      circles: circles,
+      polylines: Set<Polyline>.of(polylines),
+      circles: Set<Circle>.of(circles),
       polygons: polygons,
       onMapCreated: (GoogleMapController controller) {
         _controller.complete(controller);
@@ -1002,16 +1105,16 @@ class _MapScreenState extends State<MapScreen> {
         setState(() {
           feedsData = querySnapshot.docs.map((doc) {
             return AcceptDonator(
-              id: doc['id'],
-              name: doc['acceptname'],
-              image: doc['acceptimage'],
-              blood: doc['acceptblood'],
-              number: doc['acceptnumber'],
-              email: doc['acceptemail'],
-              rating: doc['acceptrating'],
-              time: doc['time1'],
-              date: doc['date1'],
-            );
+                id: doc['id'],
+                name: doc['acceptname'],
+                image: doc['acceptimage'],
+                blood: doc['acceptblood'],
+                number: doc['acceptnumber'],
+                email: doc['acceptemail'],
+                rating: doc['acceptrating'],
+                time: doc['time1'],
+                date: doc['date1'],
+                locaion: doc['location']);
           }).toList();
         });
       } else {
