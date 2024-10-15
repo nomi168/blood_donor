@@ -1,5 +1,6 @@
 // ignore_for_file: file_names
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:core';
 import 'dart:developer';
@@ -48,6 +49,8 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
   String sender_id = '';
   String receiver_id = '';
   bool isLoading = true;
+  bool availablility = false;
+  Timer? _timer;
   // static int takerId = 0;
 
   @override
@@ -57,17 +60,21 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
     getChatRequestData();
     getChatRequestId();
     WidgetsBinding.instance.addObserver(this);
-    Future.delayed(Duration(seconds: 3), () {
+    Future.delayed(Duration(seconds: 3), () async {
       setState(() {
         isLoading = false;
+
         // Populate feedsData with actual data
       });
+      await deleteExpiredRequests();
+      await getavailableDonor();
     });
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _timer?.cancel();
     super.dispose();
   }
 
@@ -221,6 +228,47 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
     } catch (e) {
       // Handle error
       print('Error: $e');
+    }
+  }
+
+  Future<void> deleteExpiredRequests() async {
+    final firestore = FirebaseFirestore.instance;
+
+    // Calculate the timestamp for 24 hours ago
+    DateTime twentyFourHoursAgo = DateTime.now().subtract(Duration(hours: 24));
+    Timestamp twentyFourHoursAgoTimestamp =
+        Timestamp.fromDate(twentyFourHoursAgo);
+
+    // Get all requests older than 24 hours
+    QuerySnapshot querySnapshot = await firestore
+        .collection('taker')
+        .where('createdAt', isLessThanOrEqualTo: twentyFourHoursAgoTimestamp)
+        .get();
+
+    // Delete each expired document
+    for (var doc in querySnapshot.docs) {
+      await firestore.collection('taker').doc(doc.id).delete();
+    }
+  }
+
+  Future<void> checkAvailabilityDonor() async {
+    final firestore = FirebaseFirestore.instance;
+
+    // Calculate the timestamp for 2 minutes ago
+    DateTime twoMinutesAgo = DateTime.now().subtract(Duration(minutes: 2));
+    Timestamp twoMinutesAgoTimestamp = Timestamp.fromDate(twoMinutesAgo);
+
+    // Get all donors added more than 2 minutes ago
+    QuerySnapshot querySnapshot = await firestore
+        .collection('available_donor')
+        .where('createdAt', isLessThanOrEqualTo: twoMinutesAgoTimestamp)
+        .get();
+
+    // Update the status of each expired document to 'false'
+    for (var doc in querySnapshot.docs) {
+      await firestore.collection('available_donor').doc(doc.id).update({
+        'status': false,
+      });
     }
   }
 
@@ -1177,10 +1225,9 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
                                                               recimage,
                                                               id);
                                                         } else {
-                                                          showCustomSnackBar(
-                                                              context,
-                                                              'Only donors can send chat requests.',
-                                                              false);
+                                                          EasyLoading.showError(
+                                                            'Only donors can send chat requests.',
+                                                          );
                                                         }
 
                                                         // Show notification or navigate to chat screen
@@ -1249,73 +1296,82 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
                                                           feedsData[index]
                                                               .t_id
                                                               .toString();
-                                                      // if (userType == 'donor') {
-                                                      Navigator.of(context,
-                                                              rootNavigator:
-                                                                  true)
-                                                          .push(
-                                                        PageRouteBuilder(
-                                                          pageBuilder: (context,
-                                                              animation,
-                                                              secondaryAnimation) {
-                                                            return MapOnDonator(
-                                                              id: id,
-                                                              name: name,
-                                                              email: email,
-                                                              image: image,
-                                                              blood: blood,
-                                                              location:
-                                                                  location,
-                                                              hosname: hosname,
-                                                              rating: rating
-                                                                  .toString(),
-                                                              time: time,
-                                                              date: date,
-                                                              note: note,
-                                                            );
-                                                          },
-                                                          transitionDuration:
-                                                              const Duration(
-                                                                  seconds: 1),
-                                                          transitionsBuilder:
-                                                              (context,
+                                                      if (userType == 'donor') {
+                                                        if (availablility ==
+                                                            true) {
+                                                          EasyLoading.showError(
+                                                            "You have already donated blood. If you want to donate again, please wait for 90 days.",
+                                                          );
+                                                        } else {
+                                                          Navigator.of(context,
+                                                                  rootNavigator:
+                                                                      true)
+                                                              .push(
+                                                            PageRouteBuilder(
+                                                              pageBuilder: (context,
                                                                   animation,
-                                                                  secondaryAnimation,
-                                                                  child) {
-                                                            const begin = Offset(
-                                                                10.0,
-                                                                0.0); // slide in from the right
-                                                            const end =
-                                                                Offset.zero;
-                                                            const curve = Curves
-                                                                .easeInOutQuart;
+                                                                  secondaryAnimation) {
+                                                                return MapOnDonator(
+                                                                  id: id,
+                                                                  name: name,
+                                                                  email: email,
+                                                                  image: image,
+                                                                  blood: blood,
+                                                                  location:
+                                                                      location,
+                                                                  hosname:
+                                                                      hosname,
+                                                                  rating: rating
+                                                                      .toString(),
+                                                                  time: time,
+                                                                  date: date,
+                                                                  note: note,
+                                                                );
+                                                              },
+                                                              transitionDuration:
+                                                                  const Duration(
+                                                                      seconds:
+                                                                          1),
+                                                              transitionsBuilder:
+                                                                  (context,
+                                                                      animation,
+                                                                      secondaryAnimation,
+                                                                      child) {
+                                                                const begin =
+                                                                    Offset(10.0,
+                                                                        0.0); // slide in from the right
+                                                                const end =
+                                                                    Offset.zero;
+                                                                const curve = Curves
+                                                                    .easeInOutQuart;
 
-                                                            var tween = Tween(
-                                                                    begin:
-                                                                        begin,
-                                                                    end: end)
-                                                                .chain(CurveTween(
-                                                                    curve:
-                                                                        curve));
-                                                            var offsetAnimation =
-                                                                animation.drive(
-                                                                    tween);
+                                                                var tween = Tween(
+                                                                        begin:
+                                                                            begin,
+                                                                        end:
+                                                                            end)
+                                                                    .chain(CurveTween(
+                                                                        curve:
+                                                                            curve));
+                                                                var offsetAnimation =
+                                                                    animation
+                                                                        .drive(
+                                                                            tween);
 
-                                                            return SlideTransition(
-                                                              position:
-                                                                  offsetAnimation,
-                                                              child: child,
-                                                            );
-                                                          },
-                                                        ),
-                                                      );
-
-                                                      //  else {
-                                                      //   showCustomSnackBar(
-                                                      //       context,
-                                                      //       "Taker is doesnot donate any blood",
-                                                      //       false);
-                                                      // }
+                                                                return SlideTransition(
+                                                                  position:
+                                                                      offsetAnimation,
+                                                                  child: child,
+                                                                );
+                                                              },
+                                                            ),
+                                                          );
+                                                        }
+                                                      } else {
+                                                        EasyLoading.showError(
+                                                          "Taker is doesnot donate any blood",
+                                                        );
+                                                      }
                                                     },
                                                     child: Container(
                                                       height: 30,
@@ -1364,6 +1420,33 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
                     mainAxisExtent: 170,
                   ),
                 )));
+  }
+
+  Future<void> getavailableDonor() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String userEmail = prefs.getString('user_email') ?? '';
+      print(userEmail);
+
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('available_donor')
+          .where('email', isEqualTo: userEmail)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot userDoc = querySnapshot.docs.first;
+
+        bool status = userDoc['status'];
+
+        setState(() {
+          availablility = status;
+        });
+      } else {
+        print('User not found with email: $userEmail');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
   }
 
   Future<void> updateStatus(bool isActive) async {

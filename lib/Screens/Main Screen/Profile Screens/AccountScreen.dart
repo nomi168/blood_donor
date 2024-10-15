@@ -3,20 +3,21 @@
 import 'dart:developer';
 
 import 'package:blood_donor/Provider/Profile.dart';
-import 'package:blood_donor/Screens/Main%20Screen/Profile%20Screens/DonorCard.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Profile%20Screens/EditProfile.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Profile%20Screens/History.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Profile%20Screens/ManageAddress.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Profile%20Screens/PaymentInfo.dart';
+import 'package:blood_donor/Screens/Main%20Screen/Profile%20Screens/Refferral.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Profile%20Screens/RewardPoints.dart';
+import 'package:blood_donor/constants.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
-import 'package:sliding_switch/sliding_switch.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -41,6 +42,7 @@ class _AccountScreenState extends State<AccountScreen>
   bool availabledonor = false;
   String location = '';
   bool checkboxslider = false;
+  bool availablility = false;
   @override
   void initState() {
     super.initState();
@@ -291,31 +293,86 @@ class _AccountScreenState extends State<AccountScreen>
               ),
             ),
             Spacer(),
+            // Padding(
+            //   padding: EdgeInsets.fromLTRB(0.w, 46.5.h, 5.w, 0.h),
+            //   child: SlidingSwitch(
+            //     width: 20.w,
+            //     height: 4.h,
+            //     value: availablility, // Use the availability state directly
+            //     onChanged: (value) async {
+            //       setState(() {
+            //         availablility = value; // Update local state
+            //       });
+
+            //       // Update Firestore when the switch is toggled
+            //       await updateStatusAvailble(value);
+            //     },
+            //     animationDuration: const Duration(milliseconds: 400),
+            //     onTap: () {},
+            //     onDoubleTap: () {},
+            //     onSwipe: () {},
+            //     textOff: "off",
+            //     textOn: "on",
+            //     iconOff: Icons.offline_bolt,
+            //     iconOn: Icons.light_mode,
+            //     contentSize: 14,
+            //     colorOn: Colors.red,
+            //     colorOff: const Color(0xff6682c0),
+            //   ),
+            // ),
+
             Padding(
-              padding: EdgeInsets.fromLTRB(0.w, 46.5.h, 5.w, 0.h),
-              child: SlidingSwitch(
-                width: 20.w,
-                height: 4.h,
-                value: isSwitched!,
-                onChanged: (value) {
-                  setState(() {
-                    isSwitched = value;
-                    updateStatusAvailble(isSwitched!);
-                  });
-                },
-                animationDuration: const Duration(milliseconds: 400),
-                onTap: () {},
-                onDoubleTap: () {},
-                onSwipe: () {},
-                textOff: "off",
-                textOn: "on",
-                iconOff: Icons.offline_bolt,
-                iconOn: Icons.light_mode,
-                contentSize: 14,
-                colorOn: Colors.red,
-                colorOff: const Color(0xff6682c0),
-              ),
-            ),
+                padding: EdgeInsets.fromLTRB(0.w, 46.5.h, 5.w, 0.h),
+                child: Container(
+                  height: 40,
+                  width: 120,
+                  decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(08)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      // First container
+
+                      // Second container
+                      Container(
+                        height: 30,
+                        width: 50,
+                        decoration: BoxDecoration(
+                          color: availablility == true
+                              ? PRIMARY_COLOR
+                              : Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Center(
+                          child: Text('No',
+                              style: TextStyle(
+                                  color: availablility == true
+                                      ? Colors.white
+                                      : Colors.black)),
+                        ),
+                      ),
+                      Container(
+                        height: 30,
+                        width: 50,
+                        decoration: BoxDecoration(
+                          color: availablility == false
+                              ? PRIMARY_COLOR
+                              : Colors
+                                  .white, // Grey if condition is true, Red otherwise
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Center(
+                          child: Text('Yes',
+                              style: TextStyle(
+                                  color: availablility == false
+                                      ? Colors.white
+                                      : Colors.black)),
+                        ),
+                      ),
+                    ],
+                  ),
+                )),
           ],
         ),
 
@@ -439,6 +496,7 @@ class _AccountScreenState extends State<AccountScreen>
             ],
           ),
         ),
+
         Padding(
           padding: EdgeInsets.fromLTRB(0, 25.h, 0, 0),
           child: Row(
@@ -454,14 +512,14 @@ class _AccountScreenState extends State<AccountScreen>
               Padding(
                   padding: EdgeInsets.fromLTRB(5.w, 42.5.h, 0, 0.h),
                   child: Text(
-                    'Donor Card',
+                    'Refferral Invitation',
                     style: TextStyle(
                         fontSize: 13.sp,
                         color: Colors.black54,
                         fontWeight: FontWeight.bold),
                   )),
               Padding(
-                  padding: EdgeInsets.fromLTRB(41.w, 42.5.h, 0, 0.h),
+                  padding: EdgeInsets.fromLTRB(26.w, 42.5.h, 0, 0.h),
                   child: IconButton(
                     icon: const Icon(
                       Icons.arrow_forward_ios,
@@ -473,7 +531,7 @@ class _AccountScreenState extends State<AccountScreen>
                         PageRouteBuilder(
                           pageBuilder:
                               (context, animation, secondaryAnimation) {
-                            return const DonorCardScreen();
+                            return const RefferalInvitation();
                           },
                           transitionDuration: const Duration(seconds: 1),
                           transitionsBuilder:
@@ -665,8 +723,36 @@ class _AccountScreenState extends State<AccountScreen>
 
         // Fetch and display the image from Firebase Storage
         // await displayImage(image);
-
+        await getavailableDonor();
         print(fullname);
+      } else {
+        print('User not found with email: $userEmail');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  Future<void> getavailableDonor() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String userEmail = prefs.getString('user_email') ?? '';
+      print(userEmail);
+
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('available_donor')
+          .where('email', isEqualTo: userEmail)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot userDoc = querySnapshot.docs.first;
+
+        bool status = userDoc['status'];
+
+        setState(() {
+          availablility = status;
+        });
+        print("Availability is $availablility");
       } else {
         print('User not found with email: $userEmail');
       }
@@ -702,20 +788,78 @@ class _AccountScreenState extends State<AccountScreen>
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String userEmail = prefs.getString('user_email') ?? '';
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('users')
+          .collection('available_donor')
           .where('email', isEqualTo: userEmail)
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
         String userId = querySnapshot.docs.first.id;
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(userId)
-            .update({'availabledonate': isActive});
+
         log("My Statis is $isActive");
       }
     } catch (e) {
       print('Error updating status: $e');
     }
+  }
+
+  void showReferralPopup(BuildContext context) {
+    String appLink =
+        'https://play.google.com/store/apps/details?id=com.pakistan.Ebloodpakistan&pcampaignid=web_share'; // Your app link
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          content: Container(
+            height: 220,
+            width: 300, // Adjust height based on your design
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'E Blood App',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 20),
+                TextField(
+                  controller: TextEditingController(text: appLink),
+                  readOnly: true,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'App Link',
+                    suffixIcon: IconButton(
+                      icon: Icon(Icons.copy),
+                      onPressed: () {
+                        // Copy app link to clipboard
+                        Clipboard.setData(ClipboardData(text: appLink));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('App link copied to clipboard!'),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Close the popup
+                    },
+                    child: Text('Close'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }

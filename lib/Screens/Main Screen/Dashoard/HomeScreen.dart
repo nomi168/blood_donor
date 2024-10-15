@@ -48,10 +48,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     'B-',
     'O-',
     'AB-',
-    'A',
-    'B',
-    'AB',
-    'O'
   ];
   String selectedIndex1 = '';
   int _currentIndex = 0;
@@ -115,6 +111,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   final CollectionReference usersCollection =
       FirebaseFirestore.instance.collection('users');
   String devicetoken = '';
+  bool availability = false;
 
   @override
   void dispose() {
@@ -1584,124 +1581,153 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                               ),
                                               const SizedBox(height: 15),
                                               Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
                                                 children: [
-                                                  InkWell(
-                                                    onTap: () {},
-                                                    child: Container(
-                                                      height: 30,
-                                                      width: 90,
-                                                      alignment:
-                                                          Alignment.center,
-                                                      decoration: BoxDecoration(
-                                                        color: PRIMARY_COLOR,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(5),
-                                                        border: Border.all(
-                                                          color: Colors.red,
-                                                          width: 1.0,
-                                                        ),
-                                                      ),
-                                                      child: Text(
-                                                        'Decline',
-                                                        style: TextStyle(
-                                                            fontSize: 14,
-                                                            color:
-                                                                Colors.white),
-                                                      ),
-                                                    ),
-                                                  ),
+                                                  // InkWell(
+                                                  //   onTap: () {},
+                                                  //   child: Container(
+                                                  //     height: 30,
+                                                  //     width: 90,
+                                                  //     alignment:
+                                                  //         Alignment.center,
+                                                  //     decoration: BoxDecoration(
+                                                  //       color: PRIMARY_COLOR,
+                                                  //       borderRadius:
+                                                  //           BorderRadius
+                                                  //               .circular(5),
+                                                  //       border: Border.all(
+                                                  //         color: Colors.red,
+                                                  //         width: 1.0,
+                                                  //       ),
+                                                  //     ),
+                                                  //     child: Text(
+                                                  //       'Decline',
+                                                  //       style: TextStyle(
+                                                  //           fontSize: 14,
+                                                  //           color:
+                                                  //               Colors.white),
+                                                  //     ),
+                                                  //   ),
+                                                  // ),
                                                   SizedBox(
-                                                    width: 10,
+                                                    width: 25.w,
                                                   ),
-                                                  InkWell(
-                                                    onTap: () {
-                                                      if (userType == 'donor') {
-                                                        Navigator.push(
-                                                          context,
-                                                          PageRouteBuilder(
-                                                            pageBuilder: (context,
-                                                                animation,
-                                                                secondaryAnimation) {
-                                                              return DonateNow(
-                                                                  name: name,
-                                                                  image: image,
-                                                                  blood: blood,
-                                                                  email: email,
-                                                                  hospital:
-                                                                      hospitaln,
-                                                                  location:
-                                                                      location,
-                                                                  date: date,
-                                                                  time: time,
-                                                                  rating:
-                                                                      rating,
-                                                                  note: note,
-                                                                  id: id);
-                                                            },
-                                                            transitionDuration:
-                                                                const Duration(
-                                                                    seconds: 1),
-                                                            transitionsBuilder:
-                                                                (context,
+                                                  Align(
+                                                    alignment:
+                                                        Alignment.centerRight,
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        if (userType ==
+                                                            'donor') {
+                                                          if (availability ==
+                                                              true) {
+                                                            EasyLoading
+                                                                .showError(
+                                                              "You have already donated blood. If you want to donate again, please wait for 90 days.",
+                                                            );
+                                                          } else {
+                                                            Navigator.push(
+                                                              context,
+                                                              PageRouteBuilder(
+                                                                pageBuilder: (context,
                                                                     animation,
-                                                                    secondaryAnimation,
-                                                                    child) {
-                                                              const begin = Offset(
-                                                                  10.0,
-                                                                  0.0); // slide in from the right
-                                                              const end =
-                                                                  Offset.zero;
-                                                              const curve = Curves
-                                                                  .easeInOutQuart;
+                                                                    secondaryAnimation) {
+                                                                  return DonateNow(
+                                                                      name:
+                                                                          name,
+                                                                      image:
+                                                                          image,
+                                                                      blood:
+                                                                          blood,
+                                                                      email:
+                                                                          email,
+                                                                      hospital:
+                                                                          hospitaln,
+                                                                      location:
+                                                                          location,
+                                                                      date:
+                                                                          date,
+                                                                      time:
+                                                                          time,
+                                                                      rating:
+                                                                          rating,
+                                                                      note:
+                                                                          note,
+                                                                      id: id);
+                                                                },
+                                                                transitionDuration:
+                                                                    const Duration(
+                                                                        seconds:
+                                                                            1),
+                                                                transitionsBuilder:
+                                                                    (context,
+                                                                        animation,
+                                                                        secondaryAnimation,
+                                                                        child) {
+                                                                  const begin =
+                                                                      Offset(
+                                                                          10.0,
+                                                                          0.0); // slide in from the right
+                                                                  const end =
+                                                                      Offset
+                                                                          .zero;
+                                                                  const curve =
+                                                                      Curves
+                                                                          .easeInOutQuart;
 
-                                                              var tween = Tween(
-                                                                      begin:
-                                                                          begin,
-                                                                      end: end)
-                                                                  .chain(CurveTween(
-                                                                      curve:
-                                                                          curve));
-                                                              var offsetAnimation =
-                                                                  animation
-                                                                      .drive(
-                                                                          tween);
+                                                                  var tween = Tween(
+                                                                          begin:
+                                                                              begin,
+                                                                          end:
+                                                                              end)
+                                                                      .chain(CurveTween(
+                                                                          curve:
+                                                                              curve));
+                                                                  var offsetAnimation =
+                                                                      animation
+                                                                          .drive(
+                                                                              tween);
 
-                                                              return SlideTransition(
-                                                                position:
-                                                                    offsetAnimation,
-                                                                child: child,
-                                                              );
-                                                            },
+                                                                  return SlideTransition(
+                                                                    position:
+                                                                        offsetAnimation,
+                                                                    child:
+                                                                        child,
+                                                                  );
+                                                                },
+                                                              ),
+                                                            );
+                                                          }
+                                                        } else {
+                                                          EasyLoading.showError(
+                                                              'Taker is doesnot to donate any blood');
+                                                        }
+                                                      },
+                                                      child: Container(
+                                                        height: 30,
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal: 15),
+                                                        alignment:
+                                                            Alignment.center,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(5),
+                                                          border: Border.all(
+                                                            color: Colors.red,
+                                                            width: 1.0,
                                                           ),
-                                                        );
-                                                      } else {
-                                                        EasyLoading.showError(
-                                                            'Taker is doesnot to donate any blood');
-                                                      }
-                                                    },
-                                                    child: Container(
-                                                      height: 30,
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 15),
-                                                      alignment:
-                                                          Alignment.center,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(5),
-                                                        border: Border.all(
-                                                          color: Colors.red,
-                                                          width: 1.0,
                                                         ),
-                                                      ),
-                                                      child: Text(
-                                                        'Donate Now',
-                                                        style: TextStyle(
-                                                            fontSize: 14,
-                                                            color:
-                                                                Colors.black87),
+                                                        child: Text(
+                                                          'Donate Now',
+                                                          style: TextStyle(
+                                                              fontSize: 14,
+                                                              color: Colors
+                                                                  .black87),
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
@@ -2316,6 +2342,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         print(profilename);
         _goToCurrentLocation();
         await getNotificationToken();
+        await checkAvailabilityDonor();
       } else {
         // No user found with the specified email
         print('User not found with email: $userEmail');
@@ -2685,6 +2712,79 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       }
     } catch (e) {
       print('Error updating status: $e');
+    }
+  }
+
+  Future<void> checkAvailabilityDonor() async {
+    final firestore = FirebaseFirestore.instance;
+
+    // Calculate the timestamp for 90 days ago
+    DateTime ninetyDaysAgo = DateTime.now().subtract(Duration(days: 90));
+    Timestamp ninetyDaysAgoTimestamp = Timestamp.fromDate(ninetyDaysAgo);
+
+    // Get all donors added more than 90 days ago
+    QuerySnapshot querySnapshot = await firestore
+        .collection('available_donor')
+        .where('createdAt', isLessThanOrEqualTo: ninetyDaysAgoTimestamp)
+        .get();
+
+    // Update the status of each expired document to 'false'
+    for (var doc in querySnapshot.docs) {
+      await firestore.collection('available_donor').doc(doc.id).update({
+        'status': false,
+      });
+    }
+
+    // Optionally, call the function again to check periodically
+    await checkAvailabilityDonor();
+  }
+
+  // Future<void> checkAvailabilityDonor() async {
+  //   final firestore = FirebaseFirestore.instance;
+
+  //   // Calculate the timestamp for 2 minutes ago
+  //   DateTime twoMinutesAgo = DateTime.now().subtract(Duration(minutes: 2));
+  //   Timestamp twoMinutesAgoTimestamp = Timestamp.fromDate(twoMinutesAgo);
+
+  //   // Get all donors added more than 2 minutes ago
+  //   QuerySnapshot querySnapshot = await firestore
+  //       .collection('available_donor')
+  //       .where('createdAt', isLessThanOrEqualTo: twoMinutesAgoTimestamp)
+  //       .get();
+
+  //   // Update the status of each expired document to 'false'
+  //   for (var doc in querySnapshot.docs) {
+  //     await firestore.collection('available_donor').doc(doc.id).update({
+  //       'status': false,
+  //     });
+  //   }
+  //   await checkAvailabilityDonor();
+  // }
+
+  Future<void> getavailableDonor() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String userEmail = prefs.getString('user_email') ?? '';
+      print(userEmail);
+
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('available_donor')
+          .where('email', isEqualTo: userEmail)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot userDoc = querySnapshot.docs.first;
+
+        bool status = userDoc['status'];
+
+        setState(() {
+          availability = status;
+        });
+      } else {
+        print('User not found with email: $userEmail');
+      }
+    } catch (e) {
+      print('Error: $e');
     }
   }
 }

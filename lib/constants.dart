@@ -15,7 +15,7 @@ void showCustomSnackBar(BuildContext context, String message, bool status) {
   );
 }
 
-void showCustomSnackBar1(BuildContext context, String message, bool status) {
+void showCustomSnackBar1(String message, bool status, context) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       content: Text(message),

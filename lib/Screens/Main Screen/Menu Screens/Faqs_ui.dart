@@ -20,12 +20,12 @@ class _FAQsState extends State<FAQs> with SingleTickerProviderStateMixin {
 
   List<Map<String, String>> faqsList = [
     {
-      "question": "What is BloodDonationHub?",
+      "question": "What is E Blood?",
       "answer":
           "BloodDonationHub is a centralized platform where you can find nearby blood donation centers, register to donate, and track your donation history."
     },
     {
-      "question": "How do I create an account on BloodDonationHub?",
+      "question": "How do I create an account on E Blood?",
       "answer":
           "No need to create an account. Simply click on the “Sign In” button, enter your details, and follow the prompts to verify your email. Once verified, you can log in and start scheduling donations."
     },

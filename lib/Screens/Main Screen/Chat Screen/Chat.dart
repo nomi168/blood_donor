@@ -9,6 +9,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:googleapis_auth/auth_io.dart' as auth;
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -16,7 +17,6 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../../constants.dart';
 import 'HeroScreen.dart';
 
 class ChatScree1 extends StatefulWidget {
@@ -291,7 +291,7 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
                           if (userType == 'donor') {
                             await getmessageid();
                             unique_id++;
-                            _controller.clear();
+
                             await sendMessage(
                               widget.sender_id,
                               widget.receiver_id,
@@ -299,12 +299,13 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
                               widget.receiveremail,
                               _controller.text,
                             );
+                            _controller.clear();
+
                             await sendNotificationsToUser(widget.receiveremail);
                           }
                           if (userType == 'taker') {
                             await getmessageid();
                             unique_id++;
-                            _controller.clear();
 
                             await sendMessage(
                               widget.sender_id,
@@ -313,6 +314,7 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
                               widget.sendemail,
                               _controller.text,
                             );
+                            _controller.clear();
                             await sendNotificationsToUser(widget.sendemail);
                           }
                         }
@@ -598,7 +600,7 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
 
       // Check if the file size exceeds 1 MB
       if (fileSizeInBytes > 1024 * 1024) {
-        showCustomSnackBar(context, 'Image size exceeds 1 MB', false);
+        EasyLoading.showInfo('Image size exceeds 1 MB');
         print('Image size exceeds 1 MB.');
         return null;
       }

@@ -181,7 +181,7 @@ class _LoginScreenState extends State<LoginScreen> {
               padding: EdgeInsets.fromLTRB(62.w, 0, 0, 0),
               child: TextButton(
                 child: Text(
-                  'Forget Password',
+                  'Forgot Password',
                   style: TextStyle(
                     fontSize: 10.sp,
                     fontWeight: FontWeight.bold,

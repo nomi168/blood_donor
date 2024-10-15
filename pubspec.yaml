@@ -89,7 +89,7 @@ dependencies:
   socket_io_client: ^2.0.3+1
   firebase_database: ^10.4.9
   figma_squircle: ^0.5.3
-  url_launcher: any
+  url_launcher: ^6.3.0
   contacts_service: any
   permission_handler: any
   path: ^1.8.3

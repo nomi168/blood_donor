@@ -439,16 +439,17 @@ class _SignupScreenState extends State<SignupScreen> {
                   borderRadius:
                       BorderRadius.circular(10.0), // Add border radius
                   child: TextFormField(
-                    onFieldSubmitted: (value) async {
-                      bool reult = await checkEmail();
-                      if (reult) {
-                        // showDialogInfo('');
-                      } else {
-                        showDialogInfo(
-                            'This Email is already Exist. Please try another email!');
-                        _email.clear();
-                      }
-                    },
+                    // onFieldSubmitted: (value) async {
+                    //   bool reult = await checkEmail();
+                    //   if (reult) {
+                    //     // showDialogInfo('');
+                    //   } else {
+                    //     showDialogInfo(
+                    //         'This Email is already Exist. Please try another email!');
+                    //     _email.clear();
+                    //   }
+                    // },
+
                     controller: _email,
                     decoration: InputDecoration(
                       label: const Text(
@@ -461,6 +462,41 @@ class _SignupScreenState extends State<SignupScreen> {
                         borderRadius: BorderRadius.circular(8.0),
                         borderSide:
                             BorderSide(color: Colors.red), // Border color
+                      ),
+                      suffixIcon: SizedBox(
+                        height: 1.h,
+                        width: 25.w,
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(0, 1.h, 2.w, 1.h),
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              bool reult = await checkEmail();
+                              if (reult) {
+                                // showDialogInfo('');
+                              } else {
+                                showDialogInfo(
+                                    'This Email is already Exist. Please try another email!');
+                                _email.clear();
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  8.0,
+                                ), // Set borderRadius to 0 for flat corners
+                              ),
+                            ),
+                            child: Center(
+                              child: Text(
+                                'verify',
+                                style: TextStyle(
+                                    fontSize: 10.sp, color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8.0),

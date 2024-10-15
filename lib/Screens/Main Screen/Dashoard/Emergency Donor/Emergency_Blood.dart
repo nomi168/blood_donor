@@ -76,7 +76,7 @@ class _Emerency_BloodState extends State<Emerency_Blood> {
               Padding(
                 padding: EdgeInsets.fromLTRB(0, 3.h, 0, 0),
                 child: Text(
-                  'Comming Soon',
+                  'Coming Soon',
                   style: TextStyle(
                       fontSize: 15.sp,
                       fontWeight: FontWeight.bold,

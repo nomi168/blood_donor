@@ -4,9 +4,11 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:blood_donor/Json%20Data/GoogleMapDark.dart';
+import 'package:blood_donor/Screens/Main%20Screen/Dashoard/Dashboatd.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Dashoard/Review1.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -190,16 +192,16 @@ class _Feed1State extends State<Feed1> {
                               fontWeight: FontWeight.bold,
                               color: const Color(0xFFDE0A1E)),
                         )),
-                    Padding(
-                        padding: EdgeInsets.fromLTRB(75.w, 0.h, 0, 3.h),
-                        child: IconButton(
-                          icon: const Icon(
-                            Icons.messenger_sharp,
-                            size: 22,
-                            color: Color(0xFFDE0A1E),
-                          ),
-                          onPressed: () {},
-                        )),
+                    // Padding(
+                    //     padding: EdgeInsets.fromLTRB(75.w, 0.h, 0, 3.h),
+                    //     child: IconButton(
+                    //       icon: const Icon(
+                    //         Icons.messenger_sharp,
+                    //         size: 22,
+                    //         color: Color(0xFFDE0A1E),
+                    //       ),
+                    //       onPressed: () {},
+                    //     )),
                   ],
                 ),
               ),
@@ -319,18 +321,18 @@ class _Feed1State extends State<Feed1> {
                               padding: EdgeInsets.fromLTRB(5.w, 0, 0, 0),
                               child: TextButton(
                                 child: Text(
-                                  'Cancel',
+                                  'Cancel Request',
                                   style: TextStyle(
                                       fontSize: 12.sp,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white70),
                                 ),
-                                onPressed: () {
-                                  add();
+                                onPressed: () async {
+                                  await deleteAcceptRequest();
                                 },
                               )),
                           Padding(
-                            padding: EdgeInsets.fromLTRB(17.w, 0, 0, 0),
+                            padding: EdgeInsets.fromLTRB(4.w, 0, 0, 0),
                             child: const VerticalDivider(
                               color: Colors.white, // Adjust the color as needed
                               thickness: 2.0, // Adjust the thickness as needed
@@ -357,6 +359,64 @@ class _Feed1State extends State<Feed1> {
         );
       },
     );
+  }
+
+  Future<void> deleteAcceptRequest() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('acceptdonation')
+          .where('acceptemail', isEqualTo: widget.donoremail)
+          .where('email', isEqualTo: widget.email)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Get the first document from the query
+        DocumentSnapshot userDoc = querySnapshot.docs.first;
+
+        // Delete the document using its ID
+        await FirebaseFirestore.instance
+            .collection('acceptdonation')
+            .doc(userDoc.id)
+            .delete();
+
+        EasyLoading.showSuccess('Cancel Request Successfully');
+        await Future.delayed(Duration(seconds: 2), () {
+          Navigator.pushAndRemoveUntil(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) {
+                return const Dashboard();
+              },
+              transitionDuration: const Duration(seconds: 1),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                const begin = Offset(10.0, 0.0); // slide in from the right
+                const end = Offset.zero;
+                const curve = Curves.easeInOutQuart;
+
+                var tween = Tween(begin: begin, end: end)
+                    .chain(CurveTween(curve: curve));
+                var offsetAnimation = animation.drive(tween);
+
+                return SlideTransition(
+                  position: offsetAnimation,
+                  child: child,
+                );
+              },
+            ),
+            (Route<dynamic> route) =>
+                false, // Predicate that removes all the routes
+          );
+        });
+        print('Document deleted successfully');
+      } else {
+        EasyLoading.showError('No Cancel Request Accepted');
+        print('No documents found in the Request collection');
+      }
+    } catch (e) {
+      // Handle error
+      print('Error: $e');
+    }
   }
 
   Future<void> _getCurrentLocation() async {
@@ -498,12 +558,12 @@ class _Feed1State extends State<Feed1> {
             double distanceInKm = distance / 1000;
 
             // Show distance in Snackbar
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content:
-                    Text('Distance: ${distanceInKm.toStringAsFixed(2)} km'),
-              ),
-            );
+            // ScaffoldMessenger.of(context).showSnackBar(
+            //   SnackBar(
+            //     content:
+            //         Text('Distance: ${distanceInKm.toStringAsFixed(2)} km'),
+            //   ),
+            // );
           } else {
             print('No route found');
           }

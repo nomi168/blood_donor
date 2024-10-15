@@ -1,6 +1,7 @@
 // ignore_for_file: file_names
 
 import 'package:blood_donor/Screens/Main%20Screen/Menu%20Screens/MenuScreen.dart';
+import 'package:blood_donor/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
@@ -131,37 +132,65 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
           height: 10,
         ),
         Container(
-            margin: EdgeInsets.symmetric(horizontal: 100),
-            height: 130,
-            width: double.infinity,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15), color: Colors.black12),
-            child: GestureDetector(
-              onTap: () {},
+          margin: EdgeInsets.symmetric(horizontal: 100),
+          height: 130,
+          width: double.infinity,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15), color: Colors.black12),
+          child: InkWell(
+            onTap: () {
+              showEmailPopup(context);
+            },
+            child: Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(08),
+                  color: Colors.grey.withOpacity(0.3)),
               child: Column(
                 children: [
-                  SizedBox(
-                    height: 30,
-                  ),
-                  Container(
-                    child: Icon(
-                      Icons.email,
-                      color: Colors.red,
-                      size: 30,
+                  Padding(
+                      padding: EdgeInsets.fromLTRB(0, 0.h, 0, 0),
+                      child: Icon(
+                        Icons.email,
+                        size: 70,
+                        color: PRIMARY_COLOR,
+                      )),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(0.w, 1.h, 0, 0),
+                    child: Text(
+                      'Email',
+                      style: TextStyle(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.bold,
+                          color: PRIMARY_COLOR),
                     ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                      child: Text(
-                    'Email',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                  ))
+                  )
                 ],
               ),
-            ))
+            ),
+          ),
+        )
       ]),
+    );
+  }
+
+  void showEmailPopup(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Owner Email"),
+          content: Text('nafeesmazhar1661@gmail.com'),
+          actions: <Widget>[
+            TextButton(
+              child: Text("Close"),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

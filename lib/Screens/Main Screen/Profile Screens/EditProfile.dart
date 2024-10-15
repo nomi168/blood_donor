@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:blood_donor/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sizer/sizer.dart';
 
@@ -545,7 +545,7 @@ class _EditProfileState extends State<EditProfile> {
             },
           ),
         );
-        showCustomSnackBar(context, 'Data updated Successfully', true);
+        EasyLoading.showSuccess('Data updated Successfully');
 
         print('Data updated successfully in acceptdonation table');
       } else {

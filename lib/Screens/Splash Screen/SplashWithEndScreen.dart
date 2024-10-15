@@ -47,7 +47,7 @@ class _SplashEndScreenState extends State<SplashEndScreen> {
             padding: EdgeInsets.fromLTRB(11.w, 1.h, 11.w, 0),
             child: Center(
               child: Text(
-                'paid donor who are active 24/7',
+                'donor who are active 24/7',
                 style: TextStyle(
                     fontSize: 12.sp,
                     fontWeight: FontWeight.bold,

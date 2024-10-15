@@ -90,12 +90,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return Center(child: Text('No history found'));
             } else {
-              return SingleChildScrollView(
+              return Expanded(
                 child: Padding(
                   padding: EdgeInsets.fromLTRB(5.w, 0.w, 5.w, 0),
                   child: GridView.builder(
                     scrollDirection: Axis.vertical,
-                    physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {

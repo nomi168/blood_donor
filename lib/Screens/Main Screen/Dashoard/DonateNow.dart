@@ -5,9 +5,9 @@ import 'dart:convert';
 
 import 'package:blood_donor/Json%20Data/GoogleMapDark.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Dashoard/MapThroughFeed.dart';
-import 'package:blood_donor/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -425,12 +425,12 @@ class _DonateNowState extends State<DonateNow> {
             double distanceInKm = distance / 1000;
 
             // Show distance in Snackbar
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content:
-                    Text('Distance: ${distanceInKm.toStringAsFixed(2)} km'),
-              ),
-            );
+            // ScaffoldMessenger.of(context).showSnackBar(
+            //   SnackBar(
+            //     content:
+            //         Text('Distance: ${distanceInKm.toStringAsFixed(2)} km'),
+            //   ),
+            // );
           } else {
             print('No route found');
           }
@@ -607,6 +607,8 @@ class _DonateNowState extends State<DonateNow> {
 
   void _acceptRequest() async {
     try {
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      String? email1 = pref.getString('user_email');
       final FirebaseFirestore _firestore = FirebaseFirestore.instance;
       accepterid++;
 
@@ -644,7 +646,8 @@ class _DonateNowState extends State<DonateNow> {
         _showDonatePopup();
         print('Nomi');
       } else {
-        showCustomSnackBar(context, 'This taker is in donation mode', false);
+        EasyLoading.showInfo('This taker is in donation mode');
+
         setState(() {
           showCircularProgressIndicator = false;
         });

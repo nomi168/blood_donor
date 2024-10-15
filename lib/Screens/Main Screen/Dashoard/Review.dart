@@ -11,6 +11,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 class Review extends StatefulWidget {
@@ -188,16 +189,16 @@ class _ReviewState extends State<Review> {
                               fontWeight: FontWeight.bold,
                               color: const Color(0xFFDE0A1E)),
                         )),
-                    Padding(
-                        padding: EdgeInsets.fromLTRB(75.w, 0.h, 0, 3.h),
-                        child: IconButton(
-                          icon: const Icon(
-                            Icons.messenger_sharp,
-                            size: 22,
-                            color: Color(0xFFDE0A1E),
-                          ),
-                          onPressed: () {},
-                        )),
+                    // Padding(
+                    //     padding: EdgeInsets.fromLTRB(75.w, 0.h, 0, 3.h),
+                    //     child: IconButton(
+                    //       icon: const Icon(
+                    //         Icons.messenger_sharp,
+                    //         size: 22,
+                    //         color: Color(0xFFDE0A1E),
+                    //       ),
+                    //       onPressed: () {},
+                    //     )),
                   ],
                 ),
               ),
@@ -491,12 +492,12 @@ class _ReviewState extends State<Review> {
             double distanceInKm = distance / 1000;
 
             // Show distance in Snackbar
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content:
-                    Text('Distance: ${distanceInKm.toStringAsFixed(2)} km'),
-              ),
-            );
+            // ScaffoldMessenger.of(context).showSnackBar(
+            //   SnackBar(
+            //     content:
+            //         Text('Distance: ${distanceInKm.toStringAsFixed(2)} km'),
+            //   ),
+            // );
           } else {
             print('No route found');
           }
@@ -581,7 +582,8 @@ class _ReviewState extends State<Review> {
             .doc(documentId)
             .update({'rating': rrr, 'review': review.text, 'status': true});
         addHistory();
-        updateStatue();
+        await updateStatue();
+        // await avialabledDonor();
         Navigator.push(
           context,
           PageRouteBuilder(
@@ -671,6 +673,7 @@ class _ReviewState extends State<Review> {
         'donorimage': widget.donorimage
       });
       print('Nomi');
+      await addOrUpdateAvailableDonor();
     } catch (error) {
       print("Error in _handleSignup: $error");
       // Handle error and show a proper error message to the user
@@ -736,6 +739,52 @@ class _ReviewState extends State<Review> {
     } catch (e) {
       // Handle error
       print('Error: $e');
+    }
+  }
+
+  Future<void> addOrUpdateAvailableDonor() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? email = prefs.getString('user_email');
+
+      if (email != null && email.isNotEmpty) {
+        final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+        // Check if the email already exists
+        QuerySnapshot querySnapshot = await _firestore
+            .collection('available_donor')
+            .where('email', isEqualTo: email)
+            .get();
+
+        if (querySnapshot.docs.isNotEmpty) {
+          // Email exists, update the document
+          DocumentSnapshot docSnapshot = querySnapshot.docs.first;
+
+          await _firestore
+              .collection('available_donor')
+              .doc(docSnapshot.id)
+              .update({
+            'status': true,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+
+          print('Donor status updated');
+        } else {
+          // Email does not exist, create a new document
+          await _firestore.collection('available_donor').add({
+            'email': email,
+            'status': true,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+
+          print('New donor added');
+        }
+      } else {
+        print('Error: No email found in SharedPreferences');
+      }
+    } catch (error) {
+      print("Error in addOrUpdateAvailableDonor: $error");
+      // Handle error and show a proper error message to the user
     }
   }
 }

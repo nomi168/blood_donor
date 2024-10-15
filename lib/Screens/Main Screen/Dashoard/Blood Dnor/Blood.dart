@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../../Modals/Taker.dart';
-import '../../../../constants.dart';
 
 class BloodDonor extends StatefulWidget {
   final String blood;
@@ -203,10 +203,9 @@ class _BloodDonorState extends State<BloodDonor> {
                             ),
                             // style: ButtonStyle(backgroundColor:k),
                             onPressed: () {
-                              showCustomSnackBar1(
-                                  context,
-                                  'Please go to Feeds for more information',
-                                  true);
+                              EasyLoading.showInfo(
+                                'Please go to Feeds for more information',
+                              );
                               // String id = feedsData[index].id;
                               // String name = feedsData[index].name;
                               // String image = feedsData[index].imageURL;

@@ -6,9 +6,9 @@ import 'dart:convert';
 import 'package:blood_donor/Json%20Data/GlobalVariable.dart';
 import 'package:blood_donor/Json%20Data/GoogleMapDark.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Dashoard/Dashboatd.dart';
-import 'package:blood_donor/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -670,7 +670,7 @@ class _MapOnDonatorState extends State<MapOnDonator> {
 
         _showDonatePopup();
       } else {
-        showCustomSnackBar(context, 'This taker is in donation mood', false);
+        EasyLoading.showInfo('This taker is in donation mood');
         setState(() {
           showCircularProgressIndicator = false;
         });
