@@ -27,6 +27,7 @@ class ChatScree1 extends StatefulWidget {
   final String sendemail;
   final String receiveremail;
   final String senderimage;
+
   const ChatScree1({
     super.key,
     required this.image,
@@ -56,13 +57,13 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
   int unique_id = 0;
   bool useractive = false;
 
-  final ImagePicker _picker = ImagePicker();
   final FocusNode nosw = FocusNode();
   bool isvisible = false;
 
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addObserver(this);
     // updateStatus(true);
     getUserDataByEmail();
@@ -211,6 +212,12 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
                   ),
                 ],
               ),
+              // Spacer(),
+              // InkWell(
+              //     splashColor: Colors.transparent,
+              //     splashFactory: NoSplash.splashFactory,
+              //     onTap: () {},
+              //     child: Icon())
             ],
           ),
         ),
@@ -236,7 +243,7 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
 
                     List<Widget> messageWidgets = buildMessagesList(messages);
 
-                    WidgetsBinding.instance!.addPostFrameCallback((_) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
                       if (_scrollController.hasClients) {
                         _scrollController
                             .jumpTo(_scrollController.position.maxScrollExtent);
@@ -265,7 +272,7 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
                             hintText: 'Enter your message...',
                             helperStyle: TextStyle(color: Colors.black54),
                             border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20.0),
+                                borderRadius: BorderRadius.circular(10.0),
                                 borderSide: BorderSide(color: Colors.grey)),
                             contentPadding: EdgeInsets.symmetric(
                               vertical: 10.0,
@@ -333,8 +340,6 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
   Future<void> sendMessage(String senderid, String receiverid,
       String senderEmail, String receiverEmail, String content,
       {bool isImage = false}) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String userChat = prefs.getString('chat_id') ?? '';
     CollectionReference chats =
         FirebaseFirestore.instance.collection('messages');
     DateTime now = DateTime.now();
@@ -354,12 +359,72 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
     });
   }
 
+  // Stream<QuerySnapshot> getMessages() async* {
+  //   try {
+  //     List<Stream<QuerySnapshot>> streams = [];
+
+  //     if (userType == 'donor') {
+  //       Query<Map<String, dynamic>> senderToReceiverQuery = FirebaseFirestore
+  //           .instance
+  //           .collection('messages')
+  //           .where('sender_id', isEqualTo: localid)
+  //           .where('receiver_id', isEqualTo: widget.receiver_id)
+  //           .orderBy('index', descending: false);
+
+  //       // Check if there are any documents in senderToReceiverQuery
+  //       QuerySnapshot senderToReceiverSnapshot =
+  //           await senderToReceiverQuery.get();
+  //       if (senderToReceiverSnapshot.docs.isNotEmpty) {
+  //         streams.add(senderToReceiverQuery.snapshots());
+  //       } else {
+  //         // Only execute the alternate query if the first query is empty
+  //         Query<Map<String, dynamic>> receiverToSenderQuery = FirebaseFirestore
+  //             .instance
+  //             .collection('messages')
+  //             .where('receiver_id', isEqualTo: localid)
+  //             .where('sender_id', isEqualTo: widget.sender_id)
+  //             .orderBy('index', descending: false);
+
+  //         QuerySnapshot receiverToSenderSnapshot =
+  //             await receiverToSenderQuery.get();
+  //         if (receiverToSenderSnapshot.docs.isNotEmpty) {
+  //           streams.add(receiverToSenderQuery.snapshots());
+  //         }
+  //       }
+  //     } else {
+  //       // Execute this query if the user is not a 'donor'
+  //       Query<Map<String, dynamic>> receiverToSenderQuery = FirebaseFirestore
+  //           .instance
+  //           .collection('messages')
+  //           .where('receiver_id', isEqualTo: localid)
+  //           .where('sender_id', isEqualTo: widget.sender_id)
+  //           .orderBy('index', descending: false);
+
+  //       QuerySnapshot receiverToSenderSnapshot =
+  //           await receiverToSenderQuery.get();
+  //       if (receiverToSenderSnapshot.docs.isNotEmpty) {
+  //         streams.add(receiverToSenderQuery.snapshots());
+  //       }
+  //     }
+
+  //     // Merge streams into a single stream
+  //     if (streams.isNotEmpty) {
+  //       yield* StreamGroup.merge<QuerySnapshot>(streams);
+  //     } else {
+  //       yield* Stream.empty(); // If no documents found, return an empty stream
+  //     }
+  //   } catch (e) {
+  //     print('Error in getMessages: $e');
+  //     yield* Stream.empty(); // Return an empty stream if an error occurs
+  //   }
+  // }
+
   Stream<QuerySnapshot> getMessages() {
     try {
       List<Stream<QuerySnapshot>> streams = [];
 
       if (userType == 'donor') {
-        var query = FirebaseFirestore.instance
+        Query<Map<String, dynamic>> query = FirebaseFirestore.instance
             .collection('messages')
             .where('sender_id', isEqualTo: localid)
             .where('receiver_id', isEqualTo: widget.receiver_id)
@@ -386,6 +451,7 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
 
   List<Widget> buildMessagesList(List<Map<String, dynamic>> dataList) {
     // Sort the messages by time (with seconds)
+
     dataList.sort((a, b) {
       try {
         DateTime timeA = DateFormat('h:mm:ss a').parse(a['time']);
@@ -411,8 +477,6 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
           .where('sender_id', isEqualTo: id)
           .get();
       if (querySnapshot.docs.isNotEmpty) {
-        DocumentSnapshot userDoc = querySnapshot.docs.first;
-
         // Access user data
         List<dynamic> receiverId = [];
         for (var doc in querySnapshot.docs) {
@@ -441,8 +505,6 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
           .where('receiver_id', isEqualTo: id)
           .get();
       if (querySnapshot.docs.isNotEmpty) {
-        DocumentSnapshot userDoc = querySnapshot.docs.first;
-
         // Access user data
         List<dynamic> senderId = [];
         for (var doc in querySnapshot.docs) {
@@ -479,6 +541,9 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
         String id = userDoc['id'];
         String type = userDoc['type'];
         String email = userDoc['email'];
+        // String firstname = userDoc['firstname'];
+        // String lastname = userDoc['lastname'];
+        // String image = userDoc['image'];
         setState(() {
           userType = type;
           userEmail1 = email;
@@ -523,32 +588,196 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Align(
-        alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-          decoration: BoxDecoration(
-            color: isMe ? Colors.green[200] : Colors.grey[200],
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Column(
-            crossAxisAlignment:
-                isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-            children: [
-              Text(
-                data['content'],
-                style: TextStyle(fontSize: 16),
+        child: Row(
+          mainAxisAlignment:
+              isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+          children: [
+            SizedBox(width: 10),
+            isMe == false
+                ? userType == 'taker'
+                    ? Material(
+                        color: Colors.transparent,
+                        child: CircleAvatar(
+                          backgroundImage: NetworkImage(widget.senderimage),
+                          radius: 20,
+                        ))
+                    : Material(
+                        color: Colors.transparent,
+                        child: CircleAvatar(
+                          backgroundImage: NetworkImage(widget.image),
+                          radius: 20,
+                        ))
+                : SizedBox(),
+            SizedBox(width: 5),
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              decoration: BoxDecoration(
+                color: isMe ? Colors.red : Colors.grey[200],
+                borderRadius: BorderRadius.circular(10),
               ),
-              SizedBox(height: 5),
-              Text(
-                data['time'] != null ? (data['time']) : 'Time not available',
-                style: TextStyle(fontSize: 10, color: Colors.grey),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        data['content'],
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: isMe ? Colors.white : Colors.black),
+                      ),
+                      SizedBox(
+                        width: 30,
+                      ),
+                      Text(
+                        data['time'] != null
+                            ? (data['time'])
+                            : 'Time not available',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: isMe ? Colors.white : Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+            SizedBox(
+              width: 5,
+            ),
+            isMe == true
+                ? userType == 'donor'
+                    ? Material(
+                        color: Colors.transparent,
+                        child: CircleAvatar(
+                          backgroundImage: NetworkImage(widget.senderimage),
+                          radius: 20,
+                        ))
+                    : Material(
+                        color: Colors.transparent,
+                        child: CircleAvatar(
+                          backgroundImage: NetworkImage(widget.image),
+                          radius: 20,
+                        ))
+                : SizedBox()
+          ],
         ),
       ),
     );
   }
+
+  // Widget buildMessage(Map<String, dynamic> data) {
+  //   bool isMe = data['receiverEmail'] == userEmail1;
+
+  //   return Padding(
+  //       padding: const EdgeInsets.all(8.0),
+  //       child: isMe
+  //           ?Row(
+  //               mainAxisAlignment: MainAxisAlignment.end,
+  //               children: [
+  //                 Container(
+  //                   padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+  //                   decoration: BoxDecoration(
+  //                     color: Colors.red,
+  //                     borderRadius: BorderRadius.circular(10),
+  //                   ),
+  //                   child: Column(
+  //                     crossAxisAlignment: CrossAxisAlignment.start,
+  //                     children: [
+  //                       Row(
+  //                         children: [
+  //                           Text(
+  //                             fullname,
+  //                             style: TextStyle(
+  //                                 fontSize: 12,
+  //                                 color: Colors.white,
+  //                                 fontWeight: FontWeight.bold),
+  //                           ),
+  //                           SizedBox(
+  //                             width: 30,
+  //                           ),
+  //                           Text(
+  //                             data['time'] != null
+  //                                 ? (data['time'])
+  //                                 : 'Time not available',
+  //                             style:
+  //                                 TextStyle(fontSize: 10, color: Colors.white),
+  //                           ),
+  //                         ],
+  //                       ),
+  //                       Text(
+  //                         data['content'],
+  //                         style: TextStyle(fontSize: 16, color: Colors.white),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //                 SizedBox(
+  //                   width: 5,
+  //                 ),
+  //                 Material(
+  //                   color: Colors.transparent,
+  //                   child: CircleAvatar(
+  //                     backgroundImage: NetworkImage(picture),
+  //                     radius: 20,
+  //                   ),
+  //                 ),
+  //               ],
+  //             )
+  //           : Row(
+  //               mainAxisAlignment: MainAxisAlignment.start,
+  //               children: [
+  //                 Material(
+  //                   color: Colors.transparent,
+  //                   child: CircleAvatar(
+  //                     backgroundImage: NetworkImage(widget.senderimage),
+  //                     radius: 20,
+  //                   ),
+  //                 ),
+  //                 SizedBox(
+  //                   width: 5,
+  //                 ),
+  //                 Container(
+  //                   padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+  //                   decoration: BoxDecoration(
+  //                     color: Colors.grey[200],
+  //                     borderRadius: BorderRadius.circular(10),
+  //                   ),
+  //                   child: Column(
+  //                     crossAxisAlignment: CrossAxisAlignment.start,
+  //                     children: [
+  //                       Row(
+  //                         children: [
+  //                           Text(
+  //                             widget.name,
+  //                             style: TextStyle(
+  //                                 fontSize: 12,
+  //                                 color: Colors.black,
+  //                                 fontWeight: FontWeight.bold),
+  //                           ),
+  //                           SizedBox(
+  //                             width: 30,
+  //                           ),
+  //                           Text(
+  //                             data['time'] != null
+  //                                 ? (data['time'])
+  //                                 : 'Time not available',
+  //                             style:
+  //                                 TextStyle(fontSize: 10, color: Colors.black),
+  //                           ),
+  //                         ],
+  //                       ),
+  //                       Text(
+  //                         data['content'],
+  //                         style: TextStyle(fontSize: 16, color: Colors.black),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //               ],
+  //             ));
+  // }
 
   Future<void> getmessageid() async {
     try {
@@ -572,25 +801,6 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
       print('Error: $e');
     }
   }
-
-  // List<Widget> buildMessagesList(List<Map<String, dynamic>> dataList) {
-  //   // Debugging: Print the time strings
-  //   dataList.forEach((data) => print('Time string: ${data['time']}'));
-
-  //   // Sort the messages by time
-  //   dataList.sort((a, b) {
-  //     try {
-  //       DateTime timeA = DateFormat.jm().parse(a['time']);
-  //       DateTime timeB = DateFormat.jm().parse(b['time']);
-  //       return timeA.compareTo(timeB);
-  //     } catch (e) {
-  //       print('Error parsing time: ${e.toString()}');
-  //       return 0;
-  //     }
-  //   });
-
-  //   return dataList.map((data) => buildMessage(data)).toList();
-  // }
 
   Future<String?> uploadImage(XFile pickedFile) async {
     try {
@@ -651,7 +861,7 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
             .snapshots()
             .map((snapshot) {
           if (snapshot.docs.isNotEmpty) {
-            return snapshot.docs.first.data()?['status'] ?? false;
+            return snapshot.docs.first.data()['status'] ?? false;
           }
           return false;
         });
@@ -662,7 +872,7 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
             .snapshots()
             .map((snapshot) {
           if (snapshot.docs.isNotEmpty) {
-            return snapshot.docs.first.data()?['status'] ?? false;
+            return snapshot.docs.first.data()['status'] ?? false;
           }
           return false;
         });
@@ -731,24 +941,4 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
       }
     }
   }
-//   Future<String> getAccessToken() async {
-//   // Load your service account credentials from the JSON key file
-//   var serviceAccount = ServiceAccountCredentials.fromJson({
-//     // Your service account details from the JSON file
-//     // Example structure:
-//     // 'type': 'service_account',
-//     // 'project_id': 'YOUR_PROJECT_ID',
-//     // 'private_key_id': 'YOUR_PRIVATE_KEY_ID',
-//     // 'private_key': 'YOUR_PRIVATE_KEY',
-//     // ...
-//   });
-
-//   var scopes = ['https://www.googleapis.com/auth/cloud-platform'];
-
-//   // Request the OAuth2 access token
-//   var authClient = await clientViaServiceAccount(serviceAccount, scopes);
-//   var token = authClient.credentials.accessToken;
-
-//   return token.data;
-// }
 }

@@ -6,7 +6,10 @@ import 'dart:convert';
 import 'package:blood_donor/Json%20Data/GlobalVariable.dart';
 import 'package:blood_donor/Json%20Data/GoogleMapDark.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Dashoard/Dashboatd.dart';
+import 'package:blood_donor/constants.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:geocoding/geocoding.dart';
@@ -73,6 +76,7 @@ class _MapOnDonatorState extends State<MapOnDonator> {
   String pic = '';
   String blood = '';
   bool showCircularProgressIndicator = false;
+  double shortdistance = 0.0;
 
   @override
   void initState() {
@@ -124,7 +128,7 @@ class _MapOnDonatorState extends State<MapOnDonator> {
       body: Column(
         children: [
           Container(
-            height: 60.h,
+            height: 41.h,
             child: GoogleMap(
               mapType: isLightMode ? MapType.normal : MapType.hybrid,
               initialCameraPosition: _kGooglePlex,
@@ -135,153 +139,358 @@ class _MapOnDonatorState extends State<MapOnDonator> {
               },
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-            // ignore: sized_box_for_whitespace
-            child: Container(
-              height: 25.h,
-              child: Stack(
+          SizedBox(
+            height: 5,
+          ),
+          Text(
+            'Confirm your Donor',
+            style: TextStyle(
+                fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black),
+          ),
+          Container(
+            padding: EdgeInsets.all(10),
+            margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.white, // Optional: Background color
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(width: 0.5, color: Color(0xFFDDDDDD)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(0, 2.h, 70.w, 0),
-                    child: CircleAvatar(
-                      radius: 30,
-                      backgroundImage: NetworkImage(widget.image),
-                    ),
-                  ),
-                  Padding(
-                      padding: EdgeInsets.fromLTRB(22.w, 2.h, 0.w, 0),
-                      child: Text(widget.name,
-                          style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black))),
-                  Padding(
-                      padding: EdgeInsets.fromLTRB(22.w, 5.h, 0.w, 0),
-                      child: Text(widget.hosname,
-                          style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.normal,
-                              color: Colors.black54))),
-                  Padding(
-                      padding: EdgeInsets.fromLTRB(22.w, 7.5.h, 0.w, 0),
-                      child: Text(widget.location,
-                          style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.normal,
-                              color: Colors.black54))),
-                  Padding(
-                      padding: EdgeInsets.fromLTRB(70.w, 9.5.h, 0.w, 0),
-                      // ignore: prefer_const_constructors
-                      child: Icon(
-                        Icons.star,
-                        size: 25,
-                        color: const Color(0xFFDE0A1E),
-                      )),
-                  Padding(
-                      padding: EdgeInsets.fromLTRB(78.w, 9.9.h, 0.w, 0),
-                      child: Text(widget.rating.toString(),
-                          style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFFDE0A1E)))),
-                  Padding(
-                      padding: EdgeInsets.fromLTRB(88.w, 4.h, 0.w, 0),
-                      child: Text(widget.blood,
-                          style: TextStyle(
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFFDE0A1E)))),
-                  Padding(
-                      padding: EdgeInsets.fromLTRB(2.w, 10.h, 0.w, 0),
-                      child: Text('Donation Details',
-                          style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black))),
-                  Padding(
-                      padding: EdgeInsets.fromLTRB(2.w, 12.h, 0.w, 0),
-                      child: Text(widget.time,
-                          style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black54))),
-                  Padding(
-                      padding: EdgeInsets.fromLTRB(25.w, 12.h, 0.w, 0),
-                      child: Text(widget.date,
-                          style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black54))),
-                  Padding(
-                      padding: EdgeInsets.fromLTRB(2.w, 14.h, 0.w, 0),
-                      child: Text(widget.note,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black54))),
-                  Container(
-                    width: 95.w,
-                    height: 30.h,
-                    padding: EdgeInsets.fromLTRB(3.w, 19.h, 3.w, 0),
-                    // margin: EdgeInsets.only(top: 20.h),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          showCircularProgressIndicator = true;
-                        });
-                        _acceptRequest();
-                      },
-                      style: ButtonStyle(
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                        // padding:
-                        //     MaterialStateProperty.all<EdgeInsetsGeometry>(
-                        //   // Increase horizontal padding
-                        //   // ignore: prefer_const_constructors
-                        //   EdgeInsets.symmetric(
-                        //       vertical: 2.h, horizontal: 32.w),
-                        // ),
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                            const Color(0xFFDE0A1E)),
+                  Row(
+                    children: [
+                      Text(
+                        'Blood Group ',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, color: Colors.black54),
                       ),
-                      child: Stack(
-                        alignment: Alignment.center,
+                      Spacer(),
+                      Text(widget.blood,
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black54)),
+                      SizedBox(
+                        width: 5,
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        'Address ',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, color: Colors.black54),
+                      ),
+                      Spacer(),
+                      Text(
+                        widget.location,
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, color: Colors.black54),
+                      ),
+                      SizedBox(
+                        width: 5,
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        'Hospital Name ',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, color: Colors.black54),
+                      ),
+                      Spacer(),
+                      Text(
+                        widget.hosname,
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, color: Colors.black54),
+                      ),
+                      SizedBox(
+                        width: 5,
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        'Rating ',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, color: Colors.black54),
+                      ),
+                      Spacer(),
+                      Text(
+                        widget.rating,
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, color: Colors.black54),
+                      ),
+                      SizedBox(
+                        width: 5,
+                      )
+                    ],
+                  ),
+                ]),
+          ),
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(10),
+            margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.white, // Optional: Background color
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(width: 0.5, color: Color(0xFFDDDDDD)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(
+                  mainAxisSize: MainAxisSize.min,
+                  // mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 70,
+                      height: 70,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: CachedNetworkImage(
+                          fit: BoxFit.cover,
+                          imageUrl: widget.image.isNotEmpty
+                              ? widget.image
+                              : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
+                          placeholder: (context, url) =>
+                              const CupertinoActivityIndicator(
+                            color: Colors.white,
+                          ),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Container(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (showCircularProgressIndicator)
-                            SizedBox(
-                              height: 20.0, // Set your desired height here
-                              width: 20.0, // Set your desired width here
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2.0,
-                                valueColor:
-                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                          Text(
+                            widget.name,
+                            style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.black54,
+                                fontWeight: FontWeight.w500),
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Icon(
+                                CupertinoIcons.calendar,
+                                size: 15,
+                                color: Colors.black45,
                               ),
-                            ),
-                          if (!showCircularProgressIndicator)
-                            Text(
-                              'Donate Now',
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                              SizedBox(
+                                width: 5,
                               ),
-                            ),
+                              Text(
+                                widget.date,
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black45),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Icon(
+                                CupertinoIcons.clock,
+                                size: 15,
+                                color: Colors.black45,
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Text(
+                                widget.time,
+                                style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black45),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.social_distance,
+                                color: Colors.black54,
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Text(
+                                '${shortdistance.toStringAsFixed(2)} km Away',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black54),
+                              )
+                            ],
+                          )
                         ],
                       ),
                     ),
-                  )
+                    Spacer(),
+                    InkWell(
+                      splashFactory: NoSplash.splashFactory,
+                      splashColor: Colors.transparent,
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) =>
+                              _buildAnimatedPopup(context, widget.note),
+                        );
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(top: 30),
+                        padding: EdgeInsets.all(1),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(100),
+                            border: Border.all(color: PRIMARY_COLOR)),
+                        child: Icon(
+                          Icons.info,
+                          color: Colors.red,
+                        ),
+                      ),
+                    )
+                  ]),
+            ]),
+          ),
+          Container(
+            width: double.infinity,
+            height: 9.h,
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            // margin: EdgeInsets.only(top: 20.h),
+            child: ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  showCircularProgressIndicator = true;
+                });
+                _acceptRequest();
+              },
+              style: ButtonStyle(
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
+                // padding:
+                //     MaterialStateProperty.all<EdgeInsetsGeometry>(
+                //   // Increase horizontal padding
+                //   // ignore: prefer_const_constructors
+                //   EdgeInsets.symmetric(
+                //       vertical: 2.h, horizontal: 32.w),
+                // ),
+                backgroundColor:
+                    MaterialStateProperty.all<Color>(const Color(0xFFDE0A1E)),
+              ),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  if (showCircularProgressIndicator)
+                    SizedBox(
+                      height: 20.0, // Set your desired height here
+                      width: 20.0, // Set your desired width here
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.0,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    ),
+                  if (!showCircularProgressIndicator)
+                    Text(
+                      'Accept',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
                 ],
               ),
             ),
           )
         ],
+      ),
+    );
+  }
+
+  Widget _buildAnimatedPopup(BuildContext context, String note) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Container(
+        width: 300,
+        height: 200,
+        padding: EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Note",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            Text(
+              note,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.red),
+                textStyle: MaterialStateProperty.all(
+                  TextStyle(color: Colors.white),
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                "Close",
+                style: TextStyle(color: Colors.white),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -422,6 +631,7 @@ class _MapOnDonatorState extends State<MapOnDonator> {
             );
 
             double distanceInKm = distance / 1000;
+            shortdistance = distanceInKm;
 
             // Show distance in Snackbar
             ScaffoldMessenger.of(context).showSnackBar(

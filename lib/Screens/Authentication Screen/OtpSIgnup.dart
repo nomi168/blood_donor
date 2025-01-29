@@ -1,6 +1,5 @@
 // ignore_for_file: file_names, use_build_context_synchronously, non_constant_identifier_names
 
-import 'package:blood_donor/Screens/Authentication%20Screen/QuestionsScreen.dart';
 import 'package:email_otp/email_otp.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
@@ -41,6 +40,7 @@ class _OTPSignupState extends State<OTPSignup> {
   EmailOTP myauth = EmailOTP();
   bool isClicked = false;
   bool isClicked1 = false;
+  bool result = false;
   @override
   void initState() {
     super.initState();
@@ -89,6 +89,7 @@ class _OTPSignupState extends State<OTPSignup> {
           Padding(
             padding: EdgeInsets.fromLTRB(5.w, 5.h, 5.w, 0),
             child: Material(
+              color: Colors.white,
               elevation: 7.0, // Add shadow/elevation
               borderRadius: BorderRadius.circular(10.0), // Add border radius
               child: TextFormField(
@@ -151,6 +152,7 @@ class _OTPSignupState extends State<OTPSignup> {
           Padding(
             padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
             child: Material(
+              color: Colors.white,
               elevation: 7.0, // Add shadow/elevation
               borderRadius: BorderRadius.circular(10.0), // Add border radius
               child: TextFormField(
@@ -234,51 +236,53 @@ class _OTPSignupState extends State<OTPSignup> {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                       content: Text("OTP is verified"),
                     ));
-                    String email = widget.email;
-                    int id = widget.Id;
-                    String image = widget.image;
-                    String fname = widget.fname;
-                    String lname = widget.lname;
-                    String number = widget.number;
-                    String location = widget.location;
-                    String blood = widget.blood;
-                    String gender = widget.gender;
-                    String password = widget.password;
-                    Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                        pageBuilder: (context, animation, secondaryAnimation) {
-                          return QuestionsScreen(
-                              id: id,
-                              image: image,
-                              fname: fname,
-                              lname: lname,
-                              number: number,
-                              email: email,
-                              location: location,
-                              blood: blood,
-                              gender: gender,
-                              password: password);
-                        },
-                        transitionDuration: const Duration(seconds: 1),
-                        transitionsBuilder:
-                            (context, animation, secondaryAnimation, child) {
-                          const begin =
-                              Offset(10.0, 0.0); // slide in from the right
-                          const end = Offset.zero;
-                          const curve = Curves.easeInOutQuart;
 
-                          var tween = Tween(begin: begin, end: end)
-                              .chain(CurveTween(curve: curve));
-                          var offsetAnimation = animation.drive(tween);
+                    // String email = widget.email;
+                    // int id = widget.Id;
+                    // String image = widget.image;
+                    // String fname = widget.fname;
+                    // String lname = widget.lname;
 
-                          return SlideTransition(
-                            position: offsetAnimation,
-                            child: child,
-                          );
-                        },
-                      ),
-                    );
+                    // String number = widget.number;
+                    // String location = widget.location;
+                    // String blood = widget.blood;
+                    // String gender = widget.gender;
+                    // String password = widget.password;
+                    // Navigator.push(
+                    //   context,
+                    //   PageRouteBuilder(
+                    //     pageBuilder: (context, animation, secondaryAnimation) {
+                    //       return QuestionsScreen(
+                    //           id: id,
+                    //           image: image,
+                    //           fname: fname,
+                    //           lname: lname,
+                    //           number: number,
+                    //           email: email,
+                    //           location: location,
+                    //           blood: blood,
+                    //           gender: gender,
+                    //           password: password);
+                    //     },
+                    //     transitionDuration: const Duration(seconds: 1),
+                    //     transitionsBuilder:
+                    //         (context, animation, secondaryAnimation, child) {
+                    //       const begin =
+                    //           Offset(10.0, 0.0); // slide in from the right
+                    //       const end = Offset.zero;
+                    //       const curve = Curves.easeInOutQuart;
+
+                    //       var tween = Tween(begin: begin, end: end)
+                    //           .chain(CurveTween(curve: curve));
+                    //       var offsetAnimation = animation.drive(tween);
+
+                    //       return SlideTransition(
+                    //         position: offsetAnimation,
+                    //         child: child,
+                    //       );
+                    //     },
+                    //   ),
+                    // );
                   } else {
                     _showAlertDialog2(context);
                   }

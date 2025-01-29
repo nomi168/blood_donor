@@ -4,7 +4,7 @@ import 'package:blood_donor/Provider/FirebaseAuth.dart';
 import 'package:blood_donor/Provider/Page.dart';
 import 'package:blood_donor/Provider/Profile.dart';
 import 'package:blood_donor/Provider/RewardPoints.dart';
-import 'package:blood_donor/Screens/Splash%20Screen/SplashScreen.dart'; // Import SplashScreen
+import 'package:blood_donor/Screens/Splash%20Screen/SplashScreen.dart';
 import 'package:blood_donor/firebase_options.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -59,12 +59,12 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => MyPageProvider()),
         ChangeNotifierProvider(create: (_) => Profile()),
-        ChangeNotifierProvider(create: (_) => RewardPoints())
+        ChangeNotifierProvider(create: (_) => RewardPoints()),
       ],
       child: MaterialApp(
         navigatorKey: navigatorKey,
         debugShowCheckedModeBanner: false,
-        home: userUid != null ? const MainSplash() : const SplashScreen(),
+        home: userUid != null ? const MainSplash() : SplashScreen(),
         builder: EasyLoading.init(),
       ),
     );

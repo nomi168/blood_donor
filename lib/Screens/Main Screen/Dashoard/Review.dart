@@ -482,15 +482,6 @@ class _ReviewState extends State<Review> {
             controller
                 .animateCamera(CameraUpdate.newLatLngBounds(bounds, 50.0));
 
-            double distance = await Geolocator.distanceBetween(
-              fromLocation.latitude,
-              fromLocation.longitude,
-              toLocation.latitude,
-              toLocation.longitude,
-            );
-
-            double distanceInKm = distance / 1000;
-
             // Show distance in Snackbar
             // ScaffoldMessenger.of(context).showSnackBar(
             //   SnackBar(
@@ -719,7 +710,6 @@ class _ReviewState extends State<Review> {
 
   Future<void> getTakerRating() async {
     try {
-      String userid = widget.id;
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('taker')
           .where('id', isEqualTo: widget.id)

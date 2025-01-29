@@ -43,6 +43,9 @@
 <string>We need your permission to access the photo library</string>
 <key>NSCameraUsageDescription</key>
 <string>We need your permission to use the camera</string>
+<key>NSMicrophoneUsageDescription</key>
+<string>Your app needs microphone access for voice calls</string>
+
 
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

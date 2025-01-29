@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:blood_donor/Json%20Data/GoogleMapDark.dart';
+import 'package:blood_donor/Screens/Main%20Screen/Dashoard/Dashboatd.dart';
+import 'package:blood_donor/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -19,11 +22,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../../../Json Data/GoogleMapDark.dart';
-import '../../../../constants.dart';
-import '../Dashboatd.dart';
-
-class CheckMap extends StatefulWidget {
+class MapCheckScreen extends StatefulWidget {
   final String takerlocation;
   final String takerid;
   final String fullname;
@@ -37,8 +36,7 @@ class CheckMap extends StatefulWidget {
   final String blood;
   final String rating;
   final bool status;
-
-  const CheckMap(
+  const MapCheckScreen(
       {super.key,
       required this.takerlocation,
       required this.takerid,
@@ -55,10 +53,10 @@ class CheckMap extends StatefulWidget {
       required this.status});
 
   @override
-  State<CheckMap> createState() => _CheckMapState();
+  State<MapCheckScreen> createState() => _MapCheckScreenState();
 }
 
-class _CheckMapState extends State<CheckMap> {
+class _MapCheckScreenState extends State<MapCheckScreen> {
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
 

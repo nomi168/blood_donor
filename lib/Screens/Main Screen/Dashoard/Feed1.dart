@@ -6,7 +6,10 @@ import 'dart:convert';
 import 'package:blood_donor/Json%20Data/GoogleMapDark.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Dashoard/Dashboatd.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Dashoard/Review1.dart';
+import 'package:blood_donor/constants.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:geocoding/geocoding.dart';
@@ -89,190 +92,227 @@ class _Feed1State extends State<Feed1> {
 
   @override
   Widget build(BuildContext context) {
-    return Sizer(
-      builder: (context, oreintation, deviceType) {
-        return Scaffold(
-          appBar: AppBar(
-            actions: [
-              // IconButton to show path
-              IconButton(
-                onPressed: () {
-                  showPath(widget.location);
-                },
-                icon: const Icon(Icons.directions),
-              ),
-              Padding(
-                  padding: EdgeInsets.fromLTRB(0.w, 0, 0, 0),
-                  child: IconButton(
-                    onPressed: _goToCurrentLocation,
-                    icon: const Icon(
-                      Icons.my_location,
-                      size: 35,
-                      color: Colors.black54,
-                    ),
-                  )),
-              // Switch for light/dark mode
-              Switch(
-                value: isLightMode,
-                onChanged: (value) {
-                  setState(() {
-                    isLightMode = value;
-                  });
-                  _toggleMapMode();
-                },
+    return Scaffold(
+      appBar: AppBar(
+        actions: [
+          // IconButton to show path
+          IconButton(
+            onPressed: () {
+              showPath(widget.location);
+            },
+            icon: const Icon(Icons.directions),
+          ),
+          Padding(
+              padding: EdgeInsets.fromLTRB(0.w, 0, 0, 0),
+              child: IconButton(
+                onPressed: _goToCurrentLocation,
+                icon: const Icon(
+                  Icons.my_location,
+                  size: 35,
+                  color: Colors.black54,
+                ),
+              )),
+          // Switch for light/dark mode
+          Switch(
+            value: isLightMode,
+            onChanged: (value) {
+              setState(() {
+                isLightMode = value;
+              });
+              _toggleMapMode();
+            },
+          ),
+        ],
+      ),
+      backgroundColor: Colors.white,
+      body: Column(children: [
+        Container(
+          color: const Color.fromRGBO(244, 67, 54, 1),
+          height: 30.h,
+          width: double.infinity,
+          child: GoogleMap(
+            mapType: isLightMode ? MapType.normal : MapType.hybrid,
+            initialCameraPosition: _kGooglePlex,
+            polylines: Set<Polyline>.of(polylines),
+            circles: Set<Circle>.of(circles),
+            onMapCreated: (GoogleMapController controller) {
+              _controller.complete(controller);
+            },
+          ),
+        ),
+        Container(
+            margin: EdgeInsets.only(top: 5),
+            height: 4,
+            width: 20.w,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade500,
+              borderRadius: BorderRadius.circular(10),
+            )),
+        SizedBox(
+          height: 15,
+        ),
+        Container(
+          decoration: BoxDecoration(
+            color: Color(0xFF3F3F3).withOpacity(0.2),
+            borderRadius: BorderRadius.circular(10.0),
+            border: Border.all(width: 1, color: Colors.grey.withOpacity(0.5)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.shade200,
+                blurRadius: 10,
+                offset: Offset(0, 4),
+                spreadRadius: 1,
               ),
             ],
           ),
-          backgroundColor: Colors.white,
-          body: Stack(children: [
-            Container(
-              color: const Color.fromRGBO(244, 67, 54, 1),
-              height: 35.h,
-              width: 100.w,
-              child: GoogleMap(
-                mapType: isLightMode ? MapType.normal : MapType.hybrid,
-                initialCameraPosition: _kGooglePlex,
-                polylines: Set<Polyline>.of(polylines),
-                circles: Set<Circle>.of(circles),
-                onMapCreated: (GoogleMapController controller) {
-                  _controller.complete(controller);
-                },
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(5.w, 30.h, 5.w, 0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10.0),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.grey,
-                      spreadRadius: 2,
-                      blurRadius: 5,
-                      offset: Offset(0, 2),
+          height: 10.h,
+          width: double.infinity,
+          margin: EdgeInsets.symmetric(horizontal: 5.w),
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          child: Row(
+            children: [
+              Container(
+                width: 60,
+                height: 70,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: CachedNetworkImage(
+                    fit: BoxFit.cover,
+                    imageUrl: widget.image.isNotEmpty
+                        ? widget.image
+                        : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
+                    placeholder: (context, url) =>
+                        const CupertinoActivityIndicator(
+                      color: Colors.white,
                     ),
-                  ],
-                ),
-                height: 11.h,
-                width: 100.w,
-                child: Stack(
-                  children: [
-                    Padding(
-                        padding: EdgeInsets.fromLTRB(7.w, 1.5.h, 0, 3.h),
-                        child: CircleAvatar(
-                            radius: 28,
-                            backgroundImage: NetworkImage(widget.image))),
-                    Padding(
-                        padding: EdgeInsets.fromLTRB(27.w, 1.h, 0, 3.h),
-                        child: Text(
-                          widget.name,
-                          style: TextStyle(
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
-                        )),
-                    Padding(
-                        padding: EdgeInsets.fromLTRB(27.w, 4.h, 0, 3.h),
-                        child: Text(
-                          widget.hospital,
-                          style:
-                              TextStyle(fontSize: 11.sp, color: Colors.black),
-                        )),
-                    Padding(
-                        padding: EdgeInsets.fromLTRB(27.w, 6.5.h, 0, 3.h),
-                        child: const Icon(Icons.star,
-                            size: 20, color: Color(0xFFDE0A1E))),
-                    Padding(
-                        padding: EdgeInsets.fromLTRB(34.w, 6.5.h, 0, 0.h),
-                        child: Text(
-                          widget.rating,
-                          style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFFDE0A1E)),
-                        )),
-                    // Padding(
-                    //     padding: EdgeInsets.fromLTRB(75.w, 0.h, 0, 3.h),
-                    //     child: IconButton(
-                    //       icon: const Icon(
-                    //         Icons.messenger_sharp,
-                    //         size: 22,
-                    //         color: Color(0xFFDE0A1E),
-                    //       ),
-                    //       onPressed: () {},
-                    //     )),
-                  ],
+                    errorWidget: (context, url, error) => Icon(Icons.error),
+                  ),
                 ),
               ),
-            ),
-            Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 42.h, 0, 0.h),
-                child: Text(
-                  'Donation Details',
-                  style: TextStyle(
-                      fontSize: 13.sp,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold),
-                )),
-            Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 46.h, 0, 0.h),
-                child: Text(
-                  'Location-',
-                  style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Colors.black54,
-                      fontWeight: FontWeight.bold),
-                )),
-            Padding(
-                padding: EdgeInsets.fromLTRB(23.w, 46.h, 0, 0.h),
-                child: Text(
-                  widget.location,
-                  style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Colors.black54,
-                      fontWeight: FontWeight.bold),
-                )),
-            Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 50.h, 0, 0.h),
-                child: Text(
-                  'Schedule-',
-                  style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Colors.black54,
-                      fontWeight: FontWeight.bold),
-                )),
-            Padding(
-                padding: EdgeInsets.fromLTRB(25.w, 50.h, 0, 0.h),
-                child: Text(
-                  widget.date,
-                  style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Colors.black54,
-                      fontWeight: FontWeight.bold),
-                )),
-            Padding(
-                padding: EdgeInsets.fromLTRB(47.w, 50.h, 0, 0.h),
-                child: Text(
-                  ', ${widget.time}',
-                  style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Colors.black54,
-                      fontWeight: FontWeight.bold),
-                )),
-            Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 57.h, 0, 0.h),
-                child: Text(
-                  'Share Your Feedback',
-                  style: TextStyle(
-                      fontSize: 13.sp,
-                      color: Colors.black54,
-                      fontWeight: FontWeight.bold),
-                )),
-            Padding(
-              padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0.h),
-              child: Row(
+              SizedBox(
+                width: 10,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Text(
+                    widget.name,
+                    style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                  Text(
+                    widget.hospital,
+                    style: TextStyle(fontSize: 11.sp, color: Colors.black),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Text(
+          'Donation Details',
+          style: TextStyle(
+              fontSize: 14.sp,
+              color: Colors.black,
+              fontWeight: FontWeight.bold),
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Container(
+          decoration: BoxDecoration(
+            color: Color(0xFF3F3F3).withOpacity(0.2),
+            borderRadius: BorderRadius.circular(10.0),
+            border: Border.all(width: 1, color: Colors.grey.withOpacity(0.5)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.shade200,
+                blurRadius: 10,
+                offset: Offset(0, 4),
+                spreadRadius: 1,
+              ),
+            ],
+          ),
+          width: double.infinity,
+          margin: EdgeInsets.symmetric(horizontal: 5.w),
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          child: Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    'Location-',
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.black.withOpacity(0.7),
+                        fontWeight: FontWeight.w500),
+                  ),
+                  Spacer(),
+                  Text(
+                    widget.location,
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.black,
+                        fontWeight: FontWeight.normal),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    'Schedule-',
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.black.withOpacity(0.7),
+                        fontWeight: FontWeight.w500),
+                  ),
+                  Spacer(),
+                  Text(
+                    widget.time,
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.black,
+                        fontWeight: FontWeight.normal),
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Text(
+                    widget.date,
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.black,
+                        fontWeight: FontWeight.normal),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    'Review-',
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.black.withOpacity(0.7),
+                        fontWeight: FontWeight.w500),
+                  ),
+                  Spacer(),
                   buildStar(1),
                   buildStar(2),
                   buildStar(3),
@@ -280,84 +320,153 @@ class _Feed1State extends State<Feed1> {
                   buildStar(5),
                 ],
               ),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Container(
+          decoration: BoxDecoration(
+            color: Color(0xFF3F3F3).withOpacity(0.2),
+            borderRadius: BorderRadius.circular(10.0),
+            border: Border.all(width: 1, color: Colors.grey.withOpacity(0.5)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.shade200,
+                blurRadius: 10,
+                offset: Offset(0, 4),
+                spreadRadius: 1,
+              ),
+            ],
+          ),
+          width: double.infinity,
+          height: 15.h,
+          margin: EdgeInsets.symmetric(horizontal: 5.w),
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          child: TextField(
+            controller: review,
+            readOnly: true,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 5.0, vertical: 00.0),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+                borderSide: const BorderSide(color: Colors.blue),
+              ),
+              hintText: 'Enter your suggestion here!',
             ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(5.w, 65.h, 5.w, 0),
-              child: Material(
-                elevation: 7.0,
-                borderRadius: BorderRadius.circular(10.0),
-                child: TextField(
-                  controller: review,
-                  decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 30.0),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: const BorderSide(color: Colors.grey),
+          ),
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 5.w),
+          child: Row(
+            children: [
+              Expanded(
+                child: InkWell(
+                  onTap: () async {
+                    await deleteAcceptRequest();
+                  },
+                  child: Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 20.0, vertical: 11),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(08),
+                        border: Border.all(color: PRIMARY_COLOR)),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Cancel Request',
+                      style: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black54),
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: const BorderSide(color: Colors.blue),
-                    ),
-                    hintText:
-                        'Tell us how was your expericence wuth the seeker',
                   ),
                 ),
               ),
-            ),
-            Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 78.h, 5.w, 2.h),
-                child: SizedBox(
-                  height: 8.h,
-                  width: 100.w,
-                  child: Material(
-                      borderRadius:
-                          BorderRadius.circular(10.0), // Add border radius
-                      elevation: 5.0,
-                      color: const Color(0xFFDE0A1E),
-                      child: Row(
-                        children: [
-                          Padding(
-                              padding: EdgeInsets.fromLTRB(5.w, 0, 0, 0),
-                              child: TextButton(
-                                child: Text(
-                                  'Cancel Request',
-                                  style: TextStyle(
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white70),
-                                ),
-                                onPressed: () async {
-                                  await deleteAcceptRequest();
-                                },
-                              )),
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(4.w, 0, 0, 0),
-                            child: const VerticalDivider(
-                              color: Colors.white, // Adjust the color as needed
-                              thickness: 2.0, // Adjust the thickness as needed
-                            ),
-                          ),
-                          Padding(
-                              padding: EdgeInsets.fromLTRB(10.w, 0, 0, 0),
-                              child: TextButton(
-                                child: Text(
-                                  'Donated',
-                                  style: TextStyle(
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white),
-                                ),
-                                onPressed: () {
-                                  _showConfirmationDialog(context);
-                                },
-                              ))
-                        ],
-                      )),
-                ))
-          ]),
-        );
-      },
+              SizedBox(
+                width: 20,
+              ),
+              Expanded(
+                child: InkWell(
+                  onTap: () async {
+                    _showConfirmationDialog(context);
+                  },
+                  child: Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 20.0, vertical: 11),
+                    decoration: BoxDecoration(
+                        color: PRIMARY_COLOR,
+                        borderRadius: BorderRadius.circular(08),
+                        border: Border.all(color: PRIMARY_COLOR)),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Continue',
+                      style: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white),
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+        // Padding(
+        //     padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0.h),
+        //     child: SizedBox(
+        //       height: 6.h,
+        //       width: 100.w,
+        //       child: Material(
+        //           borderRadius: BorderRadius.circular(10.0),
+        //           elevation: 5.0,
+        //           color: const Color(0xFFDE0A1E),
+        //           child: Row(
+        //             children: [
+        //               Padding(
+        //                   padding: EdgeInsets.fromLTRB(5.w, 0, 0, 0),
+        //                   child: TextButton(
+        //                     child: Text(
+        //                       'Cancel Request',
+        //                       style: TextStyle(
+        //                           fontSize: 12.sp,
+        //                           fontWeight: FontWeight.bold,
+        //                           color: Colors.white70),
+        //                     ),
+        //                     onPressed: () async {
+        //                       await deleteAcceptRequest();
+        //                     },
+        //                   )),
+        //               Padding(
+        //                 padding: EdgeInsets.fromLTRB(4.w, 0, 0, 0),
+        //                 child: const VerticalDivider(
+        //                   color: Colors.white, // Adjust the color as needed
+        //                   thickness: 2.0, // Adjust the thickness as needed
+        //                 ),
+        //               ),
+        //               Padding(
+        //                   padding: EdgeInsets.fromLTRB(10.w, 0, 0, 0),
+        //                   child: TextButton(
+        //                     child: Text(
+        //                       'Donated',
+        //                       style: TextStyle(
+        //                           fontSize: 12.sp,
+        //                           fontWeight: FontWeight.bold,
+        //                           color: Colors.white),
+        //                     ),
+        //                     onPressed: () {
+        //                       _showConfirmationDialog(context);
+        //                     },
+        //                   ))
+        //             ],
+        //           )),
+        //     ))
+      ]),
     );
   }
 
@@ -621,21 +730,18 @@ class _Feed1State extends State<Feed1> {
   }
 
   Widget buildStar(int starNumber) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(0.h, 60.h, 0, 0),
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            selectedRating = starNumber;
-          });
-        },
-        child: Icon(
-          Icons.star,
-          size: 23,
-          color: starNumber <= selectedRating
-              ? const Color.fromARGB(255, 224, 208, 63)
-              : Colors.black54,
-        ),
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedRating = starNumber;
+        });
+      },
+      child: Icon(
+        Icons.star,
+        size: 23,
+        color: starNumber <= selectedRating
+            ? const Color.fromARGB(255, 224, 208, 63)
+            : Colors.black54,
       ),
     );
   }
@@ -748,14 +854,36 @@ class _Feed1State extends State<Feed1> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          content: const Text(
-            'You have Successfully donated blood to the seeker',
-          ),
+          backgroundColor: Colors.white,
           actions: <Widget>[
             Column(
               children: [
+                SizedBox(
+                  height: 5.h,
+                ),
+                Image.asset('images/fi_16322725.png'),
+                Container(
+                  margin: EdgeInsets.only(top: 1.h),
+                  child: Text(
+                    'Congratulations',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(top: 3.h),
+                  child: Text(
+                    'You have Successfully donated blood to the seeker',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
                 Padding(
-                  padding: EdgeInsets.fromLTRB(0.w, 0.h, 3.w, 0),
+                  padding: EdgeInsets.fromLTRB(0.w, 3.h, 3.w, 0),
                   child: Material(
                     elevation: 10.0,
                     shadowColor: Colors.black,
@@ -833,7 +961,7 @@ class _Feed1State extends State<Feed1> {
                             const Color(0xFFDE0A1E)),
                       ),
                       child: Text(
-                        'Yes',
+                        'Done',
                         style: TextStyle(
                           fontSize: 12.sp,
                           fontWeight: FontWeight.bold,
@@ -843,42 +971,42 @@ class _Feed1State extends State<Feed1> {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(0.w, 1.h, 3.w, 0),
-                  child: Material(
-                    elevation: 10.0,
-                    shadowColor: Colors.black,
-                    borderRadius: BorderRadius.circular(10.0),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      style: ButtonStyle(
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                          // Increase horizontal padding
-                          // ignore: prefer_const_constructors
-                          EdgeInsets.symmetric(vertical: 2.h, horizontal: 26.w),
-                        ),
-                        backgroundColor:
-                            MaterialStateProperty.all<Color>(Colors.black12),
-                      ),
-                      child: Text(
-                        'No',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                // Padding(
+                //   padding: EdgeInsets.fromLTRB(0.w, 1.h, 3.w, 0),
+                //   child: Material(
+                //     elevation: 10.0,
+                //     shadowColor: Colors.black,
+                //     borderRadius: BorderRadius.circular(10.0),
+                //     child: ElevatedButton(
+                //       onPressed: () {
+                //         Navigator.pop(context);
+                //       },
+                //       style: ButtonStyle(
+                //         shape:
+                //             MaterialStateProperty.all<RoundedRectangleBorder>(
+                //           RoundedRectangleBorder(
+                //             borderRadius: BorderRadius.circular(10.0),
+                //           ),
+                //         ),
+                //         padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                //           // Increase horizontal padding
+                //           // ignore: prefer_const_constructors
+                //           EdgeInsets.symmetric(vertical: 2.h, horizontal: 26.w),
+                //         ),
+                //         backgroundColor:
+                //             MaterialStateProperty.all<Color>(Colors.black12),
+                //       ),
+                //       child: Text(
+                //         'No',
+                //         style: TextStyle(
+                //           fontSize: 12.sp,
+                //           fontWeight: FontWeight.bold,
+                //           color: Colors.white,
+                //         ),
+                //       ),
+                //     ),
+                //   ),
+                // ),
               ],
             )
           ],

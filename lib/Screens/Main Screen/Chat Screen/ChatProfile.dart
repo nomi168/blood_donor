@@ -18,8 +18,8 @@ class ChatProfile extends StatefulWidget {
 
 class _ChatProfileState extends State<ChatProfile> with WidgetsBindingObserver {
   List<AcceptChat> chatrequestData = [];
+
   String usertype = '';
-  String id = '';
 
   @override
   void initState() {
@@ -30,202 +30,194 @@ class _ChatProfileState extends State<ChatProfile> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return Sizer(builder: (context, orientation, deviceType) {
-      return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(
-          body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Padding(
-                padding: EdgeInsets.fromLTRB(0.w, 5.h, 0, 0),
-                child: Text(
-                  'Inbox',
-                  style: TextStyle(
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black54),
-                )),
-            if (chatrequestData.isEmpty)
-              Center(
-                child: Text(
-                  'No Person Inbox',
-                  style: TextStyle(
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black54),
-                ),
-              ),
-            if (chatrequestData.isNotEmpty)
-              Expanded(
-                  child: usertype == 'donor'
-                      ? ListView.builder(
-                          itemCount: chatrequestData.length,
-                          itemBuilder: (context, index) {
-                            final chat = chatrequestData[index];
-                            return Column(
-                              children: [
-                                ListTile(
-                                  onTap: () {
-                                    String sender_id = chat.sender_id;
-                                    String receiver_id = chat.receiver_id;
-                                    String image = chat.image;
-                                    String name = chat.name;
-                                    String sendemail = chat.senderemail;
-                                    String receiveremail = chat.receiveremail;
-                                    String senderimage = chat.senderimage;
+    return Scaffold(
+      body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Padding(
+            padding: EdgeInsets.fromLTRB(0.w, 5.h, 0, 0),
+            child: Text(
+              'Inbox',
+              style: TextStyle(
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black54),
+            )),
+        if (chatrequestData.isEmpty)
+          Center(
+            child: Text(
+              'No Person Inbox',
+              style: TextStyle(
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black54),
+            ),
+          ),
+        if (chatrequestData.isNotEmpty)
+          Expanded(
+              child: usertype == 'donor'
+                  ? ListView.builder(
+                      itemCount: chatrequestData.length,
+                      itemBuilder: (context, index) {
+                        final chat = chatrequestData[index];
+                        return Column(
+                          children: [
+                            ListTile(
+                              onTap: () {
+                                String sender_id = chat.sender_id;
+                                String receiver_id = chat.receiver_id;
+                                String image = chat.image;
+                                String name = chat.name;
+                                String sendemail = chat.senderemail;
+                                String receiveremail = chat.receiveremail;
+                                String senderimage = chat.senderimage;
 
-                                    Navigator.of(context, rootNavigator: true)
-                                        .push(
-                                      PageRouteBuilder(
-                                        pageBuilder: (context, animation,
-                                            secondaryAnimation) {
-                                          return ChatScree1(
-                                            sender_id: sender_id,
-                                            receiver_id: receiver_id,
-                                            image: image,
-                                            name: name,
-                                            sendemail: sendemail,
-                                            receiveremail: receiveremail,
-                                            senderimage: senderimage,
-                                          );
-                                        },
-                                        transitionDuration:
-                                            const Duration(seconds: 1),
-                                        transitionsBuilder: (context, animation,
-                                            secondaryAnimation, child) {
-                                          const begin = Offset(10.0,
-                                              0.0); // slide in from the right
-                                          const end = Offset.zero;
-                                          const curve = Curves.easeInOutQuart;
+                                Navigator.of(context, rootNavigator: true).push(
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, animation,
+                                        secondaryAnimation) {
+                                      return ChatScree1(
+                                        sender_id: sender_id,
+                                        receiver_id: receiver_id,
+                                        image: image,
+                                        name: name,
+                                        sendemail: sendemail,
+                                        receiveremail: receiveremail,
+                                        senderimage: senderimage,
+                                      );
+                                    },
+                                    transitionDuration:
+                                        const Duration(seconds: 1),
+                                    transitionsBuilder: (context, animation,
+                                        secondaryAnimation, child) {
+                                      const begin = Offset(
+                                          10.0, 0.0); // slide in from the right
+                                      const end = Offset.zero;
+                                      const curve = Curves.easeInOutQuart;
 
-                                          var tween = Tween(
-                                                  begin: begin, end: end)
-                                              .chain(CurveTween(curve: curve));
-                                          var offsetAnimation =
-                                              animation.drive(tween);
+                                      var tween = Tween(begin: begin, end: end)
+                                          .chain(CurveTween(curve: curve));
+                                      var offsetAnimation =
+                                          animation.drive(tween);
 
-                                          return SlideTransition(
-                                            position: offsetAnimation,
-                                            child: child,
-                                          );
-                                        },
-                                      ),
-                                    );
-                                  },
-                                  leading: ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: Container(
-                                      height: 45,
-                                      width: 45,
-                                      child: CachedNetworkImage(
-                                        fit: BoxFit.cover,
-                                        imageUrl: chat.image,
-                                        placeholder: (context, url) =>
-                                            const CupertinoActivityIndicator(
-                                          color: Colors.white,
-                                        ),
-                                        errorWidget: (context, url, error) =>
-                                            Icon(Icons.error),
-                                      ),
-                                    ),
+                                      return SlideTransition(
+                                        position: offsetAnimation,
+                                        child: child,
+                                      );
+                                    },
                                   ),
-
-                                  title: Text(chat.name),
-                                  // subtitle: Text(chat['message']),
-                                  trailing: Text(chat.time),
-                                ),
-                                const Divider(
-                                  color: Colors.black26,
-                                  thickness: 1.0,
-                                ),
-                              ],
-                            );
-                          },
-                        )
-                      : ListView.builder(
-                          itemCount: chatrequestData.length,
-                          itemBuilder: (context, index) {
-                            final chat = chatrequestData[index];
-                            return Column(
-                              children: [
-                                ListTile(
-                                  onTap: () {
-                                    String sender_id = chat.sender_id;
-                                    String receiver_id = chat.receiver_id;
-                                    String image = chat.image;
-                                    String name = chat.acceptname;
-                                    String sendemail = chat.senderemail;
-                                    String receiveremail = chat.receiveremail;
-                                    String senderimage = chat.senderimage;
-                                    Navigator.of(context, rootNavigator: true)
-                                        .push(
-                                      PageRouteBuilder(
-                                        pageBuilder: (context, animation,
-                                            secondaryAnimation) {
-                                          return ChatScree1(
-                                              sender_id: sender_id,
-                                              receiver_id: receiver_id,
-                                              image: image,
-                                              name: name,
-                                              sendemail: sendemail,
-                                              receiveremail: receiveremail,
-                                              senderimage: senderimage);
-                                        },
-                                        transitionDuration:
-                                            const Duration(seconds: 1),
-                                        transitionsBuilder: (context, animation,
-                                            secondaryAnimation, child) {
-                                          const begin = Offset(10.0,
-                                              0.0); // slide in from the right
-                                          const end = Offset.zero;
-                                          const curve = Curves.easeInOutQuart;
-
-                                          var tween = Tween(
-                                                  begin: begin, end: end)
-                                              .chain(CurveTween(curve: curve));
-                                          var offsetAnimation =
-                                              animation.drive(tween);
-
-                                          return SlideTransition(
-                                            position: offsetAnimation,
-                                            child: child,
-                                          );
-                                        },
-                                      ),
-                                    );
-                                  },
-                                  leading: ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: Container(
-                                      height: 45,
-                                      width: 45,
-                                      child: CachedNetworkImage(
-                                        fit: BoxFit.cover,
-                                        imageUrl: chat.senderimage,
-                                        placeholder: (context, url) =>
-                                            const CupertinoActivityIndicator(
-                                          color: Colors.white,
-                                        ),
-                                        errorWidget: (context, url, error) =>
-                                            Icon(Icons.error),
-                                      ),
+                                );
+                              },
+                              leading: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Container(
+                                  height: 45,
+                                  width: 45,
+                                  child: CachedNetworkImage(
+                                    fit: BoxFit.cover,
+                                    imageUrl: chat.image,
+                                    placeholder: (context, url) =>
+                                        const CupertinoActivityIndicator(
+                                      color: Colors.white,
                                     ),
+                                    errorWidget: (context, url, error) =>
+                                        Icon(Icons.error),
                                   ),
-                                  title: Text(chat.acceptname),
-                                  // subtitle: Text(chat['message']),
-                                  trailing: Text(chat.time),
                                 ),
-                                const Divider(
-                                  color: Colors.black26,
-                                  thickness: 1.0,
+                              ),
+
+                              title: Text(chat.name),
+                              // subtitle: Text(chat['message']),
+                              trailing: Text(chat.time),
+                            ),
+                            const Divider(
+                              color: Colors.black26,
+                              thickness: 1.0,
+                            ),
+                          ],
+                        );
+                      },
+                    )
+                  : ListView.builder(
+                      itemCount: chatrequestData.length,
+                      itemBuilder: (context, index) {
+                        final chat = chatrequestData[index];
+                        return Column(
+                          children: [
+                            ListTile(
+                              onTap: () {
+                                String sender_id = chat.sender_id;
+                                String receiver_id = chat.receiver_id;
+                                String image = chat.image;
+                                String name = chat.acceptname;
+                                String sendemail = chat.senderemail;
+                                String receiveremail = chat.receiveremail;
+                                String senderimage = chat.senderimage;
+                                Navigator.of(context, rootNavigator: true).push(
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, animation,
+                                        secondaryAnimation) {
+                                      return ChatScree1(
+                                        sender_id: sender_id,
+                                        receiver_id: receiver_id,
+                                        image: image,
+                                        name: name,
+                                        sendemail: sendemail,
+                                        receiveremail: receiveremail,
+                                        senderimage: senderimage,
+                                      );
+                                    },
+                                    transitionDuration:
+                                        const Duration(seconds: 1),
+                                    transitionsBuilder: (context, animation,
+                                        secondaryAnimation, child) {
+                                      const begin = Offset(
+                                          10.0, 0.0); // slide in from the right
+                                      const end = Offset.zero;
+                                      const curve = Curves.easeInOutQuart;
+
+                                      var tween = Tween(begin: begin, end: end)
+                                          .chain(CurveTween(curve: curve));
+                                      var offsetAnimation =
+                                          animation.drive(tween);
+
+                                      return SlideTransition(
+                                        position: offsetAnimation,
+                                        child: child,
+                                      );
+                                    },
+                                  ),
+                                );
+                              },
+                              leading: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Container(
+                                  height: 45,
+                                  width: 45,
+                                  child: CachedNetworkImage(
+                                    fit: BoxFit.cover,
+                                    imageUrl: chat.senderimage,
+                                    placeholder: (context, url) =>
+                                        const CupertinoActivityIndicator(
+                                      color: Colors.white,
+                                    ),
+                                    errorWidget: (context, url, error) =>
+                                        Icon(Icons.error),
+                                  ),
                                 ),
-                              ],
-                            );
-                          },
-                        )),
-          ]),
-        ),
-      );
-    });
+                              ),
+                              title: Text(chat.acceptname),
+                              // subtitle: Text(chat['message']),
+                              trailing: Text(chat.time),
+                            ),
+                            const Divider(
+                              color: Colors.black26,
+                              thickness: 1.0,
+                            ),
+                          ],
+                        );
+                      },
+                    )),
+      ]),
+    );
   }
 
   Future<void> getChatUsers() async {
@@ -242,13 +234,13 @@ class _ChatProfileState extends State<ChatProfile> with WidgetsBindingObserver {
         DocumentSnapshot userDoc = querySnapshot.docs.first;
 
         usertype = userDoc['type'];
-        id = userDoc['id'];
 
         if (usertype == 'donor') {
           QuerySnapshot chatQuerySnapshot = await FirebaseFirestore.instance
               .collection('chat_accept')
               .where('senderemail', isEqualTo: userEmail)
               .get();
+
           print('nomi');
 
           if (chatQuerySnapshot.docs.isNotEmpty) {
@@ -307,6 +299,7 @@ class _ChatProfileState extends State<ChatProfile> with WidgetsBindingObserver {
                     senderimage: doc['senderimage']);
               }).toList();
             });
+            print(chatrequestData);
           } else {
             print('No pending chat requests found');
             // Clear chatrequestData to remove any previously fetched data

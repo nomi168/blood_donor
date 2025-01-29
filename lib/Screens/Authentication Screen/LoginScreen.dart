@@ -1,6 +1,7 @@
 // ignore_for_file: file_names, use_build_context_synchronously
 import 'package:blood_donor/Json%20Data/GlobalVariable.dart';
 import 'package:blood_donor/Screens/Authentication%20Screen/OTPForget.dart';
+import 'package:blood_donor/Screens/Authentication%20Screen/SignupScreen.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Dashoard/Dashboatd.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -25,6 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool showCircularProgressIndicator = false;
   final LocalAuthentication auth = LocalAuthentication();
   bool _isFingerprintAuthenticated = false;
+  bool isPasswordVisible = false;
 
   String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
@@ -157,6 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 borderRadius: BorderRadius.circular(10.0),
                 child: TextFormField(
                   controller: _password,
+                  obscureText: !isPasswordVisible,
                   decoration: InputDecoration(
                     label: const Text(
                       'Password',
@@ -171,6 +174,18 @@ class _LoginScreenState extends State<LoginScreen> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
                       borderSide: const BorderSide(color: Colors.white),
+                    ),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        isPasswordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          isPasswordVisible = !isPasswordVisible;
+                        });
+                      },
                     ),
                   ),
                   validator: validatePassword,
@@ -275,6 +290,42 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: EdgeInsets.fromLTRB(5.w, 2.h, 0, 0),
+                  child: Center(
+                    child: Text(
+                      'If you want to create account:',
+                      style: TextStyle(
+                          fontSize: 12.sp, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SignupScreen()));
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(1.w, 2.h, 0, 0),
+                    child: Center(
+                      child: Text(
+                        'Sign Up',
+                        style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            )
 
             // Padding(
             //   padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
@@ -323,24 +374,37 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void loginToFirestore() async {
+    final email = _email.text.trim();
+    final password = _password.text.trim();
+
+    if (email.isEmpty || !email.contains('@')) {
+      EasyLoading.showError('Invalid email format');
+      return;
+    }
+    if (password.isEmpty) {
+      EasyLoading.showError('Password cannot be empty');
+      return;
+    }
+
     try {
       UserCredential userCredential =
           await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _email.text,
-        password: _password.text,
+        email: email,
+        password: password,
       );
 
       DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
           .collection('users')
           .doc(userCredential.user?.uid)
           .get();
+
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('user_uid', userCredential.user?.uid ?? '');
-      prefs.setString('user_email', _email.text);
+      prefs.setString('user_email', email);
 
       if (userSnapshot.exists) {
         EasyLoading.showSuccess('Login Successfully!');
-        profile.email = _email.text;
+        profile.email = email;
         Navigator.pushReplacement(
           context,
           PageRouteBuilder(
@@ -365,28 +429,101 @@ class _LoginScreenState extends State<LoginScreen> {
             },
           ),
         );
-        return;
       } else {
         _showUserNotFoundDialog(context);
         setState(() {
           showCircularProgressIndicator = false;
         });
-        return;
       }
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found' || e.code == 'wrong-password') {
+      if (e.code == 'invalid-credential') {
         _showPasswordIncorrectDialog(context);
       } else {
         print('Login failed: $e');
         _showUserNotFoundDialog(context);
-        setState(() {
-          showCircularProgressIndicator = false;
-        });
       }
+      setState(() {
+        showCircularProgressIndicator = false;
+      });
     } catch (e) {
       print('Error: $e');
+      setState(() {
+        showCircularProgressIndicator = false;
+      });
     }
   }
+
+  // void loginToFirestore() async {
+  //   try {
+  //     UserCredential userCredential =
+  //         await FirebaseAuth.instance.signInWithEmailAndPassword(
+  //       email: _email.text,
+  //       password: _password.text,
+  //     );
+
+  //     DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+  //         .collection('users')
+  //         .doc(userCredential.user?.uid)
+  //         .get();
+  //     SharedPreferences prefs = await SharedPreferences.getInstance();
+  //     prefs.setString('user_uid', userCredential.user?.uid ?? '');
+  //     prefs.setString('user_email', _email.text);
+
+  //     if (userSnapshot.exists) {
+  //       EasyLoading.showSuccess('Login Successfully!');
+  //       profile.email = _email.text;
+  //       Navigator.pushReplacement(
+  //         context,
+  //         PageRouteBuilder(
+  //           pageBuilder: (context, animation, secondaryAnimation) {
+  //             return const Dashboard();
+  //           },
+  //           transitionDuration: const Duration(seconds: 1),
+  //           transitionsBuilder:
+  //               (context, animation, secondaryAnimation, child) {
+  //             const begin = Offset(10.0, 0.0);
+  //             const end = Offset.zero;
+  //             const curve = Curves.easeInOutQuart;
+
+  //             var tween =
+  //                 Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+  //             var offsetAnimation = animation.drive(tween);
+
+  //             return SlideTransition(
+  //               position: offsetAnimation,
+  //               child: child,
+  //             );
+  //           },
+  //         ),
+  //       );
+  //       return;
+  //     } else {
+  //       _showUserNotFoundDialog(context);
+  //       setState(() {
+  //         showCircularProgressIndicator = false;
+  //       });
+  //       return;
+  //     }
+  //   } on FirebaseAuthException catch (e) {
+  //     if (e.code == 'user-not-found' || e.code == 'wrong-password') {
+  //       _showPasswordIncorrectDialog(context);
+  //       setState(() {
+  //         showCircularProgressIndicator = false;
+  //       });
+  //     } else {
+  //       print('Login failed: $e');
+  //       _showUserNotFoundDialog(context);
+  //       setState(() {
+  //         showCircularProgressIndicator = false;
+  //       });
+  //     }
+  //   } catch (e) {
+  //     print('Error: $e');
+  //     setState(() {
+  //       showCircularProgressIndicator = false;
+  //     });
+  //   }
+  // }
 
   void authenticateWithFingerprint() async {
     try {
@@ -444,7 +581,7 @@ class _LoginScreenState extends State<LoginScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Alert'),
-          content: const Text('Please Enter Correct Password:'),
+          content: const Text('invalid-credential'),
           actions: [
             TextButton(
               onPressed: () {

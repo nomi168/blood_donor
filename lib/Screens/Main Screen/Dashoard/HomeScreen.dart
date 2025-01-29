@@ -8,8 +8,9 @@ import 'package:blood_donor/Provider/Page.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Dashoard/Blood%20Dnor/Blood.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Dashoard/DonateNow.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Dashoard/Feed1.dart';
+import 'package:blood_donor/Screens/Main%20Screen/Feed%20Screen/FeedScreen.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Feed%20Screen/Notification.dart';
-import 'package:blood_donor/Screens/Main%20Screen/SendRequestForBood/SendRequestScreen.dart';
+import 'package:blood_donor/Screens/Main%20Screen/SendRequestForBood/Post%20Rquest/post_request.dart';
 import 'package:blood_donor/constants.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -56,12 +57,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   final CarouselController _carouselController = CarouselController();
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
-  static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(0, 0),
-    zoom: 10.0,
-  );
 
-  Set<Polygon> polygons = {};
   Set<Circle> circles = {};
 
   final List<String> images = [
@@ -194,6 +190,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
             home: Scaffold(
+              resizeToAvoidBottomInset: true,
               backgroundColor: Colors.white,
               body: SingleChildScrollView(
                 child: Column(
@@ -357,7 +354,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                               PageRouteBuilder(
                                 pageBuilder:
                                     (context, animation, secondaryAnimation) {
-                                  return SendRequestScreen(blood: blood);
+                                  return MultipleBloodRequest(blood: blood);
                                 },
                                 transitionsBuilder: (context, animation,
                                     secondaryAnimation, child) {
@@ -454,84 +451,163 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          GestureDetector(
-                              onTap: () {
-                                if (userType == 'donor') {
-                                  EasyLoading.showInfo(
-                                      'Donor cannot add the Blood Post');
-                                } else {
-                                  // ignore: avoid_print
-                                  Navigator.push(
-                                    context,
-                                    PageRouteBuilder(
-                                      pageBuilder: (context, animation,
-                                          secondaryAnimation) {
-                                        return const PostRequest();
-                                      },
-                                      transitionDuration:
-                                          const Duration(seconds: 1),
-                                      transitionsBuilder: (context, animation,
-                                          secondaryAnimation, child) {
-                                        const begin = Offset(10.0,
-                                            0.0); // slide in from the right
-                                        const end = Offset.zero;
-                                        const curve = Curves.easeInOutQuart;
+                          userType == 'donor'
+                              ? GestureDetector(
+                                  onTap: () {
+                                    // ignore: avoid_print
+                                    Navigator.of(context, rootNavigator: true)
+                                        .push(
+                                      PageRouteBuilder(
+                                        pageBuilder: (context, animation,
+                                            secondaryAnimation) {
+                                          return FeedScreen(
+                                            id: '12345',
+                                          );
+                                        },
+                                        transitionDuration:
+                                            const Duration(seconds: 1),
+                                        transitionsBuilder: (context, animation,
+                                            secondaryAnimation, child) {
+                                          const begin = Offset(10.0,
+                                              0.0); // slide in from the right
+                                          const end = Offset.zero;
+                                          const curve = Curves.easeInOutQuart;
 
-                                        var tween = Tween(
-                                                begin: begin, end: end)
-                                            .chain(CurveTween(curve: curve));
-                                        var offsetAnimation =
-                                            animation.drive(tween);
+                                          var tween = Tween(
+                                                  begin: begin, end: end)
+                                              .chain(CurveTween(curve: curve));
+                                          var offsetAnimation =
+                                              animation.drive(tween);
 
-                                        return SlideTransition(
-                                          position: offsetAnimation,
-                                          child: child,
-                                        );
-                                      },
-                                    ),
-                                  );
-                                }
-                              },
-                              child: Container(
-                                height: 120,
-                                width: 100,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(color: Colors.grey)),
-                                child: Column(
-                                  children: [
-                                    Padding(
-                                      padding:
-                                          EdgeInsets.fromLTRB(5.w, 3.h, 5.w, 0),
-                                      child: Center(
-                                        child: Image.network(
-                                          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQigoM43RUySVjX6VVeTVg2xcXGuk7SOoTw_A&usqp=CAU',
-                                        ),
+                                          return SlideTransition(
+                                            position: offsetAnimation,
+                                            child: child,
+                                          );
+                                        },
                                       ),
+                                    );
+                                  },
+                                  child: Container(
+                                    height: 120,
+                                    width: 100,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(color: Colors.grey)),
+                                    child: Column(
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.fromLTRB(
+                                              5.w, 3.h, 5.w, 0),
+                                          child: Center(
+                                            child: Image.network(
+                                              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQigoM43RUySVjX6VVeTVg2xcXGuk7SOoTw_A&usqp=CAU',
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                            padding: EdgeInsets.fromLTRB(
+                                                3.w, 0.h, 2.w, 0),
+                                            child: Text(
+                                              'Donate',
+                                              style: TextStyle(
+                                                  fontSize: 12.sp,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black54),
+                                            )),
+                                        Padding(
+                                            padding: EdgeInsets.fromLTRB(
+                                                3.w, 0.h, 2.w, 0),
+                                            child: Text(
+                                              'Blood',
+                                              style: TextStyle(
+                                                  fontSize: 12.sp,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black54),
+                                            )),
+                                      ],
                                     ),
-                                    Padding(
-                                        padding: EdgeInsets.fromLTRB(
-                                            3.w, 0.h, 2.w, 0),
-                                        child: Text(
-                                          'Post Blood',
-                                          style: TextStyle(
-                                              fontSize: 12.sp,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black54),
-                                        )),
-                                    Padding(
-                                        padding: EdgeInsets.fromLTRB(
-                                            3.w, 0.h, 2.w, 0),
-                                        child: Text(
-                                          'Request',
-                                          style: TextStyle(
-                                              fontSize: 12.sp,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black54),
-                                        )),
-                                  ],
-                                ),
-                              )),
+                                  ))
+                              : GestureDetector(
+                                  onTap: () {
+                                    if (userType == 'donor') {
+                                      EasyLoading.showInfo(
+                                          'Donor cannot add the Blood Post');
+                                    } else {
+                                      // ignore: avoid_print
+                                      Navigator.push(
+                                        context,
+                                        PageRouteBuilder(
+                                          pageBuilder: (context, animation,
+                                              secondaryAnimation) {
+                                            return const PostRequest();
+                                          },
+                                          transitionDuration:
+                                              const Duration(seconds: 1),
+                                          transitionsBuilder: (context,
+                                              animation,
+                                              secondaryAnimation,
+                                              child) {
+                                            const begin = Offset(10.0,
+                                                0.0); // slide in from the right
+                                            const end = Offset.zero;
+                                            const curve = Curves.easeInOutQuart;
+
+                                            var tween = Tween(
+                                                    begin: begin, end: end)
+                                                .chain(
+                                                    CurveTween(curve: curve));
+                                            var offsetAnimation =
+                                                animation.drive(tween);
+
+                                            return SlideTransition(
+                                              position: offsetAnimation,
+                                              child: child,
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  child: Container(
+                                    height: 120,
+                                    width: 100,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(color: Colors.grey)),
+                                    child: Column(
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.fromLTRB(
+                                              5.w, 3.h, 5.w, 0),
+                                          child: Center(
+                                            child: Image.network(
+                                              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQigoM43RUySVjX6VVeTVg2xcXGuk7SOoTw_A&usqp=CAU',
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                            padding: EdgeInsets.fromLTRB(
+                                                3.w, 0.h, 2.w, 0),
+                                            child: Text(
+                                              'Post Blood',
+                                              style: TextStyle(
+                                                  fontSize: 12.sp,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black54),
+                                            )),
+                                        Padding(
+                                            padding: EdgeInsets.fromLTRB(
+                                                3.w, 0.h, 2.w, 0),
+                                            child: Text(
+                                              'Request',
+                                              style: TextStyle(
+                                                  fontSize: 12.sp,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black54),
+                                            )),
+                                      ],
+                                    ),
+                                  )),
                           GestureDetector(
                               onTap: () {
                                 Navigator.push(
@@ -1764,327 +1840,301 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                   textAlign: TextAlign.left),
                             ),
                           ),
-                          GestureDetector(
-                            child: Container(
-                                height: 25.h,
-                                margin: EdgeInsets.symmetric(horizontal: 5.w),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: Colors.red,
-                                    width: 1,
-                                  ),
+                          Container(
+                            width: double.infinity,
+                            margin: EdgeInsets.symmetric(
+                                horizontal: 5.w, vertical: 2.h),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 20),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Color(0xFF3F3F3).withOpacity(0.2),
+                              border: Border.all(
+                                  width: 1,
+                                  color: Colors.grey.withOpacity(0.5)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.shade200,
+                                  blurRadius: 10,
+                                  offset: Offset(0, 4),
+                                  spreadRadius: 1,
                                 ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Container(
-                                      width: 40.w,
-                                      margin: EdgeInsets.all(5.w),
-                                      height: 25.h,
+                                      width: 70,
+                                      height: 70,
                                       child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(20),
-                                        child: Container(
-                                          child: CachedNetworkImage(
-                                            fit: BoxFit.fitWidth,
-                                            imageUrl: requestimage.isNotEmpty
-                                                ? requestimage
-                                                : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
-                                            placeholder: (context, url) =>
-                                                const CupertinoActivityIndicator(
-                                              color: PRIMARY_COLOR,
-                                            ),
-                                            errorWidget:
-                                                (context, url, error) =>
-                                                    Icon(Icons.error),
+                                        borderRadius:
+                                            BorderRadius.circular(100),
+                                        child: CachedNetworkImage(
+                                          fit: BoxFit.cover,
+                                          imageUrl: requestimage.isNotEmpty
+                                              ? requestimage
+                                              : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
+                                          placeholder: (context, url) =>
+                                              const CupertinoActivityIndicator(
+                                            color: Colors.white,
                                           ),
+                                          errorWidget: (context, url, error) =>
+                                              Icon(Icons.error),
                                         ),
                                       ),
                                     ),
-                                    Expanded(
+                                    const SizedBox(width: 10),
+                                    Container(
+                                      child: Expanded(
                                         child: Column(
-                                      children: [
-                                        Row(
+                                          mainAxisSize: MainAxisSize.max,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            Container(
-                                              margin: EdgeInsets.only(top: 2.h),
-                                              child: Icon(Icons.person),
+                                            Text(
+                                              requestname,
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.bold),
                                             ),
-                                            Expanded(
-                                              child: Padding(
-                                                  padding: EdgeInsets.fromLTRB(
-                                                      2.w, 2.h, 0.w, 00),
+                                            SizedBox(
+                                              height: 7,
+                                            ),
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Location : ',
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.black,
+                                                      fontWeight:
+                                                          FontWeight.w500),
+                                                ),
+                                                Expanded(
                                                   child: Text(
-                                                    requestname,
+                                                    requestbloc,
                                                     style: TextStyle(
-                                                        fontSize: 11.sp,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.black),
-                                                  )),
-                                            )
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            Container(
-                                              margin: EdgeInsets.only(top: 2.h),
-                                              child: Icon(Icons.local_hospital),
+                                                        fontSize: 14,
+                                                        color: Colors.black
+                                                            .withOpacity(0.7)),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            Expanded(
-                                              child: Padding(
-                                                  padding: EdgeInsets.fromLTRB(
-                                                      1.w, 2.h, 0.w, 00),
+                                            SizedBox(
+                                              height: 7,
+                                            ),
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Hospital Name : ',
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.black,
+                                                      fontWeight:
+                                                          FontWeight.w500),
+                                                ),
+                                                Expanded(
                                                   child: Text(
                                                     requesthosname,
                                                     style: TextStyle(
-                                                        fontSize: 11.sp,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.black),
-                                                  )),
-                                            )
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            Container(
-                                              margin: EdgeInsets.only(top: 2.h),
-                                              child: Icon(
-                                                Icons.lock_clock,
-                                                color: Colors.black,
-                                              ),
+                                                        fontSize: 14,
+                                                        color: Colors.black
+                                                            .withOpacity(0.7)),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            Expanded(
-                                                child: Padding(
-                                                    padding:
-                                                        EdgeInsets.fromLTRB(
-                                                            1.w, 2.h, 0.w, 00),
-                                                    child: Text(
-                                                      requesttime,
-                                                      style: TextStyle(
-                                                          fontSize: 12.sp,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Colors.black),
-                                                    )))
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            Container(
-                                              margin: EdgeInsets.only(top: 2.h),
-                                              child: Icon(
-                                                Icons.date_range,
-                                                color: Colors.black,
-                                              ),
+                                            SizedBox(
+                                              height: 7,
                                             ),
-                                            Expanded(
-                                                child: Padding(
-                                                    padding:
-                                                        EdgeInsets.fromLTRB(
-                                                            1.w, 2.h, 0.w, 00),
-                                                    child: Text(
-                                                      requestdate,
-                                                      style: TextStyle(
-                                                          fontSize: 12.sp,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Colors.black),
-                                                    )))
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Blood Group : ',
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.black,
+                                                      fontWeight:
+                                                          FontWeight.w500),
+                                                ),
+                                                Expanded(
+                                                  child: Text(
+                                                    requestblood,
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Colors.black
+                                                            .withOpacity(0.7)),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Date : ',
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.black,
+                                                      fontWeight:
+                                                          FontWeight.w500),
+                                                ),
+                                                Expanded(
+                                                  child: Text(
+                                                    requestdate,
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Colors.black
+                                                            .withOpacity(0.7)),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Time : ',
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.black,
+                                                      fontWeight:
+                                                          FontWeight.w500),
+                                                ),
+                                                Expanded(
+                                                  child: Text(
+                                                    requesttime,
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Colors.black
+                                                            .withOpacity(0.7)),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ],
                                         ),
-                                      ],
-                                    ))
+                                      ),
+                                    ),
                                   ],
-                                )),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                PageRouteBuilder(
-                                  pageBuilder:
-                                      (context, animation, secondaryAnimation) {
-                                    return Feed1(
-                                        name: requestname,
-                                        image: requestimage,
-                                        blood: requestblood,
-                                        email: requestemail,
-                                        hospital: requesthosname,
-                                        location: requestbloc,
-                                        date: requestdate,
-                                        time: requesttime,
-                                        rating: requestrating,
-                                        note: requestnote,
-                                        id: requestid,
-                                        donorname: donorname,
-                                        donorblood: donorblood,
-                                        donoremail: donoremail,
-                                        donorimage: donorimage,
-                                        takerid: takerid);
-                                  },
-                                  transitionDuration:
-                                      const Duration(seconds: 1),
-                                  transitionsBuilder: (context, animation,
-                                      secondaryAnimation, child) {
-                                    const begin = Offset(
-                                        10.0, 0.0); // slide in from the right
-                                    const end = Offset.zero;
-                                    const curve = Curves.easeInOutQuart;
-
-                                    var tween = Tween(begin: begin, end: end)
-                                        .chain(CurveTween(curve: curve));
-                                    var offsetAnimation =
-                                        animation.drive(tween);
-
-                                    return SlideTransition(
-                                      position: offsetAnimation,
-                                      child: child,
-                                    );
-                                  },
                                 ),
-                              );
-                              // ignore: avoid_print
-                              print('Nomi1');
-                            },
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation,
+                                                secondaryAnimation) {
+                                              return Feed1(
+                                                  name: requestname,
+                                                  image: requestimage,
+                                                  blood: requestblood,
+                                                  email: requestemail,
+                                                  hospital: requesthosname,
+                                                  location: requestbloc,
+                                                  date: requestdate,
+                                                  time: requesttime,
+                                                  rating: requestrating,
+                                                  note: requestnote,
+                                                  id: requestid,
+                                                  donorname: donorname,
+                                                  donorblood: donorblood,
+                                                  donoremail: donoremail,
+                                                  donorimage: donorimage,
+                                                  takerid: takerid);
+                                            },
+                                            transitionDuration:
+                                                const Duration(seconds: 1),
+                                            transitionsBuilder: (context,
+                                                animation,
+                                                secondaryAnimation,
+                                                child) {
+                                              const begin = Offset(10.0,
+                                                  0.0); // slide in from the right
+                                              const end = Offset.zero;
+                                              const curve =
+                                                  Curves.easeInOutQuart;
+
+                                              var tween = Tween(
+                                                      begin: begin, end: end)
+                                                  .chain(
+                                                      CurveTween(curve: curve));
+                                              var offsetAnimation =
+                                                  animation.drive(tween);
+
+                                              return SlideTransition(
+                                                position: offsetAnimation,
+                                                child: child,
+                                              );
+                                            },
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        height: 38,
+                                        width: 220,
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                          color: PRIMARY_COLOR,
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          border: Border.all(
+                                            color: Colors.red,
+                                            width: 1.0,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          'Donate',
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
                         ],
                       ),
                     SizedBox(
                       height: 13.h,
                     )
-
-                    // Padding(
-                    //   padding: EdgeInsets.fromLTRB(0.w, 1.5.h, 0, 0),
-                    //   child:
-                    // ),
-
-                    // Padding(
-                    //   padding: EdgeInsets.fromLTRB(6.5.w, 1.5.h, 0, 0),
-                    //   child: Text(
-                    //     'Blood Journey Map',
-                    //     style:
-                    //         TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold),
-                    //   ),
-                    // ),
-                    // GestureDetector(
-                    //   child: Padding(
-                    //     padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
-                    //     child: Material(
-                    //       elevation: 5,
-                    //       shadowColor: Colors.grey,
-                    //       borderRadius: BorderRadius.circular(12),
-                    //       child: Container(
-                    //           height: 30.h,
-                    //           decoration: BoxDecoration(
-                    //             borderRadius: BorderRadius.circular(12),
-                    //             border: Border.all(
-                    //               color: Colors.red,
-                    //               width: 1,
-                    //             ),
-                    //           ),
-                    //           child: Stack(
-                    //             children: [
-                    //               Padding(
-                    //                 padding: EdgeInsets.fromLTRB(5.w, 2.h, 45.w, 00),
-                    //                 child: Container(
-                    //                   color: Colors.amberAccent,
-                    //                   height: 25.h,
-                    //                   child: GoogleMap(
-                    //                     mapType: MapType.hybrid,
-                    //                     initialCameraPosition: _kGooglePlex,
-                    //                     polygons: polygons,
-                    //                     circles: circles,
-                    //                     onMapCreated:
-                    //                         (GoogleMapController controller) {
-                    //                       _controller.complete(controller);
-                    //                     },
-                    //                   ),
-                    //                 ),
-                    //               ),
-                    //               Padding(
-                    //                   padding:
-                    //                       EdgeInsets.fromLTRB(50.w, 2.h, 5.w, 00),
-                    //                   child: Text(
-                    //                     donator.name,
-                    //                     style: TextStyle(
-                    //                         fontSize: 13.sp,
-                    //                         fontWeight: FontWeight.bold,
-                    //                         color: Colors.black),
-                    //                   )),
-                    //               Padding(
-                    //                   padding:
-                    //                       EdgeInsets.fromLTRB(50.w, 6.h, 5.w, 00),
-                    //                   child: Text(
-                    //                     donator.location,
-                    //                     style: TextStyle(
-                    //                         fontSize: 12.sp,
-                    //                         fontWeight: FontWeight.bold,
-                    //                         color: Colors.black),
-                    //                   )),
-                    //               Padding(
-                    //                   padding:
-                    //                       EdgeInsets.fromLTRB(50.w, 12.h, 5.w, 00),
-                    //                   child: Text(
-                    //                     donator.time,
-                    //                     style: TextStyle(
-                    //                         fontSize: 12.sp,
-                    //                         fontWeight: FontWeight.bold,
-                    //                         color: Colors.black),
-                    //                   )),
-                    //               Padding(
-                    //                   padding:
-                    //                       EdgeInsets.fromLTRB(50.w, 15.h, 5.w, 00),
-                    //                   child: Text(
-                    //                     donator.date,
-                    //                     style: TextStyle(
-                    //                         fontSize: 12.sp,
-                    //                         fontWeight: FontWeight.bold,
-                    //                         color: Colors.black),
-                    //                   )),
-                    //               Padding(
-                    //                   padding:
-                    //                       EdgeInsets.fromLTRB(50.w, 15.h, 5.w, 00),
-                    //                   child: Text(
-                    //                     donator.date,
-                    //                     style: TextStyle(
-                    //                         fontSize: 12.sp,
-                    //                         fontWeight: FontWeight.bold,
-                    //                         color: Colors.black),
-                    //                   )),
-                    //             ],
-                    //           )),
-                    //     ),
-                    //   ),
-                    //   onTap: () {
-                    //     // Navigator.push(
-                    //     //   context,
-                    //     //   PageRouteBuilder(
-                    //     //     pageBuilder: (context, animation, secondaryAnimation) {
-                    //     //       return Feed(location: location);
-                    //     //     },
-                    //     //     transitionsBuilder:
-                    //     //         (context, animation, secondaryAnimation, child) {
-                    //     //       const begin =
-                    //     //           Offset(10.0, 0.0); // slide in from the right
-                    //     //       const end = Offset.zero;
-                    //     //       const curve = Curves.easeInOutQuart;
-
-                    //     //       var tween = Tween(begin: begin, end: end)
-                    //     //           .chain(CurveTween(curve: curve));
-                    //     //       var offsetAnimation = animation.drive(tween);
-
-                    //     //       return SlideTransition(
-                    //     //         position: offsetAnimation,
-                    //     //         child: child,
-                    //     //       );
-                    //     //     },
-                    //     //   ),
-                    //     // );
-                    //     // ignore: avoid_print
-                    //     print('Nomi1');
-                    //   },
-                    // ),
                   ],
                 ),
               ),
@@ -2634,7 +2684,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         donorblood = d_blood;
         donorimage = d_image;
         takerid = takid;
-        provider.notifyListeners();
       } else {
         // No user found with the specified email
         print('User not found with email: $userEmail');

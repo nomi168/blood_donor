@@ -60,12 +60,15 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
     getChatRequestData();
     getChatRequestId();
     WidgetsBinding.instance.addObserver(this);
-    Future.delayed(Duration(seconds: 3), () async {
-      setState(() {
-        isLoading = false;
 
-        // Populate feedsData with actual data
-      });
+    Future.delayed(Duration(seconds: 3), () async {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+          // Populate feedsData with actual data
+        });
+      }
+
       await deleteExpiredRequests();
       await getavailableDonor();
     });
@@ -75,6 +78,7 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
+
     super.dispose();
   }
 
@@ -98,83 +102,123 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
       backgroundColor: const Color(0xFFFFFFFF),
       body: Column(
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Material(
-                  child: Container(
-                    padding: EdgeInsets.fromLTRB(5.w, 5.h, 0, 0),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
+          userType == 'taker'
+              ? Row(
+                  children: [
+                    Expanded(
+                      child: Material(
+                        child: Container(
+                          padding: EdgeInsets.fromLTRB(5.w, 5.h, 5.w, 0),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              elevation: 7,
+                              shadowColor: const Color(0x00e3e3e3),
+                              backgroundColor: index == 1
+                                  ? const Color(0xFFDE0A1E)
+                                  : const Color(0xFFFFFFFF),
+                              minimumSize: Size(double.infinity, 6.h),
+                            ),
+                            child: Text(
+                              'Request',
+                              style: TextStyle(
+                                color: index == 1
+                                    ? const Color(0xFFFFFFFF)
+                                    : const Color(0xFF353535),
+                              ),
+                            ),
+                            onPressed: () {
+                              // setState(() {
+                              //   index = 2;
+                              // });
+                            },
+                          ),
                         ),
-                        elevation: 7,
-                        shadowColor: const Color(0x00e3e3e3),
-                        backgroundColor: index == 1
-                            ? const Color(0xFFDE0A1E)
-                            : const Color(0xFFFFFFFF),
-                        minimumSize: Size(double.infinity, 6.h),
                       ),
-                      child: Text(
-                        'Feed',
-                        style: TextStyle(
-                          color: index == 1
-                              ? const Color(0xFFFFFFFF)
-                              : const Color(0xFF353535),
-                        ),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          index = 1;
-                        });
-                      },
                     ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Material(
-                  child: Container(
-                    padding: EdgeInsets.fromLTRB(1.w, 5.h, 5.w, 0),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(
+                      child: Material(
+                        child: Container(
+                          padding: EdgeInsets.fromLTRB(5.w, 5.h, 0, 0),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              elevation: 7,
+                              shadowColor: const Color(0x00e3e3e3),
+                              backgroundColor: index == 1
+                                  ? const Color(0xFFDE0A1E)
+                                  : const Color(0xFFFFFFFF),
+                              minimumSize: Size(double.infinity, 6.h),
+                            ),
+                            child: Text(
+                              'Feed',
+                              style: TextStyle(
+                                color: index == 1
+                                    ? const Color(0xFFFFFFFF)
+                                    : const Color(0xFF353535),
+                              ),
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                index = 1;
+                              });
+                            },
+                          ),
                         ),
-                        elevation: 7,
-                        shadowColor: const Color(0x00e3e3e3),
-                        backgroundColor: index == 2
-                            ? const Color(0xFFDE0A1E)
-                            : const Color(0xFFFFFFFF),
-                        minimumSize: Size(double.infinity, 6.h),
                       ),
-                      child: Text(
-                        'Request',
-                        style: TextStyle(
-                          color: index == 2
-                              ? const Color(0xFFFFFFFF)
-                              : const Color(0xFF353535),
-                        ),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          index = 2;
-                        });
-                      },
                     ),
-                  ),
+                    Expanded(
+                      child: Material(
+                        child: Container(
+                          padding: EdgeInsets.fromLTRB(1.w, 5.h, 5.w, 0),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              elevation: 7,
+                              shadowColor: const Color(0x00e3e3e3),
+                              backgroundColor: index == 2
+                                  ? const Color(0xFFDE0A1E)
+                                  : const Color(0xFFFFFFFF),
+                              minimumSize: Size(double.infinity, 6.h),
+                            ),
+                            child: Text(
+                              'Request',
+                              style: TextStyle(
+                                color: index == 2
+                                    ? const Color(0xFFFFFFFF)
+                                    : const Color(0xFF353535),
+                              ),
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                index = 2;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
-          Expanded(
-            child: index == 1
-                ? FeedButton()
-                : index == 2
-                    ? RequestButton()
-                    : Container(), // Add more conditions as needed
-          ),
+          userType == 'taker'
+              ? Expanded(child: RequestButton())
+              : Expanded(
+                  child: index == 1
+                      ? FeedButton()
+                      : index == 2
+                          ? RequestButton()
+                          : Container(), // Add more conditions as needed
+                ),
         ],
       ),
     );
@@ -216,9 +260,12 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
                 status: doc['status'],
                 tak_id: doc['id'] ?? ''));
           }
-          setState(() {
-            feedsData = tempList;
-          });
+          if (mounted) {
+            setState(() {
+              feedsData = tempList;
+            });
+          }
+
           getUserDataByEmail();
         }
         // String imageURL = await getImageURL(doc['image']);
@@ -296,34 +343,38 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
       print('nomi');
 
       if (querySnapshot.docs.isNotEmpty) {
-        setState(() {
-          chatrequestData = querySnapshot.docs.map((doc) {
-            Timestamp timestamp = doc['timestamp'];
-            DateTime dateTime = timestamp.toDate();
-            String formattedTime =
-                DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
+        if (mounted) {
+          setState(() {
+            chatrequestData = querySnapshot.docs.map((doc) {
+              Timestamp timestamp = doc['timestamp'];
+              DateTime dateTime = timestamp.toDate();
+              String formattedTime =
+                  DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
 
-            return ChatRequest(
-              receiver_id: doc['receiver_id'],
-              sender_id: doc['sender_id'],
-              senderemail: doc['senderEmail'],
-              receivername: doc['name'],
-              receiverimage: doc['receiverimage'],
-              senderimage: doc['image'],
-              sendername: doc['senderName'],
-              sendernumber: doc['senderNumber'],
-              receiveremail: doc['recipientEmail'],
-              status: doc['status'],
-              time: formattedTime,
-            );
-          }).toList();
-        });
+              return ChatRequest(
+                receiver_id: doc['receiver_id'],
+                sender_id: doc['sender_id'],
+                senderemail: doc['senderEmail'],
+                receivername: doc['name'],
+                receiverimage: doc['receiverimage'],
+                senderimage: doc['image'],
+                sendername: doc['senderName'],
+                sendernumber: doc['senderNumber'],
+                receiveremail: doc['recipientEmail'],
+                status: doc['status'],
+                time: formattedTime,
+              );
+            }).toList();
+          });
+        }
       } else {
         print('No pending chat requests found');
+        if (mounted) {
+          setState(() {
+            chatrequestData = [];
+          });
+        }
         // Clear chatrequestData to remove any previously fetched data
-        setState(() {
-          chatrequestData = [];
-        });
       }
     } catch (e) {
       // Handle error
@@ -358,7 +409,7 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
   // ignore: non_constant_identifier_names
   Widget RequestButton() {
     getChatRequestData();
-    if (chatrequestData == null) {
+    if (chatrequestData.isEmpty) {
       return Center(child: CircularProgressIndicator());
     } else if (chatrequestData.isEmpty) {
       return Center(child: Text('No chat requests available'));
@@ -367,9 +418,11 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
         color: Colors.red,
         onRefresh: () async {
           await Future.delayed(Duration(seconds: 1));
-          setState(() {
-            getChatRequestData();
-          });
+          if (mounted) {
+            setState(() {
+              getChatRequestData();
+            });
+          }
         },
         child: SingleChildScrollView(
           child: Padding(
@@ -482,11 +535,13 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
                                               const Color(0xFFDE0A1E)),
                                     ),
                                     child: Text(
-                                      'Decline',
+                                      'Reject',
                                       style: TextStyle(
                                           fontSize: 12, color: Colors.white),
                                     ),
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      deleteRequest(chat.senderemail);
+                                    },
                                   ),
                                   SizedBox(
                                     width: 10,
@@ -579,15 +634,16 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
         String n = userDoc['phonenumber'];
         String img = userDoc['image'];
         String type = userDoc['type'];
-
-        setState(() {
-          profilename = name + ' $name1';
-          number = n;
-          image = img;
-          userType = type;
-          taker_email = email;
-          sender_id = id;
-        });
+        if (mounted) {
+          setState(() {
+            profilename = name + ' $name1';
+            number = n;
+            image = img;
+            userType = type;
+            taker_email = email;
+            sender_id = id;
+          });
+        }
 
         print(profilename);
       } else {
@@ -738,37 +794,57 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
 
       // Increment acceptid (if needed)
 
-      // If senderEmail does not exist, send chat request
-      DocumentReference docRef =
-          await _firestore.collection('chat_accept').add({
-        'id': '',
-        'sender_id': send_id,
-        'receiver_id': receive_id,
-        'name': name,
-        'accepteremail': email,
-        'senderemail': senderemail,
-        'date': formattedDate,
-        'time': formattedTime,
-        'image': image,
-        'acceptername': acceptn,
-        'senderimage': image1
-      });
-      String documentId = docRef.id;
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('chat_id', documentId);
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('chat_accept')
+          .where('accepteremail', isEqualTo: email)
+          .where('senderemail', isEqualTo: senderemail)
+          .get();
 
-      // Update the document with the document ID in place of 'takerid'
-      await docRef.update({
-        'id': documentId,
-      });
+      QuerySnapshot querySnapshot1 = await FirebaseFirestore.instance
+          .collection('chat_accept')
+          .where('accepteremail', isEqualTo: senderemail)
+          .where('senderemail', isEqualTo: email)
+          .get();
 
-      // Show success message
-      EasyLoading.showSuccess('Chat Accept of $email');
-      UpdateStatus(senderemail);
+      if (querySnapshot.docs.isNotEmpty) {
+        EasyLoading.showError('This person is already in chat');
+      } else if (querySnapshot1.docs.isNotEmpty) {
+        EasyLoading.showError('This person is already in chat');
+      } else {
+        // If senderEmail does not exist, send chat request
+        DocumentReference docRef =
+            await _firestore.collection('chat_accept').add({
+          'id': '',
+          'sender_id': send_id,
+          'receiver_id': receive_id,
+          'name': name,
+          'accepteremail': email,
+          'senderemail': senderemail,
+          'date': formattedDate,
+          'time': formattedTime,
+          'image': image,
+          'acceptername': acceptn,
+          'senderimage': image1
+        });
+        String documentId = docRef.id;
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('chat_id', documentId);
 
-      // Call function to send request (not sure about this function)
-      AcceptRequest(senderemail);
-      setState(() {});
+        // Update the document with the document ID in place of 'takerid'
+        await docRef.update({
+          'id': documentId,
+        });
+
+        // Show success message
+        EasyLoading.showSuccess('Chat Accept of $email');
+        UpdateStatus(senderemail);
+
+        // Call function to send request (not sure about this function)
+        AcceptRequest(senderemail);
+        if (mounted) {
+          setState(() {});
+        }
+      }
     } catch (error) {
       print("Error sending chat request: $error");
     }
@@ -777,8 +853,6 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
   void AcceptRequest(String email) async {
     try {
       String projectId = 'blood-app-8f4c2';
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? iddd = await prefs.getString('chat_id');
 
       // Fetch all users from Firestore who are donors
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -858,9 +932,12 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
         // Update only the 'status' field to 'accepting'
         await docRef.update({'status': 'accepting'});
         // EasyLoading.showSuccess('Chat request updated for $senderEmail');
-        setState(() {
-          getChatRequestData();
-        });
+        if (mounted) {
+          setState(() {
+            getChatRequestData();
+          });
+        }
+
         return;
       }
     } catch (error) {
@@ -887,6 +964,7 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
               )
             : Container(
                 margin: EdgeInsets.fromLTRB(5.w, 0.w, 5.w, 0),
+                width: double.infinity,
                 child: GridView.builder(
                   physics: const ScrollPhysics(),
                   shrinkWrap: true,
@@ -910,503 +988,342 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
                     } else {
                       Taker taker = feedsData[index];
                       return Container(
-                        margin: EdgeInsets.fromLTRB(0.w, 0.w, 0.w, 0),
-                        child:
-                            // notifi = feedsData[index].email;
-
-                            Column(
+                        width: double.infinity,
+                        height: 200,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 20),
+                        clipBehavior: Clip.antiAlias,
+                        decoration: BoxDecoration(
+                          color: Colors.white, // Optional: Background color
+                          borderRadius: BorderRadius.circular(10),
+                          border:
+                              Border.all(width: 0.5, color: Color(0xFFDDDDDD)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 10,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              height: 160,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 5, vertical: 12),
-                              clipBehavior: Clip.antiAlias,
-                              decoration: ShapeDecoration(
-                                shape: RoundedRectangleBorder(
-                                  side: BorderSide(
-                                      width: 1, color: Color(0xFFDDDDDD)),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          width: 70,
-                                          height: 70,
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            child: CachedNetworkImage(
-                                              fit: BoxFit.cover,
-                                              imageUrl: taker
-                                                      .imageURL.isNotEmpty
-                                                  ? taker.imageURL
-                                                  : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
-                                              placeholder: (context, url) =>
-                                                  const CupertinoActivityIndicator(
-                                                color: Colors.white,
-                                              ),
-                                              errorWidget:
-                                                  (context, url, error) =>
-                                                      Icon(Icons.error),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 5),
-                                        Container(
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.max,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                feedsData[index].name,
-                                                style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 18,
-                                                  fontFamily: 'Montserrat',
-                                                  fontWeight: FontWeight.w500,
-                                                  height: 0,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 12),
-                                              Container(
-                                                child: Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Container(
-                                                      width: 220,
-                                                      child: Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .start,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                            'Location :',
-                                                            style: TextStyle(
-                                                              color: Color(
-                                                                  0xFF5A5A5A),
-                                                              fontSize: 12,
-                                                              fontFamily:
-                                                                  'Montserrat',
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              height: 0.13,
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                              width: 5),
-                                                          Expanded(
-                                                            child: SizedBox(
-                                                              child: Text(
-                                                                feedsData[index]
-                                                                    .location,
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Color(
-                                                                      0xFF5A5A5A),
-                                                                  fontSize: 12,
-                                                                  fontFamily:
-                                                                      'Montserrat',
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  height: 0.13,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    const SizedBox(height: 15),
-                                                    Container(
-                                                      child: Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .start,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                            'Blood Group :',
-                                                            style: TextStyle(
-                                                              color: Color(
-                                                                  0xFF5A5A5A),
-                                                              fontSize: 12,
-                                                              fontFamily:
-                                                                  'Montserrat',
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              height: 0.13,
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                              width: 5),
-                                                          Text(
-                                                            feedsData[index]
-                                                                .blood,
-                                                            style: TextStyle(
-                                                              color: Color(
-                                                                  0xFF5A5A5A),
-                                                              fontSize: 12,
-                                                              fontFamily:
-                                                                  'Montserrat',
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              height: 0.13,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    const SizedBox(height: 15),
-                                                    Container(
-                                                      child: Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .start,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                            'Date :',
-                                                            style: TextStyle(
-                                                              color: Color(
-                                                                  0xFF5A5A5A),
-                                                              fontSize: 12,
-                                                              fontFamily:
-                                                                  'Montserrat',
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              height: 0.13,
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                              width: 5),
-                                                          Text(
-                                                            feedsData[index]
-                                                                .date,
-                                                            style: TextStyle(
-                                                              color: Color(
-                                                                  0xFF5A5A5A),
-                                                              fontSize: 12,
-                                                              fontFamily:
-                                                                  'Montserrat',
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              height: 0.13,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    const SizedBox(height: 15),
-                                                    Container(
-                                                      child: Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .start,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                            'Time :',
-                                                            style: TextStyle(
-                                                              color: Color(
-                                                                  0xFF5A5A5A),
-                                                              fontSize: 12,
-                                                              fontFamily:
-                                                                  'Montserrat',
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              height: 0.13,
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                              width: 5),
-                                                          Text(
-                                                            feedsData[index]
-                                                                .time,
-                                                            style: TextStyle(
-                                                              color: Color(
-                                                                  0xFF5A5A5A),
-                                                              fontSize: 12,
-                                                              fontFamily:
-                                                                  'Montserrat',
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              height: 0.13,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              const SizedBox(height: 15),
-                                              Row(
-                                                children: [
-                                                  InkWell(
-                                                    onTap: () async {
-                                                      final FirebaseAuth _auth =
-                                                          FirebaseAuth.instance;
-                                                      final User? currentUser =
-                                                          _auth.currentUser;
-                                                      final String? userEmail =
-                                                          currentUser?.email;
-
-                                                      if (currentUser != null) {
-                                                        // Get recipient's email (for demo, you can replace this with actual recipient email)
-                                                        String recipientEmail =
-                                                            feedsData[index]
-                                                                .email;
-                                                        String rename =
-                                                            feedsData[index]
-                                                                .name;
-                                                        String recimage =
-                                                            feedsData[index]
-                                                                .imageURL;
-                                                        String id =
-                                                            feedsData[index]
-                                                                .tak_id!;
-                                                        receiver_id = id;
-
-                                                        if (userType ==
-                                                            'donor') {
-                                                          // Send chat request
-                                                          await sendChatRequest(
-                                                              userEmail!,
-                                                              recipientEmail,
-                                                              profilename,
-                                                              number,
-                                                              image,
-                                                              rename,
-                                                              recimage,
-                                                              id);
-                                                        } else {
-                                                          EasyLoading.showError(
-                                                            'Only donors can send chat requests.',
-                                                          );
-                                                        }
-
-                                                        // Show notification or navigate to chat screen
-                                                      }
-                                                    },
-                                                    child: Container(
-                                                      height: 30,
-                                                      width: 90,
-                                                      alignment:
-                                                          Alignment.center,
-                                                      decoration: BoxDecoration(
-                                                        color: PRIMARY_COLOR,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(5),
-                                                        border: Border.all(
-                                                          color: Colors.red,
-                                                          width: 1.0,
-                                                        ),
-                                                      ),
-                                                      child: Text(
-                                                        'Request',
-                                                        style: TextStyle(
-                                                            fontSize: 14,
-                                                            color:
-                                                                Colors.white),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  SizedBox(
-                                                    width: 10,
-                                                  ),
-                                                  InkWell(
-                                                    onTap: () {
-                                                      String id =
-                                                          feedsData[index].id;
-                                                      String name =
-                                                          feedsData[index].name;
-                                                      String email =
-                                                          feedsData[index]
-                                                              .email;
-                                                      String image =
-                                                          feedsData[index]
-                                                              .imageURL;
-                                                      String blood =
-                                                          feedsData[index]
-                                                              .blood;
-                                                      String location =
-                                                          feedsData[index]
-                                                              .location;
-                                                      String hosname =
-                                                          feedsData[index]
-                                                              .hospitaname;
-                                                      String rating =
-                                                          feedsData[index]
-                                                              .rating
-                                                              .toString();
-
-                                                      String time =
-                                                          feedsData[index].time;
-                                                      String date =
-                                                          feedsData[index].date;
-                                                      String note =
-                                                          feedsData[index].note;
-                                                      String taker_id =
-                                                          feedsData[index]
-                                                              .t_id
-                                                              .toString();
-                                                      if (userType == 'donor') {
-                                                        if (availablility ==
-                                                            true) {
-                                                          EasyLoading.showError(
-                                                            "You have already donated blood. If you want to donate again, please wait for 90 days.",
-                                                          );
-                                                        } else {
-                                                          Navigator.of(context,
-                                                                  rootNavigator:
-                                                                      true)
-                                                              .push(
-                                                            PageRouteBuilder(
-                                                              pageBuilder: (context,
-                                                                  animation,
-                                                                  secondaryAnimation) {
-                                                                return MapOnDonator(
-                                                                  id: id,
-                                                                  name: name,
-                                                                  email: email,
-                                                                  image: image,
-                                                                  blood: blood,
-                                                                  location:
-                                                                      location,
-                                                                  hosname:
-                                                                      hosname,
-                                                                  rating: rating
-                                                                      .toString(),
-                                                                  time: time,
-                                                                  date: date,
-                                                                  note: note,
-                                                                );
-                                                              },
-                                                              transitionDuration:
-                                                                  const Duration(
-                                                                      seconds:
-                                                                          1),
-                                                              transitionsBuilder:
-                                                                  (context,
-                                                                      animation,
-                                                                      secondaryAnimation,
-                                                                      child) {
-                                                                const begin =
-                                                                    Offset(10.0,
-                                                                        0.0); // slide in from the right
-                                                                const end =
-                                                                    Offset.zero;
-                                                                const curve = Curves
-                                                                    .easeInOutQuart;
-
-                                                                var tween = Tween(
-                                                                        begin:
-                                                                            begin,
-                                                                        end:
-                                                                            end)
-                                                                    .chain(CurveTween(
-                                                                        curve:
-                                                                            curve));
-                                                                var offsetAnimation =
-                                                                    animation
-                                                                        .drive(
-                                                                            tween);
-
-                                                                return SlideTransition(
-                                                                  position:
-                                                                      offsetAnimation,
-                                                                  child: child,
-                                                                );
-                                                              },
-                                                            ),
-                                                          );
-                                                        }
-                                                      } else {
-                                                        EasyLoading.showError(
-                                                          "Taker is doesnot donate any blood",
-                                                        );
-                                                      }
-                                                    },
-                                                    child: Container(
-                                                      height: 30,
-                                                      width: 90,
-                                                      alignment:
-                                                          Alignment.center,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(5),
-                                                        border: Border.all(
-                                                          color: Colors.red,
-                                                          width: 1.0,
-                                                        ),
-                                                      ),
-                                                      child: Text(
-                                                        'Donate',
-                                                        style: TextStyle(
-                                                            fontSize: 14,
-                                                            color:
-                                                                Colors.black87),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                      ],
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: 70,
+                                  height: 70,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: CachedNetworkImage(
+                                      fit: BoxFit.cover,
+                                      imageUrl: taker.imageURL.isNotEmpty
+                                          ? taker.imageURL
+                                          : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
+                                      placeholder: (context, url) =>
+                                          const CupertinoActivityIndicator(
+                                        color: Colors.white,
+                                      ),
+                                      errorWidget: (context, url, error) =>
+                                          Icon(Icons.error),
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                                const SizedBox(width: 10),
+                                Container(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        taker.name,
+                                        style: TextStyle(
+                                            fontSize: 14, color: Colors.black),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            CupertinoIcons.calendar,
+                                            size: 15,
+                                            color: Colors.black45,
+                                          ),
+                                          SizedBox(
+                                            width: 5,
+                                          ),
+                                          Text(
+                                            taker.date,
+                                            style: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.black45),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            CupertinoIcons.clock,
+                                            size: 15,
+                                            color: Colors.black45,
+                                          ),
+                                          SizedBox(
+                                            width: 5,
+                                          ),
+                                          Text(
+                                            taker.time,
+                                            style: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.black45),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Spacer(),
+                                InkWell(
+                                  splashFactory: NoSplash.splashFactory,
+                                  splashColor: Colors.transparent,
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) =>
+                                          _buildAnimatedPopup(
+                                              context, taker.note),
+                                    );
+                                  },
+                                  child: Container(
+                                    margin: EdgeInsets.only(top: 30),
+                                    padding: EdgeInsets.all(1),
+                                    decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(100),
+                                        border:
+                                            Border.all(color: PRIMARY_COLOR)),
+                                    child: Icon(
+                                      Icons.info,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                )
+                              ],
                             ),
+                            SizedBox(
+                              height: 15,
+                            ),
+                            Divider(
+                              height: 0.5,
+                              color: Colors.black45,
+                              thickness: 0.5,
+                            ),
+                            SizedBox(
+                              height: 12,
+                            ),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.pin_drop,
+                                  color: Colors.black54,
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Location',
+                                      style: TextStyle(
+                                          fontSize: 14, color: Colors.black54),
+                                    ),
+                                    Text(
+                                      taker.location,
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.black54,
+                                          fontWeight: FontWeight.w500),
+                                    )
+                                  ],
+                                )
+                              ],
+                            ),
+                            SizedBox(
+                              height: 9,
+                            ),
+                            Row(
+                              children: [
+                                InkWell(
+                                  onTap: () async {
+                                    final FirebaseAuth _auth =
+                                        FirebaseAuth.instance;
+                                    final User? currentUser = _auth.currentUser;
+                                    final String? userEmail =
+                                        currentUser?.email;
+
+                                    if (currentUser != null) {
+                                      String recipientEmail =
+                                          feedsData[index].email;
+                                      String rename = feedsData[index].name;
+                                      String recimage =
+                                          feedsData[index].imageURL;
+                                      String id = feedsData[index].tak_id!;
+                                      receiver_id = id;
+
+                                      if (userType == 'donor') {
+                                        // Send chat request
+                                        await sendChatRequest(
+                                            userEmail!,
+                                            recipientEmail,
+                                            profilename,
+                                            number,
+                                            image,
+                                            rename,
+                                            recimage,
+                                            id);
+                                      } else {
+                                        EasyLoading.showError(
+                                          'Only donors can send chat requests.',
+                                        );
+                                      }
+
+                                      // Show notification or navigate to chat screen
+                                    }
+                                  },
+                                  child: Container(
+                                    height: 40,
+                                    width: 140,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5),
+                                      border: Border.all(
+                                        color: Colors.red,
+                                        width: 1.0,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Friend Request',
+                                      style: TextStyle(
+                                          fontSize: 14, color: PRIMARY_COLOR),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                InkWell(
+                                  onTap: () {
+                                    String id = feedsData[index].id;
+                                    String name = feedsData[index].name;
+                                    String email = feedsData[index].email;
+                                    String image = feedsData[index].imageURL;
+                                    String blood = feedsData[index].blood;
+                                    String location = feedsData[index].location;
+                                    String hosname =
+                                        feedsData[index].hospitaname;
+                                    String rating =
+                                        feedsData[index].rating.toString();
+
+                                    String time = feedsData[index].time;
+                                    String date = feedsData[index].date;
+                                    String note = feedsData[index].note;
+                                    // String taker_id =
+                                    //     feedsData[index]
+                                    //         .t_id
+                                    //         .toString();
+                                    if (userType == 'donor') {
+                                      if (availablility == true) {
+                                        EasyLoading.showError(
+                                          "You have already donated blood. If you want to donate again, please wait for 90 days.",
+                                        );
+                                      } else {
+                                        Navigator.of(context,
+                                                rootNavigator: true)
+                                            .push(
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation,
+                                                secondaryAnimation) {
+                                              return MapOnDonator(
+                                                id: id,
+                                                name: name,
+                                                email: email,
+                                                image: image,
+                                                blood: blood,
+                                                location: location,
+                                                hosname: hosname,
+                                                rating: rating.toString(),
+                                                time: time,
+                                                date: date,
+                                                note: note,
+                                              );
+                                            },
+                                            transitionDuration:
+                                                const Duration(seconds: 1),
+                                            transitionsBuilder: (context,
+                                                animation,
+                                                secondaryAnimation,
+                                                child) {
+                                              const begin = Offset(10.0,
+                                                  0.0); // slide in from the right
+                                              const end = Offset.zero;
+                                              const curve =
+                                                  Curves.easeInOutQuart;
+
+                                              var tween = Tween(
+                                                      begin: begin, end: end)
+                                                  .chain(
+                                                      CurveTween(curve: curve));
+                                              var offsetAnimation =
+                                                  animation.drive(tween);
+
+                                              return SlideTransition(
+                                                position: offsetAnimation,
+                                                child: child,
+                                              );
+                                            },
+                                          ),
+                                        );
+                                      }
+                                    } else {
+                                      EasyLoading.showError(
+                                        "Taker is doesnot donate any blood",
+                                      );
+                                    }
+                                  },
+                                  child: Container(
+                                    height: 40,
+                                    width: 140,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: PRIMARY_COLOR,
+                                      borderRadius: BorderRadius.circular(5),
+                                      border: Border.all(
+                                        color: Colors.red,
+                                        width: 1.0,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Donate Now',
+                                      style: TextStyle(
+                                          fontSize: 14, color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
                           ],
                         ),
                       );
@@ -1417,9 +1334,57 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
                     childAspectRatio: 1.0,
                     crossAxisSpacing: 5.0,
                     mainAxisSpacing: 5,
-                    mainAxisExtent: 170,
+                    mainAxisExtent: 228,
                   ),
                 )));
+  }
+
+  Widget _buildAnimatedPopup(BuildContext context, String note) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Container(
+        width: 300,
+        height: 200,
+        padding: EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Note",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            Text(
+              note,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.red),
+                textStyle: MaterialStateProperty.all(
+                  TextStyle(color: Colors.white),
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                "Close",
+                style: TextStyle(color: Colors.white),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> getavailableDonor() async {
@@ -1437,10 +1402,11 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
         DocumentSnapshot userDoc = querySnapshot.docs.first;
 
         bool status = userDoc['status'];
-
-        setState(() {
-          availablility = status;
-        });
+        if (mounted) {
+          setState(() {
+            availablility = status;
+          });
+        }
       } else {
         print('User not found with email: $userEmail');
       }
@@ -1470,110 +1436,46 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
       print('Error updating status: $e');
     }
   }
-}
 
-class CoupanCard extends StatefulWidget {
-  const CoupanCard({super.key});
+  Future<void> deleteRequest(String email) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String userEmail = prefs.getString('user_email') ?? '';
 
-  @override
-  State<CoupanCard> createState() => _CoupanCardState();
-}
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('chat_request')
+          .where('status', isEqualTo: 'pending')
+          .where('recipientEmail', isEqualTo: userEmail)
+          .where('senderEmail', isEqualTo: email)
+          .get();
+      QuerySnapshot querySnapshot1 = await FirebaseFirestore.instance
+          .collection('chat_request')
+          .where('status', isEqualTo: 'pending')
+          .where('recipientEmail', isEqualTo: email)
+          .where('senderEmail', isEqualTo: userEmail)
+          .get();
 
-class _CoupanCardState extends State<CoupanCard> {
-  @override
-  Widget build(BuildContext context) {
-    return CouponCard(
-      height: 300,
-      curvePosition: 180,
-      curveRadius: 30,
-      borderRadius: 10,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.purple,
-            Colors.purple.shade700,
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      firstChild: const Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'CHIRISTMAS SALES',
-            style: TextStyle(
-              color: Colors.white54,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 10),
-          Text(
-            '16%',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 56,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            'OFF',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-      secondChild: Container(
-        width: double.maxFinite,
-        decoration: const BoxDecoration(
-          border: Border(
-            top: BorderSide(color: Colors.white),
-          ),
-        ),
-        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 42),
-        child: ElevatedButton(
-          style: ButtonStyle(
-            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-              RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(60),
-              ),
-            ),
-            padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-              const EdgeInsets.symmetric(horizontal: 80),
-            ),
-            backgroundColor: MaterialStateProperty.all<Color>(
-              Colors.white,
-            ),
-          ),
-          onPressed: () {},
-          child: const Text(
-            'REDEEM',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.purple,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class MyRequest extends StatefulWidget {
-  const MyRequest({super.key});
-
-  @override
-  State<MyRequest> createState() => _MyRequestState();
-}
-
-class _MyRequestState extends State<MyRequest> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold();
+      if (querySnapshot.docs.isNotEmpty) {
+        for (var doc in querySnapshot.docs) {
+          await FirebaseFirestore.instance
+              .collection('chat_request')
+              .doc(doc.id)
+              .delete();
+        }
+        print("Pending requests deleted successfully.");
+      } else if (querySnapshot1.docs.isNotEmpty) {
+        for (var doc in querySnapshot1.docs) {
+          await FirebaseFirestore.instance
+              .collection('chat_request')
+              .doc(doc.id)
+              .delete();
+        }
+        print("Pending requests deleted successfully.");
+      } else {
+        print("No pending requests found.");
+      }
+    } catch (e) {
+      print('Error updating or deleting user: $e');
+    }
   }
 }

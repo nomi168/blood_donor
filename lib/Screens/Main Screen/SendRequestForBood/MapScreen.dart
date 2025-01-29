@@ -32,16 +32,10 @@ class _MapScreenState extends State<MapScreen> {
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
 
-  static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(0, 0),
-    zoom: 10.0,
-  );
-
   // Set<Polygon> polygons = {};
   Set<Polygon> polygons = HashSet<Polygon>();
   Set<Circle> circles = {};
   Set<Polyline> polylines = {};
-  final Set<Marker> _markers = {};
   TextEditingController fromController = TextEditingController();
   TextEditingController toController = TextEditingController();
   bool isLightMode = false;

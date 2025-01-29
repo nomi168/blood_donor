@@ -2,7 +2,6 @@
 
 import 'dart:io';
 
-import 'package:blood_donor/Screens/Main%20Screen/Dashoard/Dashboatd.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Feed%20Screen/Notification.dart';
 import 'package:blood_donor/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -88,7 +87,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
         child: Column(
           children: [
             Padding(
-              padding: EdgeInsets.fromLTRB(5.w, 5.h, 0, 0),
+              padding: EdgeInsets.fromLTRB(5.w, 2.h, 0, 0),
               child: Text(
                 'Questionnaires',
                 style: TextStyle(
@@ -110,6 +109,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
             Padding(
               padding: EdgeInsets.fromLTRB(5.w, 1.5.h, 5.w, 0),
               child: Material(
+                color: Colors.white,
                 elevation: 5,
                 shadowColor: Colors.grey,
                 borderRadius: BorderRadius.circular(12),
@@ -179,6 +179,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
             Padding(
               padding: EdgeInsets.fromLTRB(5.w, 1.5.h, 5.w, 0),
               child: Material(
+                color: Colors.white,
                 elevation: 5,
                 shadowColor: Colors.grey,
                 borderRadius: BorderRadius.circular(12),
@@ -247,6 +248,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
             Padding(
               padding: EdgeInsets.fromLTRB(5.w, 1.5.h, 5.w, 0),
               child: Material(
+                color: Colors.white,
                 elevation: 5,
                 shadowColor: Colors.grey,
                 borderRadius: BorderRadius.circular(12),
@@ -315,6 +317,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
             Padding(
               padding: EdgeInsets.fromLTRB(5.w, 1.5.h, 5.w, 0),
               child: Material(
+                color: Colors.white,
                 elevation: 5,
                 shadowColor: Colors.grey,
                 borderRadius: BorderRadius.circular(12),
@@ -384,6 +387,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
             Padding(
               padding: EdgeInsets.fromLTRB(5.w, 1.5.h, 5.w, 0),
               child: Material(
+                color: Colors.white,
                 elevation: 5,
                 shadowColor: Colors.grey,
                 borderRadius: BorderRadius.circular(12),
@@ -453,6 +457,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
             Padding(
               padding: EdgeInsets.fromLTRB(5.w, 1.5.h, 5.w, 0),
               child: Material(
+                color: Colors.white,
                 elevation: 5,
                 shadowColor: Colors.grey,
                 borderRadius: BorderRadius.circular(12),
@@ -567,7 +572,13 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
                             Q2 == 'Yes' ||
                             Q4 == 'Yes' ||
                             Q5 == 'Yes') {
-                          _showAlertDialog4(context);
+                          // authBloc.questionresult = true;
+                          // bool response = authBloc.questionresult;
+                          // authBloc.notifyListeners();
+
+                          _showAlertDialog4(
+                            context,
+                          );
                         } else {
                           _uploadImage();
                         }
@@ -789,37 +800,40 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
           password: widget.password,
         );
         String name = widget.fname + " " + widget.lname;
-        EasyLoading.showSuccess('Create Acccount Successfully!');
+        EasyLoading.showSuccess('Create Account Successfully!');
+
+        showCircularProgressIndicator = false;
+        setState(() {});
         Future.delayed(Duration(seconds: 2), () {
           _usereligible();
           _userAddLocations(name, widget.location, picture);
         });
 
         // ignore: use_build_context_synchronously
-        Navigator.pushReplacement(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) {
-              return const Dashboard();
-            },
-            transitionDuration: const Duration(seconds: 1),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              const begin = Offset(10.0, 0.0); // slide in from the right
-              const end = Offset.zero;
-              const curve = Curves.easeInOutQuart;
+        // Navigator.pushReplacement(
+        //   context,
+        //   PageRouteBuilder(
+        //     pageBuilder: (context, animation, secondaryAnimation) {
+        //       return const Dashboard();
+        //     },
+        //     transitionDuration: const Duration(seconds: 1),
+        //     transitionsBuilder:
+        //         (context, animation, secondaryAnimation, child) {
+        //       const begin = Offset(10.0, 0.0); // slide in from the right
+        //       const end = Offset.zero;
+        //       const curve = Curves.easeInOutQuart;
 
-              var tween =
-                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-              var offsetAnimation = animation.drive(tween);
+        //       var tween =
+        //           Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        //       var offsetAnimation = animation.drive(tween);
 
-              return SlideTransition(
-                position: offsetAnimation,
-                child: child,
-              );
-            },
-          ),
-        );
+        //       return SlideTransition(
+        //         position: offsetAnimation,
+        //         child: child,
+        //       );
+        //     },
+        //   ),
+        // );
       }
 
       // Navigate to the home page or another screen after successful signup
@@ -917,35 +931,38 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
           password: widget.password,
         );
         EasyLoading.showSuccess('Create Acccount Successfully!');
+
+        showCircularProgressIndicator = false;
+        setState(() {});
         Future.delayed(Duration(seconds: 2), () {
           _usereligible1();
         });
 
         // ignore: use_build_context_synchronously
-        Navigator.pushReplacement(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) {
-              return const Dashboard();
-            },
-            transitionDuration: const Duration(seconds: 1),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              const begin = Offset(10.0, 0.0); // slide in from the right
-              const end = Offset.zero;
-              const curve = Curves.easeInOutQuart;
+        // Navigator.pushReplacement(
+        //   context,
+        //   PageRouteBuilder(
+        //     pageBuilder: (context, animation, secondaryAnimation) {
+        //       return const Dashboard();
+        //     },
+        //     transitionDuration: const Duration(seconds: 1),
+        //     transitionsBuilder:
+        //         (context, animation, secondaryAnimation, child) {
+        //       const begin = Offset(10.0, 0.0); // slide in from the right
+        //       const end = Offset.zero;
+        //       const curve = Curves.easeInOutQuart;
 
-              var tween =
-                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-              var offsetAnimation = animation.drive(tween);
+        //       var tween =
+        //           Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        //       var offsetAnimation = animation.drive(tween);
 
-              return SlideTransition(
-                position: offsetAnimation,
-                child: child,
-              );
-            },
-          ),
-        );
+        //       return SlideTransition(
+        //         position: offsetAnimation,
+        //         child: child,
+        //       );
+        //     },
+        //   ),
+        // );
       }
 
       // Navigate to the home page or another screen after successful signup
@@ -956,7 +973,6 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
       // Handle error and show a proper error message to the user
     }
   }
-  
 
   void _userAddLocations(String name, String location, String image) async {
     try {

@@ -3,11 +3,8 @@
 import 'package:blood_donor/Screens/Main%20Screen/Menu%20Screens/MenuScreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
-
-import '../../../Provider/FirebaseAuth.dart';
 
 class TermsConditionScreen extends StatefulWidget {
   const TermsConditionScreen({Key? key}) : super(key: key);
@@ -183,7 +180,6 @@ class _TermsConditionScreenState extends State<TermsConditionScreen> {
 
   Future<void> getTerms_Condition() async {
     try {
-      final provider = Provider.of<AuthProvider>(context, listen: false);
       // Use the 'where' method to query documents with the specified email
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String userId = prefs.getString('user_uid') ?? '';
@@ -208,7 +204,6 @@ class _TermsConditionScreenState extends State<TermsConditionScreen> {
         safety = saf;
         hygience = hyg;
         setState(() {});
-        provider.notifyListeners();
       } else {
         // No user found with the specified email
         print('User not found with email: $userId');

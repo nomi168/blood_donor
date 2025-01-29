@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+6
+version: 1.0.0+11
 
 environment:
   sdk: '>=3.2.3 <4.0.0'
@@ -99,8 +99,12 @@ dependencies:
   syncfusion_flutter_pdfviewer: any
   change_app_package_name: ^1.2.0
   validators: ^3.0.0
-  lottie: ^3.0.0
+  lottie: any
   googleapis_auth: ^1.4.1
+  cnic_scanner: ^0.0.4
+  easy_stepper: ^0.8.3
+  screen_brightness: ^2.0.1
+
   
  
 
@@ -140,32 +144,11 @@ flutter:
    - images/image1.jpeg
    - images/image2.jpeg
    - images/image3.jpeg
-   - images/image4.jpeg
-   - images/Nafees.jpeg
-   - images/pic1.jpg
-   - images/pic2.jpeg
-   - images/award.jpeg
-   - images/pic3.png
    - images/active.jpeg
-   - images/speed.jpeg
-   - images/cross.jpg
-   - images/person.png
-   - images/good.png
-   - images/injection.png
-   - images/person1.png
-   - images/star.png
-   - images/correct.png
    - images/svg1.png
-   - images/blood.jpeg
-   - images/pop.jpeg
-   - images/hero.jpeg
-   - images/do.png
    - images/applogo.jpeg
    - images/bloodsplash.png
-   - images/images (1).png
    - images/SVGRepo_iconCarrier.png
-   - images/Banners/Banner1.png
-   - images/Banners/Banner2.png
    - images/Banners/Login.svg
    - images/Banners/1.jpeg
    - images/Banners/2.jpeg
@@ -174,6 +157,8 @@ flutter:
    - images/pdf/
    - images/json/
    - images/Banners/
+   - images/svg/
+   - images/
    
 
 

@@ -53,8 +53,8 @@ class _EditProfileState extends State<EditProfile> {
     final pickedFile = await picker.pickImage(source: source);
 
     if (pickedFile != null) {
-      final fileSize = await pickedFile.length();
-      const maxFileSize = 1 * 1024 * 1024; // 1MB in bytes
+      // final fileSize = await pickedFile.length();
+      // const maxFileSize = 1 * 1024 * 1024; // 1MB in bytes
 
       // if (fileSize > maxFileSize) {
       //   // File size exceeds 1MB, compress the image
