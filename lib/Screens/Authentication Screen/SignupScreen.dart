@@ -1123,345 +1123,314 @@ class _SignupScreenState extends State<SignupScreen> {
                             ),
                           ),
                         )),
-                    // Visibility(
-                    //   visible: activeStep == 1,
-                    //   child: Expanded(
-                    //     child: Builder(
-                    //       builder: (context) {
-                    //         // Declare variables here
-                    //         String email = _email.text.trim();
-                    //         int id = 0; // Replace this with the actual id value
-                    //         String iimage = image?.path.toString() ?? '';
-                    //         String fname = _fname.text.trim();
-                    //         String lname = _lname.text.trim();
-                    //         String number = '0${_phonenumber.text.trim()}';
-                    //         String location = _location.text.trim();
-                    //         String blood = selectedIndex1;
-                    //         String gender = selectedIndex;
-                    //         String password = _password.text.trim();
 
-                    //         // Return the child widget
-                    //         return OTPSignup(
-                    //           email: email,
-                    //           Id: id,
-                    //           image: iimage,
-                    //           fname: fname,
-                    //           lname: lname,
-                    //           number: number,
-                    //           location: location,
-                    //           blood: blood,
-                    //           gender: gender,
-                    //           password: password,
-                    //         );
-                    //       },
-                    //     ),
-                    //   ),
-                    // ),
-                    // Visibility(
-                    //   visible: activeStep == 1,
-                    //   child: Expanded(
-                    //     child: SingleChildScrollView(
-                    //       child: Column(
-                    //         children: [
-                    //           Padding(
-                    //             padding: EdgeInsets.fromLTRB(0.w, 5.h, 0.w, 0),
-                    //             child: Center(
-                    //               child: Text(
-                    //                 'Verification Code',
-                    //                 style: TextStyle(
-                    //                     fontSize: 22.sp,
-                    //                     fontWeight: FontWeight.bold),
-                    //               ),
-                    //             ),
-                    //           ),
-                    //           Padding(
-                    //             padding: EdgeInsets.fromLTRB(5.w, 5.h, 5.w, 0),
-                    //             child: Center(
-                    //               child: Text(
-                    //                 'We will send you a verification code',
-                    //                 style: TextStyle(
-                    //                     fontSize: 12.sp,
-                    //                     fontWeight: FontWeight.bold,
-                    //                     color: Colors.black54),
-                    //               ),
-                    //             ),
-                    //           ),
-                    //           Padding(
-                    //             padding: EdgeInsets.fromLTRB(5.w, 1.h, 5.w, 0),
-                    //             child: Center(
-                    //               child: Text(
-                    //                 'on your email',
-                    //                 style: TextStyle(
-                    //                     fontSize: 12.sp,
-                    //                     fontWeight: FontWeight.bold,
-                    //                     color: Colors.black54),
-                    //               ),
-                    //             ),
-                    //           ),
-                    //           Padding(
-                    //             padding: EdgeInsets.fromLTRB(5.w, 5.h, 5.w, 0),
-                    //             child: Material(
-                    //               color: Colors.white,
-                    //               elevation: 7.0, // Add shadow/elevation
-                    //               borderRadius: BorderRadius.circular(
-                    //                   10.0), // Add border radius
-                    //               child: TextFormField(
-                    //                 controller: _email,
-                    //                 readOnly: false,
-                    //                 decoration: InputDecoration(
-                    //                   label: const Text('Email'),
-                    //                   contentPadding:
-                    //                       const EdgeInsets.symmetric(
-                    //                           horizontal:
-                    //                               16.0), // Adjust padding
-                    //                   border: OutlineInputBorder(
-                    //                     borderRadius:
-                    //                         BorderRadius.circular(8.0),
-                    //                     borderSide: const BorderSide(
-                    //                         color: Colors.grey), // Border color
-                    //                   ),
-                    //                   focusedBorder: OutlineInputBorder(
-                    //                     borderRadius:
-                    //                         BorderRadius.circular(8.0),
-                    //                     borderSide: const BorderSide(
-                    //                         color: Colors
-                    //                             .blue), // Border color when focused
-                    //                   ),
-                    //                   hintText: 'Enter Email',
-                    //                 ),
-                    //               ),
-                    //             ),
-                    //           ),
-                    //           Padding(
-                    //             padding: EdgeInsets.fromLTRB(60.w, 0.h, 5.w, 0),
-                    //             child: Center(
-                    //                 child: TextButton(
-                    //               // ignore: prefer_const_constructors
-                    //               child: Text(
-                    //                 'Send OTP',
-                    //                 style: TextStyle(
-                    //                     fontWeight: FontWeight.bold,
-                    //                     fontSize: 13.sp,
-                    //                     color: isClicked
-                    //                         ? Colors.red
-                    //                         : Colors.blue,
-                    //                     decoration: TextDecoration.underline),
-                    //               ),
-                    //               onPressed: () async {
-                    //                 setState(() {
-                    //                   isClicked = true;
-                    //                 });
+                    Visibility(
+                      visible: activeStep == 1,
+                      child: Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(0.w, 5.h, 0.w, 0),
+                                child: Center(
+                                  child: Text(
+                                    'Verification Code',
+                                    style: TextStyle(
+                                        fontSize: 22.sp,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(5.w, 5.h, 5.w, 0),
+                                child: Center(
+                                  child: Text(
+                                    'We will send you a verification code',
+                                    style: TextStyle(
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black54),
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(5.w, 1.h, 5.w, 0),
+                                child: Center(
+                                  child: Text(
+                                    'on your email',
+                                    style: TextStyle(
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black54),
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(5.w, 5.h, 5.w, 0),
+                                child: Material(
+                                  color: Colors.white,
+                                  elevation: 7.0, // Add shadow/elevation
+                                  borderRadius: BorderRadius.circular(
+                                      10.0), // Add border radius
+                                  child: TextFormField(
+                                    controller: _email,
+                                    readOnly: false,
+                                    decoration: InputDecoration(
+                                      label: const Text('Email'),
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              horizontal:
+                                                  16.0), // Adjust padding
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                        borderSide: const BorderSide(
+                                            color: Colors.grey), // Border color
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                        borderSide: const BorderSide(
+                                            color: Colors
+                                                .blue), // Border color when focused
+                                      ),
+                                      hintText: 'Enter Email',
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(60.w, 0.h, 5.w, 0),
+                                child: Center(
+                                    child: TextButton(
+                                  // ignore: prefer_const_constructors
+                                  child: Text(
+                                    'Send OTP',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13.sp,
+                                        color: isClicked
+                                            ? Colors.red
+                                            : Colors.blue,
+                                        decoration: TextDecoration.underline),
+                                  ),
+                                  onPressed: () async {
+                                    setState(() {
+                                      isClicked = true;
+                                    });
 
-                    //                 myauth.setConfig(
-                    //                     appEmail: "me@rohitchouhan.com",
-                    //                     appName: "Email OTP",
-                    //                     userEmail: "noumansaeed171@gmail.com",
-                    //                     otpLength: 4,
-                    //                     otpType: OTPType.digitsOnly);
-                    //                 if (await myauth.sendOTP() == true) {
-                    //                   ScaffoldMessenger.of(context)
-                    //                       .showSnackBar(const SnackBar(
-                    //                     content: Text("OTP has been sent"),
-                    //                   ));
-                    //                   setState(() {
-                    //                     otpsend = true;
-                    //                   });
-                    //                 } else {
-                    //                   ScaffoldMessenger.of(context)
-                    //                       .showSnackBar(const SnackBar(
-                    //                     content: Text("Oops, OTP send failed"),
-                    //                   ));
-                    //                 }
-                    //               },
-                    //             )),
-                    //           ),
-                    //           Padding(
-                    //             padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
-                    //             child: Material(
-                    //               color: Colors.white,
-                    //               elevation: 7.0, // Add shadow/elevation
-                    //               borderRadius: BorderRadius.circular(
-                    //                   10.0), // Add border radius
-                    //               child: TextFormField(
-                    //                 controller: otp,
-                    //                 keyboardType: TextInputType.number,
-                    //                 decoration: InputDecoration(
-                    //                   label: const Text('OTP'),
-                    //                   contentPadding:
-                    //                       const EdgeInsets.symmetric(
-                    //                           horizontal:
-                    //                               16.0), // Adjust padding
-                    //                   border: OutlineInputBorder(
-                    //                     borderRadius:
-                    //                         BorderRadius.circular(8.0),
-                    //                     borderSide: const BorderSide(
-                    //                         color: Colors.grey), // Border color
-                    //                   ),
-                    //                   focusedBorder: OutlineInputBorder(
-                    //                     borderRadius:
-                    //                         BorderRadius.circular(8.0),
-                    //                     borderSide: const BorderSide(
-                    //                         color: Colors
-                    //                             .blue), // Border color when focused
-                    //                   ),
-                    //                   hintText: 'Enter OTP',
-                    //                 ),
-                    //               ),
-                    //             ),
-                    //           ),
-                    //           Padding(
-                    //             padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
-                    //             child: Center(
-                    //               child: Text(
-                    //                 'Donot recieve code?',
-                    //                 style: TextStyle(
-                    //                     fontSize: 12.sp,
-                    //                     fontWeight: FontWeight.bold,
-                    //                     color: Colors.black54),
-                    //               ),
-                    //             ),
-                    //           ),
-                    //           Padding(
-                    //             padding: EdgeInsets.fromLTRB(5.w, 0.h, 5.w, 0),
-                    //             child: Center(
-                    //                 child: TextButton(
-                    //               // ignore: prefer_const_constructors
-                    //               child: Text(
-                    //                 'Resend OTP',
-                    //                 style: TextStyle(
-                    //                     fontWeight: FontWeight.bold,
-                    //                     fontSize: 13.sp,
-                    //                     color: isClicked1
-                    //                         ? Colors.red
-                    //                         : Colors.blue,
-                    //                     decoration: TextDecoration.underline),
-                    //               ),
-                    //               onPressed: () async {
-                    //                 setState(() {
-                    //                   isClicked1 = true;
-                    //                 });
-                    //                 myauth.setConfig(
-                    //                     appEmail: "me@rohitchouhan.com",
-                    //                     appName: "Email OTP",
-                    //                     userEmail: _email.text,
-                    //                     otpLength: 6,
-                    //                     otpType: OTPType.digitsOnly);
-                    //                 if (await myauth.sendOTP() == true) {
-                    //                   ScaffoldMessenger.of(context)
-                    //                       .showSnackBar(const SnackBar(
-                    //                     content: Text("OTP has been sent"),
-                    //                   ));
-                    //                 } else {
-                    //                   ScaffoldMessenger.of(context)
-                    //                       .showSnackBar(const SnackBar(
-                    //                     content: Text("Oops, OTP send failed"),
-                    //                   ));
-                    //                 }
-                    //               },
-                    //             )),
-                    //           ),
-                    //           // Padding(
-                    //           //   padding: EdgeInsets.fromLTRB(5.w, 17.h, 5.w, 0),
-                    //           //   child: Material(
-                    //           //     elevation: 10.0,
-                    //           //     shadowColor: Colors.black,
-                    //           //     borderRadius: BorderRadius.circular(10.0),
-                    //           //     child: ElevatedButton(
-                    //           //       onPressed: () async {
-                    //           //         if (await myauth.verifyOTP(otp: otp.text) ==
-                    //           //             true) {
-                    //           //           ScaffoldMessenger.of(context)
-                    //           //               .showSnackBar(const SnackBar(
-                    //           //             content: Text("OTP is verified"),
-                    //           //           ));
-                    //           //           setState(() {
-                    //           //             otpresult = true;
-                    //           //           });
+                                    EmailOTP.config(
+                                        appEmail: "me@rohitchouhan.com",
+                                        appName: "Email OTP",
+                                        otpLength: 4,
+                                        otpType: OTPType.numeric);
+                                    if (await EmailOTP.sendOTP(
+                                            email: _email.text.trim()) ==
+                                        true) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                        content: Text("OTP has been sent"),
+                                      ));
+                                      setState(() {
+                                        otpsend = true;
+                                      });
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                        content: Text("Oops, OTP send failed"),
+                                      ));
+                                    }
+                                  },
+                                )),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
+                                child: Material(
+                                  color: Colors.white,
+                                  elevation: 7.0, // Add shadow/elevation
+                                  borderRadius: BorderRadius.circular(
+                                      10.0), // Add border radius
+                                  child: TextFormField(
+                                    controller: otp,
+                                    keyboardType: TextInputType.number,
+                                    decoration: InputDecoration(
+                                      label: const Text('OTP'),
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              horizontal:
+                                                  16.0), // Adjust padding
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                        borderSide: const BorderSide(
+                                            color: Colors.grey), // Border color
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                        borderSide: const BorderSide(
+                                            color: Colors
+                                                .blue), // Border color when focused
+                                      ),
+                                      hintText: 'Enter OTP',
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
+                                child: Center(
+                                  child: Text(
+                                    'Donot recieve code?',
+                                    style: TextStyle(
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black54),
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(5.w, 0.h, 5.w, 0),
+                                child: Center(
+                                    child: TextButton(
+                                  // ignore: prefer_const_constructors
+                                  child: Text(
+                                    'Resend OTP',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13.sp,
+                                        color: isClicked1
+                                            ? Colors.red
+                                            : Colors.blue,
+                                        decoration: TextDecoration.underline),
+                                  ),
+                                  onPressed: () async {
+                                    setState(() {
+                                      isClicked1 = true;
+                                    });
+                                    EmailOTP.config(
+                                        appEmail: "me@rohitchouhan.com",
+                                        appName: "Email OTP",
+                                        otpLength: 6,
+                                        otpType: OTPType.numeric);
+                                    if (await EmailOTP.sendOTP(
+                                            email: _email.text.trim()) ==
+                                        true) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                        content: Text("OTP has been sent"),
+                                      ));
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                        content: Text("Oops, OTP send failed"),
+                                      ));
+                                    }
+                                  },
+                                )),
+                              ),
+                              // Padding(
+                              //   padding: EdgeInsets.fromLTRB(5.w, 17.h, 5.w, 0),
+                              //   child: Material(
+                              //     elevation: 10.0,
+                              //     shadowColor: Colors.black,
+                              //     borderRadius: BorderRadius.circular(10.0),
+                              //     child: ElevatedButton(
+                              //       onPressed: () async {
+                              //         if (await myauth.verifyOTP(otp: otp.text) ==
+                              //             true) {
+                              //           ScaffoldMessenger.of(context)
+                              //               .showSnackBar(const SnackBar(
+                              //             content: Text("OTP is verified"),
+                              //           ));
+                              //           setState(() {
+                              //             otpresult = true;
+                              //           });
 
-                    //           //           // String email = widget.email;
-                    //           //           // int id = widget.Id;
-                    //           //           // String image = widget.image;
-                    //           //           // String fname = widget.fname;
-                    //           //           // String lname = widget.lname;
+                              //           // String email = widget.email;
+                              //           // int id = widget.Id;
+                              //           // String image = widget.image;
+                              //           // String fname = widget.fname;
+                              //           // String lname = widget.lname;
 
-                    //           //           // String number = widget.number;
-                    //           //           // String location = widget.location;
-                    //           //           // String blood = widget.blood;
-                    //           //           // String gender = widget.gender;
-                    //           //           // String password = widget.password;
-                    //           //           // Navigator.push(
-                    //           //           //   context,
-                    //           //           //   PageRouteBuilder(
-                    //           //           //     pageBuilder: (context, animation, secondaryAnimation) {
-                    //           //           //       return QuestionsScreen(
-                    //           //           //           id: id,
-                    //           //           //           image: image,
-                    //           //           //           fname: fname,
-                    //           //           //           lname: lname,
-                    //           //           //           number: number,
-                    //           //           //           email: email,
-                    //           //           //           location: location,
-                    //           //           //           blood: blood,
-                    //           //           //           gender: gender,
-                    //           //           //           password: password);
-                    //           //           //     },
-                    //           //           //     transitionDuration: const Duration(seconds: 1),
-                    //           //           //     transitionsBuilder:
-                    //           //           //         (context, animation, secondaryAnimation, child) {
-                    //           //           //       const begin =
-                    //           //           //           Offset(10.0, 0.0); // slide in from the right
-                    //           //           //       const end = Offset.zero;
-                    //           //           //       const curve = Curves.easeInOutQuart;
+                              //           // String number = widget.number;
+                              //           // String location = widget.location;
+                              //           // String blood = widget.blood;
+                              //           // String gender = widget.gender;
+                              //           // String password = widget.password;
+                              //           // Navigator.push(
+                              //           //   context,
+                              //           //   PageRouteBuilder(
+                              //           //     pageBuilder: (context, animation, secondaryAnimation) {
+                              //           //       return QuestionsScreen(
+                              //           //           id: id,
+                              //           //           image: image,
+                              //           //           fname: fname,
+                              //           //           lname: lname,
+                              //           //           number: number,
+                              //           //           email: email,
+                              //           //           location: location,
+                              //           //           blood: blood,
+                              //           //           gender: gender,
+                              //           //           password: password);
+                              //           //     },
+                              //           //     transitionDuration: const Duration(seconds: 1),
+                              //           //     transitionsBuilder:
+                              //           //         (context, animation, secondaryAnimation, child) {
+                              //           //       const begin =
+                              //           //           Offset(10.0, 0.0); // slide in from the right
+                              //           //       const end = Offset.zero;
+                              //           //       const curve = Curves.easeInOutQuart;
 
-                    //           //           //       var tween = Tween(begin: begin, end: end)
-                    //           //           //           .chain(CurveTween(curve: curve));
-                    //           //           //       var offsetAnimation = animation.drive(tween);
+                              //           //       var tween = Tween(begin: begin, end: end)
+                              //           //           .chain(CurveTween(curve: curve));
+                              //           //       var offsetAnimation = animation.drive(tween);
 
-                    //           //           //       return SlideTransition(
-                    //           //           //         position: offsetAnimation,
-                    //           //           //         child: child,
-                    //           //           //       );
-                    //           //           //     },
-                    //           //           //   ),
-                    //           //           // );
-                    //           //         } else {
-                    //           //           _showAlertDialog2(context);
-                    //           //         }
-                    //           //       },
-                    //           //       style: ButtonStyle(
-                    //           //         shape: MaterialStateProperty.all<
-                    //           //             RoundedRectangleBorder>(
-                    //           //           RoundedRectangleBorder(
-                    //           //             borderRadius:
-                    //           //                 BorderRadius.circular(10.0),
-                    //           //           ),
-                    //           //         ),
-                    //           //         padding: MaterialStateProperty.all<
-                    //           //             EdgeInsetsGeometry>(
-                    //           //           // ignore: prefer_const_constructors
-                    //           //           EdgeInsets.symmetric(
-                    //           //               vertical: 13.5, horizontal: 35.w),
-                    //           //         ),
-                    //           //         backgroundColor: MaterialStateProperty
-                    //           //             .all<Color>(const Color(
-                    //           //                 0xFFDE0A1E)), // Change button color
-                    //           //       ),
-                    //           //       child: Text(
-                    //           //         'Continue',
-                    //           //         style: TextStyle(
-                    //           //           fontSize: 12.sp, // Adjust the font size
-                    //           //           fontWeight: FontWeight.bold,
-                    //           //           color: Colors.white,
-                    //           //         ),
-                    //           //       ),
-                    //           //     ),
-                    //           //   ),
-                    //           // ),
-                    //         ],
-                    //       ),
-                    //     ),
-                    //   ),
-                    // ),
+                              //           //       return SlideTransition(
+                              //           //         position: offsetAnimation,
+                              //           //         child: child,
+                              //           //       );
+                              //           //     },
+                              //           //   ),
+                              //           // );
+                              //         } else {
+                              //           _showAlertDialog2(context);
+                              //         }
+                              //       },
+                              //       style: ButtonStyle(
+                              //         shape: MaterialStateProperty.all<
+                              //             RoundedRectangleBorder>(
+                              //           RoundedRectangleBorder(
+                              //             borderRadius:
+                              //                 BorderRadius.circular(10.0),
+                              //           ),
+                              //         ),
+                              //         padding: MaterialStateProperty.all<
+                              //             EdgeInsetsGeometry>(
+                              //           // ignore: prefer_const_constructors
+                              //           EdgeInsets.symmetric(
+                              //               vertical: 13.5, horizontal: 35.w),
+                              //         ),
+                              //         backgroundColor: MaterialStateProperty
+                              //             .all<Color>(const Color(
+                              //                 0xFFDE0A1E)), // Change button color
+                              //       ),
+                              //       child: Text(
+                              //         'Continue',
+                              //         style: TextStyle(
+                              //           fontSize: 12.sp, // Adjust the font size
+                              //           fontWeight: FontWeight.bold,
+                              //           color: Colors.white,
+                              //         ),
+                              //       ),
+                              //     ),
+                              //   ),
+                              // ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
 
                     // Visibility(
                     //   visible: activeStep == 2,
@@ -1485,7 +1454,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     //   ),
                     // ),
                     Visibility(
-                      visible: activeStep == 1,
+                      visible: activeStep == 2,
                       child: Expanded(
                           child: SingleChildScrollView(
                         child: Column(children: [
@@ -1585,7 +1554,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       )),
                     ),
                     Visibility(
-                      visible: activeStep == 2,
+                      visible: activeStep == 3,
                       child: Expanded(
                         child: Container(
                           margin: const EdgeInsets.only(
@@ -1655,7 +1624,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                     ),
                     Visibility(
-                      visible: activeStep == 3,
+                      visible: activeStep == 4,
                       child: Expanded(
                         child: SingleChildScrollView(
                           child: Column(
@@ -2316,37 +2285,35 @@ class _SignupScreenState extends State<SignupScreen> {
                             } else {
                               EasyLoading.showInfo("Must upload Picture");
                             }
-                          }
-                          // else if (activeStep == 1) {
-                          //   if (otpsend == true) {
-                          //     if (myauth.verifyOTP(otp: otp.text.trim()) ==
-                          //         true) {
-                          //       setState(() {
-                          //         otpresult = true;
-                          //       });
-                          //       if (otpresult == true) {
-                          //         setState(() {
-                          //           if (activeStep < 4) activeStep++;
-                          //         });
-                          //       }
-                          //     } else {
-                          //       ScaffoldMessenger.of(context)
-                          //           .showSnackBar(const SnackBar(
-                          //         content: Text("OTP is incorrect"),
-                          //       ));
-                          //     }
-                          //   } else {
-                          //     ScaffoldMessenger.of(context)
-                          //         .showSnackBar(const SnackBar(
-                          //       content: Text("OTP is not sending"),
-                          //     ));
-                          //   }
-                          // }
-                          else if (activeStep == 1) {
+                          } else if (activeStep == 1) {
+                            if (otpsend == true) {
+                              if (EmailOTP.verifyOTP(otp: otp.text.trim()) ==
+                                  true) {
+                                setState(() {
+                                  otpresult = true;
+                                });
+                                if (otpresult == true) {
+                                  setState(() {
+                                    if (activeStep < 4) activeStep++;
+                                  });
+                                }
+                              } else {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(const SnackBar(
+                                  content: Text("OTP is incorrect"),
+                                ));
+                              }
+                            } else {
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(const SnackBar(
+                                content: Text("OTP is not sending"),
+                              ));
+                            }
+                          } else if (activeStep == 2) {
                             setState(() {
                               if (activeStep < 4) activeStep++;
                             });
-                          } else if (activeStep == 2) {
+                          } else if (activeStep == 3) {
                             bool? result = await getCardScanningUsers();
                             if (result == true) {
                               bool? response = await addCnicCardDetail();
@@ -2362,7 +2329,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                     "Card number already matched! please try another cnic card number"),
                               ));
                             }
-                          } else if (activeStep == 3) {
+                          } else if (activeStep == 4) {
                             setState(() {});
                             await getNotificationToken();
                             if (type == 'Yes') {

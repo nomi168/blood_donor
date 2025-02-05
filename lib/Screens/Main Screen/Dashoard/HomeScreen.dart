@@ -420,7 +420,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           });
                         },
                       ),
-                      carouselController: _carouselController,
+                      // carouselController: _carouselController,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,

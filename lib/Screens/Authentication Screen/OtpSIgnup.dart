@@ -131,13 +131,12 @@ class _OTPSignupState extends State<OTPSignup> {
                 setState(() {
                   isClicked = true;
                 });
-                myauth.setConfig(
+                EmailOTP.config(
                     appEmail: "me@rohitchouhan.com",
                     appName: "Email OTP",
-                    userEmail: email.text,
                     otpLength: 6,
-                    otpType: OTPType.digitsOnly);
-                if (await myauth.sendOTP() == true) {
+                    otpType: OTPType.numeric);
+                if (await EmailOTP.sendOTP(email: email.text.trim()) == true) {
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                     content: Text("OTP has been sent"),
                   ));
@@ -206,13 +205,12 @@ class _OTPSignupState extends State<OTPSignup> {
                 setState(() {
                   isClicked1 = true;
                 });
-                myauth.setConfig(
+                EmailOTP.config(
                     appEmail: "me@rohitchouhan.com",
                     appName: "Email OTP",
-                    userEmail: email.text,
                     otpLength: 6,
-                    otpType: OTPType.digitsOnly);
-                if (await myauth.sendOTP() == true) {
+                    otpType: OTPType.numeric);
+                if (await EmailOTP.sendOTP(email: email.text.trim()) == true) {
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                     content: Text("OTP has been sent"),
                   ));
@@ -232,7 +230,7 @@ class _OTPSignupState extends State<OTPSignup> {
               borderRadius: BorderRadius.circular(10.0),
               child: ElevatedButton(
                 onPressed: () async {
-                  if (await myauth.verifyOTP(otp: otp.text) == true) {
+                  if (await EmailOTP.verifyOTP(otp: otp.text) == true) {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                       content: Text("OTP is verified"),
                     ));
