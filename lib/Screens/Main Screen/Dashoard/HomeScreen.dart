@@ -3,11 +3,13 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:blood_donor/Modals/acceptance_model.dart';
 import 'package:blood_donor/Provider/FirebaseAuth.dart';
 import 'package:blood_donor/Provider/Page.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Dashoard/Blood%20Dnor/Blood.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Dashoard/DonateNow.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Dashoard/Feed1.dart';
+import 'package:blood_donor/Screens/Main%20Screen/Dashoard/taker_more.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Feed%20Screen/FeedScreen.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Feed%20Screen/Notification.dart';
 import 'package:blood_donor/Screens/Main%20Screen/SendRequestForBood/Post%20Rquest/post_request.dart';
@@ -54,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   int _currentIndex = 0;
   String profilename = '';
   String user_id = '';
-  final CarouselController _carouselController = CarouselController();
+  List<AcceptanceModel> acceptList = [];
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
 
@@ -65,6 +67,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     'images/Banners/3.jpeg',
     'images/Banners/4.jpg',
     'images/Banners/5.jpg',
+    'images/Banners/banner_app.jpg'
   ];
 
   TextEditingController fromController = TextEditingController();
@@ -95,6 +98,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   String requestrating = '';
   String requestimage = '';
   String requestemail = '';
+  String takerNumber = '';
 
   String donorname = '';
 
@@ -206,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             child: Text(
                               'Hello!  $profilename',
                               style: TextStyle(
-                                  fontSize: 12.sp, fontWeight: FontWeight.bold),
+                                  fontSize: 16.sp, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),
@@ -269,7 +273,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       child: Text(
                         'Are you looking for blood?',
                         style: TextStyle(
-                            fontSize: 11.sp, fontWeight: FontWeight.bold),
+                            fontSize: 16.sp, fontWeight: FontWeight.bold),
                       ),
                     ),
                     // Padding(
@@ -302,102 +306,95 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     // ),
                     Padding(
                         padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
-                        child: Material(
-                          elevation: 7.0,
-                          borderRadius: BorderRadius.circular(10.0),
-                          child: DropdownButtonFormField(
-                            decoration: const InputDecoration(
-                              contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 16.0, vertical: 13.0),
-                              labelText: "Select Blood",
-                              suffixIcon: Icon(Icons.bloodtype),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10.0),
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.blue, width: 2.5),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10.0),
-                                ),
+                        child: DropdownButtonFormField(
+                          decoration: const InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 13.0),
+                            labelText: "Select Blood",
+                            suffixIcon: Icon(Icons.bloodtype),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10.0),
                               ),
                             ),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(10.0)),
-                            items: nomi1
-                                .map((e) => DropdownMenuItem(
-                                      // ignore: sort_child_properties_last
-                                      child: Text(e),
-                                      value: e,
-                                    ))
-                                .toList(),
-                            onChanged: (v) {
-                              setState(() {
-                                selectedIndex1 = v!;
-                              });
-                            },
-                          ),
-                        )),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
-                      child: Material(
-                        elevation: 10.0,
-                        shadowColor: Colors.black,
-                        borderRadius: BorderRadius.circular(10.0),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            String blood = selectedIndex1.toString();
-                            Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                pageBuilder:
-                                    (context, animation, secondaryAnimation) {
-                                  return MultipleBloodRequest(blood: blood);
-                                },
-                                transitionsBuilder: (context, animation,
-                                    secondaryAnimation, child) {
-                                  const begin = Offset(
-                                      10.0, 0.0); // slide in from the right
-                                  const end = Offset.zero;
-                                  const curve = Curves.easeInOutQuart;
-
-                                  var tween = Tween(begin: begin, end: end)
-                                      .chain(CurveTween(curve: curve));
-                                  var offsetAnimation = animation.drive(tween);
-
-                                  return SlideTransition(
-                                    position: offsetAnimation,
-                                    child: child,
-                                  );
-                                },
+                            focusedBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: Colors.blue, width: 2.5),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10.0),
                               ),
-                            );
+                            ),
+                          ),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(10.0)),
+                          items: nomi1
+                              .map((e) => DropdownMenuItem(
+                                    // ignore: sort_child_properties_last
+                                    child: Text(e),
+                                    value: e,
+                                  ))
+                              .toList(),
+                          onChanged: (v) {
+                            setState(() {
+                              selectedIndex1 = v!;
+                            });
                           },
-                          style: ButtonStyle(
-                            shape: MaterialStateProperty.all<
-                                RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
+                        )),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 20),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          String blood = selectedIndex1.toString();
+                          Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) {
+                                return MultipleBloodRequest(blood: blood);
+                              },
+                              transitionsBuilder: (context, animation,
+                                  secondaryAnimation, child) {
+                                const begin = Offset(
+                                    10.0, 0.0); // slide in from the right
+                                const end = Offset.zero;
+                                const curve = Curves.easeInOutQuart;
+
+                                var tween = Tween(begin: begin, end: end)
+                                    .chain(CurveTween(curve: curve));
+                                var offsetAnimation = animation.drive(tween);
+
+                                return SlideTransition(
+                                  position: offsetAnimation,
+                                  child: child,
+                                );
+                              },
                             ),
-                            padding:
-                                MaterialStateProperty.all<EdgeInsetsGeometry>(
-                              // ignore: prefer_const_constructors
-                              EdgeInsets.symmetric(
-                                  vertical: 13.5, horizontal: 32.w),
+                          );
+                        },
+                        style: ButtonStyle(
+                          shape:
+                              WidgetStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
                             ),
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                                const Color(0xFFDE0A1E)),
                           ),
-                          child: Text(
-                            'Send Request',
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
+                          padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
+                            // ignore: prefer_const_constructors
+                            EdgeInsets.symmetric(
+                                vertical: 13.5, horizontal: 32.w),
+                          ),
+                          backgroundColor: WidgetStateProperty.all<Color>(
+                              const Color(0xFFDE0A1E)),
+                        ),
+                        child: Text(
+                          'Send Request',
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
                           ),
                         ),
                       ),
@@ -510,7 +507,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                             child: Text(
                                               'Donate',
                                               style: TextStyle(
-                                                  fontSize: 12.sp,
+                                                  fontSize: 16.sp,
                                                   fontWeight: FontWeight.bold,
                                                   color: Colors.black54),
                                             )),
@@ -520,7 +517,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                             child: Text(
                                               'Blood',
                                               style: TextStyle(
-                                                  fontSize: 12.sp,
+                                                  fontSize: 16.sp,
                                                   fontWeight: FontWeight.bold,
                                                   color: Colors.black54),
                                             )),
@@ -591,7 +588,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                             child: Text(
                                               'Post Blood',
                                               style: TextStyle(
-                                                  fontSize: 12.sp,
+                                                  fontSize: 16.sp,
                                                   fontWeight: FontWeight.bold,
                                                   color: Colors.black54),
                                             )),
@@ -601,7 +598,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                             child: Text(
                                               'Request',
                                               style: TextStyle(
-                                                  fontSize: 12.sp,
+                                                  fontSize: 16.sp,
                                                   fontWeight: FontWeight.bold,
                                                   color: Colors.black54),
                                             )),
@@ -662,7 +659,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                         child: Text(
                                           'Blood',
                                           style: TextStyle(
-                                              fontSize: 12.sp,
+                                              fontSize: 16.sp,
                                               fontWeight: FontWeight.bold,
                                               color: Colors.black54),
                                         )),
@@ -672,7 +669,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                         child: Text(
                                           'Bank',
                                           style: TextStyle(
-                                              fontSize: 12.sp,
+                                              fontSize: 16.sp,
                                               fontWeight: FontWeight.bold,
                                               color: Colors.black54),
                                         )),
@@ -733,7 +730,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                         child: Text(
                                           'Emergency',
                                           style: TextStyle(
-                                              fontSize: 12.sp,
+                                              fontSize: 16.sp,
                                               fontWeight: FontWeight.bold,
                                               color: Colors.black54),
                                         )),
@@ -743,7 +740,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                         child: Text(
                                           'Donors',
                                           style: TextStyle(
-                                              fontSize: 12.sp,
+                                              fontSize: 16.sp,
                                               fontWeight: FontWeight.bold,
                                               color: Colors.black54),
                                         )),
@@ -780,7 +777,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                       child: Text(
                                         'Blood Donor',
                                         style: TextStyle(
-                                            fontSize: 12.sp,
+                                            fontSize: 16.sp,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.red),
                                       )),
@@ -797,7 +794,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                           return Text(
                                             value.location.toString(),
                                             style: TextStyle(
-                                                fontSize: 12.sp,
+                                                fontSize: 16.sp,
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.red),
                                           );
@@ -1091,31 +1088,479 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                               ),
                             ],
                           )),
-
-                    Row(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(6.5.w, 0.h, 0, 0),
-                          child: Text(
-                            'Donation Request',
-                            style: TextStyle(
-                                fontSize: 15.sp, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Padding(
-                            padding: EdgeInsets.fromLTRB(30.w, 0.h, 0, 0),
-                            child: TextButton(
-                              child: Text(
-                                'See All',
-                                style: TextStyle(
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black54),
+                    userType == 'donor'
+                        ? Row(
+                            children: [
+                              SizedBox(
+                                width: 20,
                               ),
-                              onPressed: () {},
-                            )),
-                      ],
+                              Text(
+                                'Donation Request',
+                                style: TextStyle(
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              Spacer(),
+                              TextButton(
+                                child: Text(
+                                  'See All',
+                                  style: TextStyle(
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black54),
+                                ),
+                                onPressed: () {},
+                              ),
+                              SizedBox(
+                                width: 20,
+                              )
+                            ],
+                          )
+                        : SizedBox(),
+                    userType == 'taker'
+                        ? Container(
+                            margin: EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 5),
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'See Donor Acceptanace',
+                              style: TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.w500),
+                            ),
+                          )
+                        : SizedBox(),
+                    SizedBox(
+                      height: 5,
                     ),
+                    userType == 'taker'
+                        ? acceptList.isEmpty
+                            ? Center(
+                                child: Text(
+                                  'no data found',
+                                  style: TextStyle(fontSize: 14),
+                                ),
+                              )
+                            : ListView.builder(
+                                padding: EdgeInsets.symmetric(vertical: 10),
+                                itemCount: acceptList.length,
+                                physics: NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                itemBuilder: (context, index) {
+                                  AcceptanceModel list = acceptList[index];
+                                  return Container(
+                                    margin: EdgeInsets.symmetric(
+                                        horizontal: 20, vertical: 5),
+                                    padding: EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(05),
+                                        border:
+                                            Border.all(color: Colors.black26)),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Container(
+                                                width: 70,
+                                                height: 70,
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(40),
+                                                  child: CachedNetworkImage(
+                                                    fit: BoxFit.cover,
+                                                    imageUrl: list.acceptImage!
+                                                            .isNotEmpty
+                                                        ? list.acceptImage!
+                                                        : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
+                                                    placeholder: (context,
+                                                            url) =>
+                                                        const CupertinoActivityIndicator(
+                                                      color: Colors.white,
+                                                    ),
+                                                    errorWidget:
+                                                        (context, url, error) =>
+                                                            Icon(Icons.error),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 5),
+                                              Container(
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          list.acceptName!,
+                                                          style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 18,
+                                                            fontFamily:
+                                                                'Montserrat',
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            height: 0,
+                                                          ),
+                                                        ),
+                                                        Container(
+                                                          margin:
+                                                              EdgeInsets.only(
+                                                                  left: 10.w),
+                                                          child: CustomPaint(
+                                                            size: Size(40, 30),
+                                                            painter:
+                                                                BloodDropPainter(
+                                                                    blood: list
+                                                                        .blood!),
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ),
+                                                    const SizedBox(height: 12),
+                                                    Container(
+                                                      child: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Container(
+                                                            width: 220,
+                                                            child: Row(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .min,
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .start,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Text(
+                                                                  'Hospital :',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Color(
+                                                                        0xFF5A5A5A),
+                                                                    fontSize:
+                                                                        12,
+                                                                    fontFamily:
+                                                                        'Montserrat',
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                    height:
+                                                                        0.13,
+                                                                  ),
+                                                                ),
+                                                                const SizedBox(
+                                                                    width: 5),
+                                                                Expanded(
+                                                                  child:
+                                                                      SizedBox(
+                                                                    child: Text(
+                                                                      list.hospital!,
+                                                                      style:
+                                                                          TextStyle(
+                                                                        color: Color(
+                                                                            0xFF5A5A5A),
+                                                                        fontSize:
+                                                                            12,
+                                                                        fontFamily:
+                                                                            'Montserrat',
+                                                                        fontWeight:
+                                                                            FontWeight.w500,
+                                                                        height:
+                                                                            0.13,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                )
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              height: 15),
+                                                          Container(
+                                                            child: Row(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .min,
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .start,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Text(
+                                                                  'Location :',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Color(
+                                                                        0xFF5A5A5A),
+                                                                    fontSize:
+                                                                        12,
+                                                                    fontFamily:
+                                                                        'Montserrat',
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                    height:
+                                                                        0.13,
+                                                                  ),
+                                                                ),
+                                                                const SizedBox(
+                                                                    width: 5),
+                                                                Text(
+                                                                  list.location!,
+                                                                  maxLines: 2,
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Color(
+                                                                        0xFF5A5A5A),
+                                                                    fontSize:
+                                                                        12,
+                                                                    fontFamily:
+                                                                        'Montserrat',
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                    height:
+                                                                        0.13,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              height: 15),
+                                                          Container(
+                                                            child: Row(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .min,
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .start,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Text(
+                                                                  'Date :',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Color(
+                                                                        0xFF5A5A5A),
+                                                                    fontSize:
+                                                                        12,
+                                                                    fontFamily:
+                                                                        'Montserrat',
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                    height:
+                                                                        0.13,
+                                                                  ),
+                                                                ),
+                                                                const SizedBox(
+                                                                    width: 5),
+                                                                Text(
+                                                                  list.date1!,
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Color(
+                                                                        0xFF5A5A5A),
+                                                                    fontSize:
+                                                                        12,
+                                                                    fontFamily:
+                                                                        'Montserrat',
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                    height:
+                                                                        0.13,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              height: 15),
+                                                          Container(
+                                                            child: Row(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .min,
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .start,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Text(
+                                                                  'Time :',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Color(
+                                                                        0xFF5A5A5A),
+                                                                    fontSize:
+                                                                        12,
+                                                                    fontFamily:
+                                                                        'Montserrat',
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                    height:
+                                                                        0.13,
+                                                                  ),
+                                                                ),
+                                                                const SizedBox(
+                                                                    width: 5),
+                                                                Text(
+                                                                  list.time1!,
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Color(
+                                                                        0xFF5A5A5A),
+                                                                    fontSize:
+                                                                        12,
+                                                                    fontFamily:
+                                                                        'Montserrat',
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                    height:
+                                                                        0.13,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 15),
+                                                    Align(
+                                                      alignment:
+                                                          Alignment.centerRight,
+                                                      child: InkWell(
+                                                        onTap: () {
+                                                          Navigator.push(
+                                                            context,
+                                                            PageRouteBuilder(
+                                                              pageBuilder: (context,
+                                                                  animation,
+                                                                  secondaryAnimation) {
+                                                                return TakerMoreInfo(
+                                                                  acceptModel:
+                                                                      list,
+                                                                );
+                                                              },
+                                                              transitionDuration:
+                                                                  const Duration(
+                                                                      seconds:
+                                                                          1),
+                                                              transitionsBuilder:
+                                                                  (context,
+                                                                      animation,
+                                                                      secondaryAnimation,
+                                                                      child) {
+                                                                const begin =
+                                                                    Offset(10.0,
+                                                                        0.0); // slide in from the right
+                                                                const end =
+                                                                    Offset.zero;
+                                                                const curve = Curves
+                                                                    .easeInOutQuart;
+
+                                                                var tween = Tween(
+                                                                        begin:
+                                                                            begin,
+                                                                        end:
+                                                                            end)
+                                                                    .chain(CurveTween(
+                                                                        curve:
+                                                                            curve));
+                                                                var offsetAnimation =
+                                                                    animation
+                                                                        .drive(
+                                                                            tween);
+
+                                                                return SlideTransition(
+                                                                  position:
+                                                                      offsetAnimation,
+                                                                  child: child,
+                                                                );
+                                                              },
+                                                            ),
+                                                          );
+                                                        },
+                                                        child: Container(
+                                                          height: 30,
+                                                          padding: EdgeInsets
+                                                              .symmetric(
+                                                                  horizontal:
+                                                                      15),
+                                                          alignment:
+                                                              Alignment.center,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        5),
+                                                            border: Border.all(
+                                                              color: Colors.red,
+                                                              width: 1.0,
+                                                            ),
+                                                          ),
+                                                          child: Text(
+                                                            'see more',
+                                                            style: TextStyle(
+                                                                fontSize: 14,
+                                                                color: Colors
+                                                                    .black87),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                })
+                        : SizedBox(),
 
                     // GestureDetector(
                     //   child: Padding(
@@ -1356,7 +1801,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           ),
                         ),
                       ),
-                    if (isLoading == false)
+                    if (isLoading == false && userType == 'donor')
                       Container(
                         margin: EdgeInsets.fromLTRB(0.w, 0.w, 0.w, 0),
                         child: Column(
@@ -1710,27 +2155,26 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                                                     animation,
                                                                     secondaryAnimation) {
                                                                   return DonateNow(
-                                                                      name:
-                                                                          name,
-                                                                      image:
-                                                                          image,
-                                                                      blood:
-                                                                          blood,
-                                                                      email:
-                                                                          email,
-                                                                      hospital:
-                                                                          hospitaln,
-                                                                      location:
-                                                                          location,
-                                                                      date:
-                                                                          date,
-                                                                      time:
-                                                                          time,
-                                                                      rating:
-                                                                          rating,
-                                                                      note:
-                                                                          note,
-                                                                      id: id);
+                                                                    name: name,
+                                                                    image:
+                                                                        image,
+                                                                    blood:
+                                                                        blood,
+                                                                    email:
+                                                                        email,
+                                                                    hospital:
+                                                                        hospitaln,
+                                                                    location:
+                                                                        location,
+                                                                    date: date,
+                                                                    time: time,
+                                                                    rating:
+                                                                        rating,
+                                                                    note: note,
+                                                                    id: id,
+                                                                    takerNumber:
+                                                                        takerNumber,
+                                                                  );
                                                                 },
                                                                 transitionDuration:
                                                                     const Duration(
@@ -1927,7 +2371,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                                     style: TextStyle(
                                                         fontSize: 14,
                                                         color: Colors.black
-                                                            .withOpacity(0.7)),
+                                                            .withValues(
+                                                                alpha: 0.7)),
                                                   ),
                                                 ),
                                               ],
@@ -1942,7 +2387,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                                 Text(
                                                   'Hospital Name : ',
                                                   style: TextStyle(
-                                                      fontSize: 14,
+                                                      fontSize: 16.sp,
                                                       color: Colors.black,
                                                       fontWeight:
                                                           FontWeight.w500),
@@ -1951,9 +2396,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                                   child: Text(
                                                     requesthosname,
                                                     style: TextStyle(
-                                                        fontSize: 14,
+                                                        fontSize: 16.sp,
                                                         color: Colors.black
-                                                            .withOpacity(0.7)),
+                                                            .withValues(
+                                                                alpha: 0.7)),
                                                   ),
                                                 ),
                                               ],
@@ -1968,7 +2414,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                                 Text(
                                                   'Blood Group : ',
                                                   style: TextStyle(
-                                                      fontSize: 14,
+                                                      fontSize: 16.sp,
                                                       color: Colors.black,
                                                       fontWeight:
                                                           FontWeight.w500),
@@ -1977,9 +2423,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                                   child: Text(
                                                     requestblood,
                                                     style: TextStyle(
-                                                        fontSize: 14,
+                                                        fontSize: 16.sp,
                                                         color: Colors.black
-                                                            .withOpacity(0.7)),
+                                                            .withValues(
+                                                                alpha: 0.7)),
                                                   ),
                                                 ),
                                               ],
@@ -2005,7 +2452,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                                     style: TextStyle(
                                                         fontSize: 14,
                                                         color: Colors.black
-                                                            .withOpacity(0.7)),
+                                                            .withValues(
+                                                                alpha: 0.7)),
                                                   ),
                                                 ),
                                               ],
@@ -2020,7 +2468,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                                 Text(
                                                   'Time : ',
                                                   style: TextStyle(
-                                                      fontSize: 14,
+                                                      fontSize: 16.sp,
                                                       color: Colors.black,
                                                       fontWeight:
                                                           FontWeight.w500),
@@ -2029,9 +2477,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                                   child: Text(
                                                     requesttime,
                                                     style: TextStyle(
-                                                        fontSize: 14,
+                                                        fontSize: 16.sp,
                                                         color: Colors.black
-                                                            .withOpacity(0.7)),
+                                                            .withValues(
+                                                                alpha: 0.7)),
                                                   ),
                                                 ),
                                               ],
@@ -2120,7 +2569,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                         child: Text(
                                           'Donate',
                                           style: TextStyle(
-                                              fontSize: 14,
+                                              fontSize: 16.sp,
                                               color: Colors.white),
                                         ),
                                       ),
@@ -2428,6 +2877,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         String rating1 = firstDoc['rating'];
         String tid = firstDoc['taker_id'];
         String email1 = firstDoc['email'];
+        String takerNumber1 = firstDoc['number'];
 
         image = pic;
         name = name1;
@@ -2440,6 +2890,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         rating = rating1;
         id = tid;
         email = email1;
+        takerNumber = takerNumber1;
         setState(() {});
         // Add data to a list of maps
         // allDonations.add({
@@ -2666,7 +3117,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         String d_email = userDoc['acceptemail'];
         String d_image = userDoc['acceptimage'];
         String d_blood = userDoc['acceptblood'];
+        // String d_rating = userDoc['acceptrating'];
+        // String d_number = userDoc['acceptnumber'];
         String takid = userDoc['takerid'];
+        String date1 = userDoc['date1'];
+        String time1 = userDoc['time1'];
+        bool status = userDoc['status'];
 
         requestname = name;
         requesthosname = hospital;
@@ -2700,6 +3156,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       // showPath(requestbloc);
     });
     await updateStatus(true);
+    if (userType == 'taker') {
+      await getAcceptance();
+    }
   }
 
 //  Future<void> getAcceptDonation() async {
@@ -2829,6 +3288,33 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         setState(() {
           availability = status;
         });
+      } else {
+        print('User not found with email: $userEmail');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  Future<void> getAcceptance() async {
+    try {
+      acceptList.clear();
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String userEmail = prefs.getString('user_email') ?? '';
+      print(userEmail);
+
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('acceptdonation')
+          .where('email', isEqualTo: userEmail)
+          .where('status', isEqualTo: false)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        for (var element in querySnapshot.docs) {
+          var data = element.data() as Map<String, dynamic>;
+          acceptList.add(AcceptanceModel.fromMap(data));
+        }
+        setState(() {});
       } else {
         print('User not found with email: $userEmail');
       }

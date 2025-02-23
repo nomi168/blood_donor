@@ -3,9 +3,9 @@
 import 'dart:io';
 
 import 'package:blood_donor/Provider/Page.dart';
-import 'package:blood_donor/Screens/Authentication%20Screen/LoginScreen.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Dashoard/Dashboatd.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Feed%20Screen/Notification.dart';
+import 'package:blood_donor/Screens/auth/presentation/screens/LoginScreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cnic_scanner/cnic_scanner.dart';
 import 'package:cnic_scanner/model/cnic_model.dart';
@@ -28,7 +28,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../constants.dart';
+import '../../../../constants.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({
@@ -48,6 +48,7 @@ class _SignupScreenState extends State<SignupScreen> {
   String mobileNumber = '';
   int id = 1;
   String picture = '';
+  bool isUrdu = false;
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
   TextEditingController _phonenumber = TextEditingController();
@@ -426,7 +427,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                           child: Text(
                                             'Camera',
                                             style: TextStyle(
-                                                fontSize: 13.sp,
+                                                fontSize: 16.sp,
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.black45),
                                           ),
@@ -477,7 +478,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                           child: Text(
                                             'Gallery',
                                             style: TextStyle(
-                                                fontSize: 13.sp,
+                                                fontSize: 16.sp,
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.black45),
                                           ),
@@ -1056,67 +1057,58 @@ class _SignupScreenState extends State<SignupScreen> {
                                 //   ),
                                 // ),
                                 Row(
-                                  // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Padding(
-                                      padding:
-                                          EdgeInsets.fromLTRB(15.w, 0.h, 0, 0),
+                                    Text(
+                                      'Already have an account?',
+                                      style: TextStyle(
+                                          fontSize: 16.sp,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    TextButton(
                                       child: Text(
-                                        'Already have an account?',
+                                        'Sign in',
                                         style: TextStyle(
-                                            fontSize: 12.sp,
+                                            fontSize: 16.sp,
+                                            color: Colors.red,
                                             fontWeight: FontWeight.bold),
                                       ),
-                                    ),
-                                    Padding(
-                                        padding: EdgeInsets.fromLTRB(
-                                            0.w, 0.h, 16.w, 0),
-                                        child: TextButton(
-                                          child: Text(
-                                            'Sign in',
-                                            style: TextStyle(
-                                                fontSize: 13.sp,
-                                                color: Colors.red,
-                                                fontWeight: FontWeight.bold),
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation,
+                                                secondaryAnimation) {
+                                              return const LoginScreen();
+                                            },
+                                            transitionDuration:
+                                                const Duration(seconds: 1),
+                                            transitionsBuilder: (context,
+                                                animation,
+                                                secondaryAnimation,
+                                                child) {
+                                              const begin = Offset(10.0,
+                                                  0.0); // slide in from the right
+                                              const end = Offset.zero;
+                                              const curve =
+                                                  Curves.easeInOutQuart;
+
+                                              var tween = Tween(
+                                                      begin: begin, end: end)
+                                                  .chain(
+                                                      CurveTween(curve: curve));
+                                              var offsetAnimation =
+                                                  animation.drive(tween);
+
+                                              return SlideTransition(
+                                                position: offsetAnimation,
+                                                child: child,
+                                              );
+                                            },
                                           ),
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              PageRouteBuilder(
-                                                pageBuilder: (context,
-                                                    animation,
-                                                    secondaryAnimation) {
-                                                  return const LoginScreen();
-                                                },
-                                                transitionDuration:
-                                                    const Duration(seconds: 1),
-                                                transitionsBuilder: (context,
-                                                    animation,
-                                                    secondaryAnimation,
-                                                    child) {
-                                                  const begin = Offset(10.0,
-                                                      0.0); // slide in from the right
-                                                  const end = Offset.zero;
-                                                  const curve =
-                                                      Curves.easeInOutQuart;
-
-                                                  var tween = Tween(
-                                                          begin: begin,
-                                                          end: end)
-                                                      .chain(CurveTween(
-                                                          curve: curve));
-                                                  var offsetAnimation =
-                                                      animation.drive(tween);
-
-                                                  return SlideTransition(
-                                                    position: offsetAnimation,
-                                                    child: child,
-                                                  );
-                                                },
-                                              ),
-                                            );
-                                          },
-                                        ))
+                                        );
+                                      },
+                                    )
                                   ],
                                 )
                               ],
@@ -1147,7 +1139,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                   child: Text(
                                     'We will send you a verification code',
                                     style: TextStyle(
-                                        fontSize: 12.sp,
+                                        fontSize: 16.sp,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black54),
                                   ),
@@ -1159,7 +1151,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                   child: Text(
                                     'on your email',
                                     style: TextStyle(
-                                        fontSize: 12.sp,
+                                        fontSize: 16.sp,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black54),
                                   ),
@@ -1199,16 +1191,16 @@ class _SignupScreenState extends State<SignupScreen> {
                                   ),
                                 ),
                               ),
-                              Padding(
-                                padding: EdgeInsets.fromLTRB(60.w, 0.h, 5.w, 0),
-                                child: Center(
-                                    child: TextButton(
+                              Container(
+                                margin: EdgeInsets.only(right: 10),
+                                alignment: Alignment.centerRight,
+                                child: TextButton(
                                   // ignore: prefer_const_constructors
                                   child: Text(
                                     'Send OTP',
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 13.sp,
+                                        fontSize: 16.sp,
                                         color: isClicked
                                             ? Colors.red
                                             : Colors.blue,
@@ -1241,7 +1233,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                       ));
                                     }
                                   },
-                                )),
+                                ),
                               ),
                               Padding(
                                 padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
@@ -1281,54 +1273,50 @@ class _SignupScreenState extends State<SignupScreen> {
                                 padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
                                 child: Center(
                                   child: Text(
-                                    'Donot recieve code?',
+                                    "Don\'t receive code?",
                                     style: TextStyle(
-                                        fontSize: 12.sp,
+                                        fontSize: 16.sp,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black54),
                                   ),
                                 ),
                               ),
-                              Padding(
-                                padding: EdgeInsets.fromLTRB(5.w, 0.h, 5.w, 0),
-                                child: Center(
-                                    child: TextButton(
-                                  // ignore: prefer_const_constructors
-                                  child: Text(
-                                    'Resend OTP',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 13.sp,
-                                        color: isClicked1
-                                            ? Colors.red
-                                            : Colors.blue,
-                                        decoration: TextDecoration.underline),
-                                  ),
-                                  onPressed: () async {
-                                    setState(() {
-                                      isClicked1 = true;
-                                    });
-                                    EmailOTP.config(
-                                        appEmail: "me@rohitchouhan.com",
-                                        appName: "Email OTP",
-                                        otpLength: 6,
-                                        otpType: OTPType.numeric);
-                                    if (await EmailOTP.sendOTP(
-                                            email: _email.text.trim()) ==
-                                        true) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(const SnackBar(
-                                        content: Text("OTP has been sent"),
-                                      ));
-                                    } else {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(const SnackBar(
-                                        content: Text("Oops, OTP send failed"),
-                                      ));
-                                    }
-                                  },
-                                )),
-                              ),
+                              Center(
+                                  child: TextButton(
+                                // ignore: prefer_const_constructors
+                                child: Text(
+                                  'Resend OTP',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16.sp,
+                                      color:
+                                          isClicked1 ? Colors.red : Colors.blue,
+                                      decoration: TextDecoration.underline),
+                                ),
+                                onPressed: () async {
+                                  setState(() {
+                                    isClicked1 = true;
+                                  });
+                                  EmailOTP.config(
+                                      appEmail: "me@rohitchouhan.com",
+                                      appName: "Email OTP",
+                                      otpLength: 6,
+                                      otpType: OTPType.numeric);
+                                  if (await EmailOTP.sendOTP(
+                                          email: _email.text.trim()) ==
+                                      true) {
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(const SnackBar(
+                                      content: Text("OTP has been sent"),
+                                    ));
+                                  } else {
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(const SnackBar(
+                                      content: Text("Oops, OTP send failed"),
+                                    ));
+                                  }
+                                },
+                              )),
                               // Padding(
                               //   padding: EdgeInsets.fromLTRB(5.w, 17.h, 5.w, 0),
                               //   child: Material(
@@ -1464,7 +1452,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               child: Text(
                                 'Verification Process',
                                 style: TextStyle(
-                                    fontSize: 13.sp,
+                                    fontSize: 16.sp,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black54),
                               ),
@@ -1475,7 +1463,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           ),
                           SvgPicture.asset(
                             height: 30.h,
-                            width: double.infinity,
+                            width: 40.w,
                             'images/svg/Layer_1.svg',
                           ),
                           SizedBox(
@@ -1487,7 +1475,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               'Setting Up your\nAccount',
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                  fontSize: 13.sp, fontWeight: FontWeight.w500),
+                                  fontSize: 16.sp, fontWeight: FontWeight.w500),
                             ),
                           ),
                           SizedBox(
@@ -1499,7 +1487,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               'We are analyzing your account',
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                  fontSize: 9.sp, fontWeight: FontWeight.w500),
+                                  fontSize: 16.sp, fontWeight: FontWeight.w500),
                             ),
                           ),
                           SizedBox(
@@ -1629,466 +1617,219 @@ class _SignupScreenState extends State<SignupScreen> {
                         child: SingleChildScrollView(
                           child: Column(
                             children: [
-                              Padding(
-                                padding: EdgeInsets.fromLTRB(5.w, 2.h, 0, 0),
-                                child: Text(
-                                  'Questionnaires',
-                                  style: TextStyle(
-                                      fontSize: 17.sp,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black),
-                                ),
+                              SizedBox(
+                                height: 20,
                               ),
-                              Padding(
-                                padding: EdgeInsets.fromLTRB(5.w, 1.h, 5.w, 0),
-                                child: Text(
-                                  'Fill up the following Questionnaires and become a donor',
-                                  style: TextStyle(
-                                      fontSize: 10.sp,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black54),
-                                ),
-                              ),
-                              Padding(
-                                padding:
-                                    EdgeInsets.fromLTRB(5.w, 1.5.h, 5.w, 0),
-                                child: Material(
-                                  color: Colors.white,
-                                  elevation: 5,
-                                  shadowColor: Colors.grey,
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Container(
-                                    height: 10.h,
-                                    width: 100.w,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                        color: Colors.red,
-                                        width: 1,
-                                      ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Questionnaires',
+                                    style: TextStyle(
+                                        fontSize: 17.sp,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black),
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  InkWell(
+                                    splashColor: Colors.transparent,
+                                    splashFactory: NoSplash.splashFactory,
+                                    onTap: () {
+                                      setState(() {
+                                        isUrdu = !isUrdu; // Toggle language
+                                      });
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          border:
+                                              Border.all(color: PRIMARY_COLOR),
+                                          borderRadius:
+                                              BorderRadius.circular(05)),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 5),
+                                      child: Text(isUrdu
+                                          ? 'Switch to English'
+                                          : 'Switch to Urdu'),
                                     ),
-                                    child: Stack(children: [
-                                      Padding(
-                                        // ignore: prefer_const_constructors
-                                        padding: EdgeInsets.fromLTRB(
-                                            5.w, 1.h, 37.w, 0),
-                                        child: Text(
-                                          'Do you have diabetes?',
-                                          style: TextStyle(
-                                              fontSize: 12.sp,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black),
-                                        ),
-                                      ),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                              child: Padding(
-                                            // ignore: prefer_const_constructors
-                                            padding: EdgeInsets.fromLTRB(
-                                                0.w, 3.h, 0.w, 0.h),
-                                            child: RadioListTile<String>(
-                                              title: const Text('Yes'),
-                                              value: 'Yes',
-                                              activeColor: PRIMARY_COLOR,
-                                              groupValue: Q1,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  Q1 = value!;
-                                                  flag = true;
-                                                });
-                                              },
-                                            ),
-                                          )),
-                                          Expanded(
-                                              child: Padding(
-                                            // ignore: prefer_const_constructors
-                                            padding: EdgeInsets.fromLTRB(
-                                                0.w, 3.h, 0.w, 0.h),
-                                            child: RadioListTile<String>(
-                                              title: const Text('No'),
-                                              value: 'No',
-                                              activeColor: PRIMARY_COLOR,
-                                              groupValue: Q1,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  Q1 = value!;
-                                                });
-                                              },
-                                            ),
-                                          )),
-                                        ],
-                                      )
-                                    ]),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Text(
+                                'Fill up the following Questionnaires and become a donor',
+                                style: TextStyle(
+                                    fontSize: 15.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black54),
+                              ),
+                              Container(
+                                margin: EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 10),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Colors.red,
+                                    width: 1,
                                   ),
                                 ),
-                              ),
-                              Padding(
-                                padding:
-                                    EdgeInsets.fromLTRB(5.w, 1.5.h, 5.w, 0),
-                                child: Material(
-                                  color: Colors.white,
-                                  elevation: 5,
-                                  shadowColor: Colors.grey,
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Container(
-                                    height: 12.h,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                        color: Colors.red,
-                                        width: 1,
+                                child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        height: 5,
                                       ),
-                                    ),
-                                    child: Stack(children: [
-                                      Padding(
-                                        // ignore: prefer_const_constructors
-                                        padding: EdgeInsets.fromLTRB(
-                                            5.w, 1.h, 0.w, 0),
-                                        child: Text(
-                                          'Have you ever had problems with your heart or lungs?',
-                                          style: TextStyle(
-                                              fontSize: 12.sp,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black),
+                                      Container(
+                                        margin: EdgeInsets.symmetric(
+                                            horizontal: 10),
+                                        child: buildQuestionContainer(
+                                          isUrdu
+                                              ? 'کیا آپ کو ذیابیطس ہے؟'
+                                              : 'Do you have diabetes?',
+                                          Q1,
+                                          (value) =>
+                                              setState(() => Q1 = value!),
                                         ),
                                       ),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                              child: Padding(
-                                            // ignore: prefer_const_constructors
-                                            padding: EdgeInsets.fromLTRB(
-                                                0.w, 5.h, 0.w, 0.h),
-                                            child: RadioListTile<String>(
-                                              title: const Text('Yes'),
-                                              value: 'Yes',
-                                              activeColor: PRIMARY_COLOR,
-                                              groupValue: Q2,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  Q2 = value!;
-                                                  flag = true;
-                                                });
-                                              },
-                                            ),
-                                          )),
-                                          Expanded(
-                                              child: Padding(
-                                            // ignore: prefer_const_constructors
-                                            padding: EdgeInsets.fromLTRB(
-                                                0.w, 5.h, 10.w, 0),
-                                            child: RadioListTile<String>(
-                                              title: const Text('No'),
-                                              value: 'No',
-                                              activeColor: PRIMARY_COLOR,
-                                              groupValue: Q2,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  Q2 = value!;
-                                                });
-                                              },
-                                            ),
-                                          )),
-                                        ],
-                                      )
                                     ]),
+                              ),
+                              Container(
+                                margin: EdgeInsets.symmetric(horizontal: 20),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Colors.red,
+                                    width: 1,
                                   ),
                                 ),
-                              ),
-                              Padding(
-                                padding:
-                                    EdgeInsets.fromLTRB(5.w, 1.5.h, 5.w, 0),
-                                child: Material(
-                                  color: Colors.white,
-                                  elevation: 5,
-                                  shadowColor: Colors.grey,
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Container(
-                                    height: 11.h,
-                                    width: 100.w,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                        color: Colors.red,
-                                        width: 1,
-                                      ),
+                                child: Column(children: [
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  Container(
+                                    margin: EdgeInsets.only(left: 10),
+                                    child: buildQuestionContainer(
+                                      isUrdu
+                                          ? 'کیا آپ کو کبھی دل یا پھیپھڑوں کے مسائل ہوئے ہیں؟'
+                                          : 'Have you ever had problems with your heart or lungs?',
+                                      Q2,
+                                      (value) => setState(() => Q2 = value!),
                                     ),
-                                    child: Stack(children: [
-                                      Padding(
-                                        // ignore: prefer_const_constructors
-                                        padding: EdgeInsets.fromLTRB(
-                                            5.w, 1.h, 0.w, 0),
-                                        child: Text(
-                                          'In the last 28 days do you have had COVID-19?',
-                                          style: TextStyle(
-                                              fontSize: 11.sp,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black),
+                                  ),
+                                ]),
+                              ),
+                              Container(
+                                margin: EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 10),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Column(children: [
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  buildQuestionContainer(
+                                    isUrdu
+                                        ? 'کیا آپ کو پچھلے 28 دنوں میں کوویڈ 19 ہوا ہے؟'
+                                        : 'In the last 28 days have you had COVID-19?',
+                                    Q3,
+                                    (value) => setState(() => Q3 = value!),
+                                  ),
+                                ]),
+                              ),
+                              Container(
+                                margin: EdgeInsets.symmetric(horizontal: 20),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Column(children: [
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  Container(
+                                    child: buildQuestionContainer(
+                                      isUrdu
+                                          ? 'کیا آپ کا کبھی ایچ آئی وی/ایڈز وائرس کے لیے ٹیسٹ مثبت آیا ہے؟'
+                                          : 'Have you ever had a positive test for the HIV/AIDS virus?',
+                                      Q4,
+                                      (value) => setState(() => Q4 = value!),
+                                    ),
+                                  ),
+                                ]),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Container(
+                                margin: EdgeInsets.symmetric(horizontal: 20),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Container(
+                                        child: buildQuestionContainer(
+                                          isUrdu
+                                              ? 'کیا آپ کو کبھی کینسر ہوا ہے؟'
+                                              : 'Have you ever had cancer?',
+                                          Q5,
+                                          (value) =>
+                                              setState(() => Q5 = value!),
                                         ),
                                       ),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                              child: Padding(
-                                            // ignore: prefer_const_constructors
-                                            padding: EdgeInsets.fromLTRB(
-                                                0.w, 3.h, 0.w, 1.h),
-                                            child: RadioListTile<String>(
-                                              title: const Text('Yes'),
-                                              value: 'Yes',
-                                              activeColor: PRIMARY_COLOR,
-                                              groupValue: Q3,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  Q3 = value!;
-                                                });
-                                              },
-                                            ),
-                                          )),
-                                          Expanded(
-                                              child: Padding(
-                                            // ignore: prefer_const_constructors
-                                            padding: EdgeInsets.fromLTRB(
-                                                0.w, 3.h, 10.w, 1.h),
-                                            child: RadioListTile<String>(
-                                              title: const Text('No'),
-                                              value: 'No',
-                                              activeColor: PRIMARY_COLOR,
-                                              groupValue: Q3,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  Q3 = value!;
-                                                });
-                                              },
-                                            ),
-                                          )),
-                                        ],
-                                      )
                                     ]),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Container(
+                                margin: EdgeInsets.symmetric(horizontal: 20),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Colors.red,
+                                    width: 1,
                                   ),
                                 ),
-                              ),
-                              Padding(
-                                padding:
-                                    EdgeInsets.fromLTRB(5.w, 1.5.h, 5.w, 0),
-                                child: Material(
-                                  color: Colors.white,
-                                  elevation: 5,
-                                  shadowColor: Colors.grey,
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Container(
-                                    height: 12.h,
-                                    width: 100.w,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                        color: Colors.red,
-                                        width: 1,
+                                child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        height: 5,
                                       ),
-                                    ),
-                                    child: Stack(children: [
-                                      Padding(
-                                        // ignore: prefer_const_constructors
-                                        padding: EdgeInsets.fromLTRB(
-                                            5.w, 1.h, 0.w, 0),
-                                        child: Text(
-                                          'Have you ever had a positive test for the HIV/AIDS virus?',
-                                          style: TextStyle(
-                                              fontSize: 12.sp,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black),
+                                      Container(
+                                        child: buildQuestionContainer(
+                                          isUrdu
+                                              ? 'کیا آپ نے پچھلے 3 ماہ میں کوئی ویکسین لگوائی ہے؟'
+                                              : 'In the last 3 months have you had a vaccination?',
+                                          Q6,
+                                          (value) =>
+                                              setState(() => Q6 = value!),
                                         ),
                                       ),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                              child: Padding(
-                                            // ignore: prefer_const_constructors
-                                            padding: EdgeInsets.fromLTRB(
-                                                0.w, 5.h, 0.w, 1.h),
-                                            child: RadioListTile<String>(
-                                              title: const Text('Yes'),
-                                              value: 'Yes',
-                                              activeColor: PRIMARY_COLOR,
-                                              groupValue: Q4,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  Q4 = value!;
-                                                  flag = true;
-                                                });
-                                              },
-                                            ),
-                                          )),
-                                          Expanded(
-                                              child: Padding(
-                                            // ignore: prefer_const_constructors
-                                            padding: EdgeInsets.fromLTRB(
-                                                0.w, 5.h, 10.w, 1.h),
-                                            child: RadioListTile<String>(
-                                              title: const Text('No'),
-                                              value: 'No',
-                                              activeColor: PRIMARY_COLOR,
-                                              groupValue: Q4,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  Q4 = value!;
-                                                });
-                                              },
-                                            ),
-                                          )),
-                                        ],
-                                      )
                                     ]),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding:
-                                    EdgeInsets.fromLTRB(5.w, 1.5.h, 5.w, 0),
-                                child: Material(
-                                  color: Colors.white,
-                                  elevation: 5,
-                                  shadowColor: Colors.grey,
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Container(
-                                    height: 9.h,
-                                    width: 100.w,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                        color: Colors.red,
-                                        width: 1,
-                                      ),
-                                    ),
-                                    child: Stack(children: [
-                                      Padding(
-                                        // ignore: prefer_const_constructors
-                                        padding: EdgeInsets.fromLTRB(
-                                            5.w, 1.h, 0.w, 0),
-                                        child: Text(
-                                          'Have you ever had cancer?',
-                                          style: TextStyle(
-                                              fontSize: 12.sp,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black),
-                                        ),
-                                      ),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                              child: Padding(
-                                            // ignore: prefer_const_constructors
-                                            padding: EdgeInsets.fromLTRB(
-                                                1.w, 2.5.h, 0.w, 1.h),
-                                            child: RadioListTile<String>(
-                                              title: const Text('Yes'),
-                                              value: 'Yes',
-                                              groupValue: Q5,
-                                              activeColor: PRIMARY_COLOR,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  Q5 = value!;
-                                                  flag = true;
-                                                });
-                                              },
-                                            ),
-                                          )),
-                                          Expanded(
-                                              child: Padding(
-                                            // ignore: prefer_const_constructors
-                                            padding: EdgeInsets.fromLTRB(
-                                                0.w, 2.5.h, 10.w, 1.h),
-                                            child: RadioListTile<String>(
-                                              title: const Text('No'),
-                                              value: 'No',
-                                              groupValue: Q5,
-                                              activeColor: PRIMARY_COLOR,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  Q5 = value!;
-                                                });
-                                              },
-                                            ),
-                                          )),
-                                        ],
-                                      )
-                                    ]),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding:
-                                    EdgeInsets.fromLTRB(5.w, 1.5.h, 5.w, 0),
-                                child: Material(
-                                  color: Colors.white,
-                                  elevation: 5,
-                                  shadowColor: Colors.grey,
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Container(
-                                    height: 11.h,
-                                    width: 100.w,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                        color: Colors.red,
-                                        width: 1,
-                                      ),
-                                    ),
-                                    child: Stack(children: [
-                                      Padding(
-                                        // ignore: prefer_const_constructors
-                                        padding: EdgeInsets.fromLTRB(
-                                            5.w, 1.h, 0.w, 0),
-                                        child: Text(
-                                          'In the last 3 months have you had a vaccination',
-                                          style: TextStyle(
-                                              fontSize: 12.sp,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black),
-                                        ),
-                                      ),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                              child: Padding(
-                                            // ignore: prefer_const_constructors
-                                            padding: EdgeInsets.fromLTRB(
-                                                1.w, 4.5.h, 0.w, 1.h),
-                                            child: RadioListTile<String>(
-                                              title: const Text('Yes'),
-                                              value: 'Yes',
-                                              activeColor: PRIMARY_COLOR,
-                                              groupValue: Q6,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  Q6 = value!;
-                                                });
-                                              },
-                                            ),
-                                          )),
-                                          Expanded(
-                                              child: Padding(
-                                            // ignore: prefer_const_constructors
-                                            padding: EdgeInsets.fromLTRB(
-                                                0.w, 4.5.h, 10.w, 1.h),
-                                            child: RadioListTile<String>(
-                                              title: const Text('No'),
-                                              value: 'No',
-                                              activeColor: PRIMARY_COLOR,
-                                              groupValue: Q6,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  Q6 = value!;
-                                                });
-                                              },
-                                            ),
-                                          )),
-                                        ],
-                                      )
-                                    ]),
-                                  ),
-                                ),
                               ),
                               Row(
                                 children: [
@@ -2115,7 +1856,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                   Text(
                                     'By clicking, you agree to our terms and codition',
                                     style: TextStyle(
-                                        fontSize: 10.sp,
+                                        fontSize: 15.sp,
                                         fontWeight: FontWeight.bold),
                                   )
                                 ],
@@ -2552,6 +2293,45 @@ class _SignupScreenState extends State<SignupScreen> {
         ));
   }
 
+  Widget buildQuestionContainer(
+      String question, String groupValue, Function(String?) onChanged) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 5),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20),
+          child: Text(
+            question,
+            style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold),
+          ),
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: RadioListTile<String>(
+                title: Text(isUrdu ? 'ہاں' : 'Yes'),
+                value: 'Yes',
+                activeColor: PRIMARY_COLOR,
+                groupValue: groupValue,
+                onChanged: onChanged,
+              ),
+            ),
+            Expanded(
+              child: RadioListTile<String>(
+                title: Text(isUrdu ? 'نہیں' : 'No'),
+                value: 'No',
+                activeColor: PRIMARY_COLOR,
+                groupValue: groupValue,
+                onChanged: onChanged,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   Widget _getScanCNICBtn() {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
@@ -2628,7 +2408,7 @@ class _SignupScreenState extends State<SignupScreen> {
               width: 5.h,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(100),
-                color: Colors.red.shade100.withOpacity(0.5),
+                color: Colors.red.shade100.withValues(alpha: 0.5),
               ),
               child: showIcon
                   ? Icon(
@@ -2659,7 +2439,7 @@ class _SignupScreenState extends State<SignupScreen> {
               style: TextStyle(
                 fontWeight: FontWeight.w500,
                 color: Colors.black,
-                fontSize: 12.sp,
+                fontSize: 15.sp,
               ),
             )
           ],

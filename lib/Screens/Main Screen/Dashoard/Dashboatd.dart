@@ -7,6 +7,7 @@ import 'package:blood_donor/Screens/Main%20Screen/Feed%20Screen/FeedScreen.dart'
 import 'package:blood_donor/Screens/Main%20Screen/Menu%20Screens/MenuScreen.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Profile%20Screens/AccountScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({
@@ -27,6 +28,7 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   void initState() {
+    getLocationPermission();
     super.initState();
   }
 
@@ -44,6 +46,24 @@ class _DashboardState extends State<Dashboard> {
     const AccountScreen(),
     const MenuScreen(),
   ];
+
+  Future<void> getLocationPermission() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+
+      if (permission == LocationPermission.denied) {
+        print("Error: Location permission denied");
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      print("Error: Location permission permanently denied");
+      return;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

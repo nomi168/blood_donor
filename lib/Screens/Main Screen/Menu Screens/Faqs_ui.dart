@@ -139,14 +139,14 @@ class _FAQsState extends State<FAQs> with SingleTickerProviderStateMixin {
                   child: Text(
                     'FAQs',
                     style: TextStyle(
-                        fontSize: 14.sp,
+                        fontSize: 17.sp,
                         fontWeight: FontWeight.bold,
                         color: Colors.black54),
                   ))
             ],
           ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 20),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(

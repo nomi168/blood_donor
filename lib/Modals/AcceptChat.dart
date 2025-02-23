@@ -9,7 +9,7 @@ class AcceptChat {
   final String time;
   final String acceptname;
   final String senderimage;
-
+  final String accept_number;
   AcceptChat(
       {required this.sender_id,
       required this.receiver_id,
@@ -20,5 +20,6 @@ class AcceptChat {
       required this.date,
       required this.time,
       required this.acceptname,
-      required this.senderimage});
+      required this.senderimage,
+      required this.accept_number});
 }

@@ -55,414 +55,408 @@ class _MenuScreenState extends State<MenuScreen> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(children: [
-        Padding(
-            padding: EdgeInsets.fromLTRB(0.w, 5.h, 0, 0),
-            child: Center(
-              child: Text(
-                'Menu',
+      body: SafeArea(
+        child: Column(children: [
+          Center(
+            child: Text(
+              'Menu',
+              style: TextStyle(
+                  fontSize: 17.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black54),
+            ),
+          ),
+          SizedBox(
+            height: 50,
+          ),
+          Row(
+            children: [
+              SizedBox(
+                width: 20,
+              ),
+              const Icon(
+                Icons.policy,
+                color: Colors.red,
+                size: 30,
+              ),
+              SizedBox(
+                width: 20,
+              ),
+              Text(
+                'Terms & Condition',
                 style: TextStyle(
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black54),
+                    fontSize: 16.sp,
+                    color: Colors.black54,
+                    fontWeight: FontWeight.bold),
               ),
-            )),
-        Padding(
-          padding: EdgeInsets.fromLTRB(0, 0.h, 0, 0),
-          child: Row(
-            children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 5.h, 0, 0),
-                child: const Icon(
-                  Icons.policy,
-                  color: Colors.red,
-                  size: 30,
+              Spacer(),
+              IconButton(
+                icon: const Icon(
+                  Icons.arrow_forward_ios,
+                  size: 28,
                 ),
-              ),
-              Padding(
-                  padding: EdgeInsets.fromLTRB(5.w, 5.h, 0, 0.h),
-                  child: Text(
-                    'Terms & Condition',
-                    style: TextStyle(
-                        fontSize: 13.sp,
-                        color: Colors.black54,
-                        fontWeight: FontWeight.bold),
-                  )),
-              Padding(
-                  padding: EdgeInsets.fromLTRB(30.w, 5.h, 0, 0.h),
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.arrow_forward_ios,
-                      size: 28,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) {
+                        return const TermsConditionScreen();
+                      },
+                      transitionDuration: const Duration(seconds: 1),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        const begin =
+                            Offset(10.0, 0.0); // slide in from the right
+                        const end = Offset.zero;
+                        const curve = Curves.easeInOutQuart;
+
+                        var tween = Tween(begin: begin, end: end)
+                            .chain(CurveTween(curve: curve));
+                        var offsetAnimation = animation.drive(tween);
+
+                        return SlideTransition(
+                          position: offsetAnimation,
+                          child: child,
+                        );
+                      },
                     ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) {
-                            return const TermsConditionScreen();
-                          },
-                          transitionDuration: const Duration(seconds: 1),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            const begin =
-                                Offset(10.0, 0.0); // slide in from the right
-                            const end = Offset.zero;
-                            const curve = Curves.easeInOutQuart;
-
-                            var tween = Tween(begin: begin, end: end)
-                                .chain(CurveTween(curve: curve));
-                            var offsetAnimation = animation.drive(tween);
-
-                            return SlideTransition(
-                              position: offsetAnimation,
-                              child: child,
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  )),
+                  );
+                },
+              ),
             ],
           ),
-        ),
-        Padding(
-          padding: EdgeInsets.fromLTRB(0, 3.h, 0, 0),
-          child: Row(
+          SizedBox(
+            height: 10,
+          ),
+          Row(
             children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0),
-                child: Icon(
-                  Icons.question_mark,
-                  color: Colors.red,
-                  size: 30,
-                ),
+              SizedBox(
+                width: 20,
               ),
-              Padding(
-                  padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0.h),
-                  child: Text(
-                    'FAQs',
-                    style: TextStyle(
-                        fontSize: 13.sp,
-                        color: Colors.black54,
-                        fontWeight: FontWeight.bold),
-                  )),
-              Padding(
-                  padding: EdgeInsets.fromLTRB(55.5.w, 0.h, 0, 0.h),
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.arrow_forward_ios,
-                      size: 28,
+              Icon(
+                Icons.question_mark,
+                color: Colors.red,
+                size: 30,
+              ),
+              SizedBox(
+                width: 20,
+              ),
+              Text(
+                'FAQs',
+                style: TextStyle(
+                    fontSize: 16.sp,
+                    color: Colors.black54,
+                    fontWeight: FontWeight.bold),
+              ),
+              Spacer(),
+              IconButton(
+                icon: const Icon(
+                  Icons.arrow_forward_ios,
+                  size: 28,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) {
+                        return const FAQs();
+                      },
+                      transitionDuration: const Duration(seconds: 1),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        const begin =
+                            Offset(10.0, 0.0); // slide in from the right
+                        const end = Offset.zero;
+                        const curve = Curves.easeInOutQuart;
+
+                        var tween = Tween(begin: begin, end: end)
+                            .chain(CurveTween(curve: curve));
+                        var offsetAnimation = animation.drive(tween);
+
+                        return SlideTransition(
+                          position: offsetAnimation,
+                          child: child,
+                        );
+                      },
                     ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) {
-                            return const FAQs();
-                          },
-                          transitionDuration: const Duration(seconds: 1),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            const begin =
-                                Offset(10.0, 0.0); // slide in from the right
-                            const end = Offset.zero;
-                            const curve = Curves.easeInOutQuart;
-
-                            var tween = Tween(begin: begin, end: end)
-                                .chain(CurveTween(curve: curve));
-                            var offsetAnimation = animation.drive(tween);
-
-                            return SlideTransition(
-                              position: offsetAnimation,
-                              child: child,
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  )),
+                  );
+                },
+              ),
             ],
           ),
-        ),
-        Padding(
-          padding: EdgeInsets.fromLTRB(0, 3.h, 0, 0),
-          child: Row(
+          SizedBox(
+            height: 10,
+          ),
+          Row(
             children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0),
-                child: Icon(
-                  Icons.privacy_tip,
-                  color: Colors.red,
-                  size: 30,
-                ),
+              SizedBox(
+                width: 20,
               ),
-              Padding(
-                  padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0.h),
-                  child: Text(
-                    'Privacy & Policy',
-                    style: TextStyle(
-                        fontSize: 13.sp,
-                        color: Colors.black54,
-                        fontWeight: FontWeight.bold),
-                  )),
-              Padding(
-                  padding: EdgeInsets.fromLTRB(33.w, 0.h, 0, 0.h),
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.arrow_forward_ios,
-                      size: 28,
+              Icon(
+                Icons.privacy_tip,
+                color: Colors.red,
+                size: 30,
+              ),
+              SizedBox(
+                width: 20,
+              ),
+              Text(
+                'Privacy & Policy',
+                style: TextStyle(
+                    fontSize: 16.sp,
+                    color: Colors.black54,
+                    fontWeight: FontWeight.bold),
+              ),
+              Spacer(),
+              IconButton(
+                icon: const Icon(
+                  Icons.arrow_forward_ios,
+                  size: 28,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) {
+                        return const PrivacyPolicy();
+                      },
+                      transitionDuration: const Duration(seconds: 1),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        const begin =
+                            Offset(10.0, 0.0); // slide in from the right
+                        const end = Offset.zero;
+                        const curve = Curves.easeInOutQuart;
+
+                        var tween = Tween(begin: begin, end: end)
+                            .chain(CurveTween(curve: curve));
+                        var offsetAnimation = animation.drive(tween);
+
+                        return SlideTransition(
+                          position: offsetAnimation,
+                          child: child,
+                        );
+                      },
                     ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) {
-                            return const PrivacyPolicy();
-                          },
-                          transitionDuration: const Duration(seconds: 1),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            const begin =
-                                Offset(10.0, 0.0); // slide in from the right
-                            const end = Offset.zero;
-                            const curve = Curves.easeInOutQuart;
-
-                            var tween = Tween(begin: begin, end: end)
-                                .chain(CurveTween(curve: curve));
-                            var offsetAnimation = animation.drive(tween);
-
-                            return SlideTransition(
-                              position: offsetAnimation,
-                              child: child,
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  )),
+                  );
+                },
+              ),
             ],
           ),
-        ),
-        Padding(
-          padding: EdgeInsets.fromLTRB(0, 3.h, 0, 0),
-          child: Row(
+          SizedBox(
+            height: 10,
+          ),
+          Row(
             children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0),
-                child: const Icon(
-                  Icons.insert_invitation,
-                  color: Colors.red,
-                  size: 30,
-                ),
+              SizedBox(
+                width: 20,
               ),
-              Padding(
-                  padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0.h),
-                  child: Text(
-                    'Invite',
-                    style: TextStyle(
-                        fontSize: 13.sp,
-                        color: Colors.black54,
-                        fontWeight: FontWeight.bold),
-                  )),
-              Padding(
-                  padding: EdgeInsets.fromLTRB(55.5.w, 0.h, 0, 0.h),
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.arrow_forward_ios,
-                      size: 28,
+              const Icon(
+                Icons.insert_invitation,
+                color: Colors.red,
+                size: 30,
+              ),
+              SizedBox(
+                width: 20,
+              ),
+              Text(
+                'Invite',
+                style: TextStyle(
+                    fontSize: 16.sp,
+                    color: Colors.black54,
+                    fontWeight: FontWeight.bold),
+              ),
+              Spacer(),
+              IconButton(
+                icon: const Icon(
+                  Icons.arrow_forward_ios,
+                  size: 28,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) {
+                        return const InviteScreen();
+                      },
+                      transitionDuration: const Duration(seconds: 1),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        const begin =
+                            Offset(10.0, 0.0); // slide in from the right
+                        const end = Offset.zero;
+                        const curve = Curves.easeInOutQuart;
+
+                        var tween = Tween(begin: begin, end: end)
+                            .chain(CurveTween(curve: curve));
+                        var offsetAnimation = animation.drive(tween);
+
+                        return SlideTransition(
+                          position: offsetAnimation,
+                          child: child,
+                        );
+                      },
                     ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) {
-                            return const InviteScreen();
-                          },
-                          transitionDuration: const Duration(seconds: 1),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            const begin =
-                                Offset(10.0, 0.0); // slide in from the right
-                            const end = Offset.zero;
-                            const curve = Curves.easeInOutQuart;
-
-                            var tween = Tween(begin: begin, end: end)
-                                .chain(CurveTween(curve: curve));
-                            var offsetAnimation = animation.drive(tween);
-
-                            return SlideTransition(
-                              position: offsetAnimation,
-                              child: child,
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  )),
+                  );
+                },
+              ),
             ],
           ),
-        ),
-        Padding(
-          padding: EdgeInsets.fromLTRB(0, 3.h, 0, 0),
-          child: Row(
+          SizedBox(
+            height: 10,
+          ),
+          Row(
             children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0),
-                child: const Icon(
-                  Icons.help_center,
-                  color: Colors.red,
-                  size: 30,
-                ),
+              SizedBox(
+                width: 20,
               ),
-              Padding(
-                  padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0.h),
-                  child: Text(
-                    'Help Center',
-                    style: TextStyle(
-                        fontSize: 13.sp,
-                        color: Colors.black54,
-                        fontWeight: FontWeight.bold),
-                  )),
-              Padding(
-                  padding: EdgeInsets.fromLTRB(42.5.w, 0.h, 0, 0.h),
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.arrow_forward_ios,
-                      size: 28,
+              const Icon(
+                Icons.help_center,
+                color: Colors.red,
+                size: 30,
+              ),
+              SizedBox(
+                width: 20,
+              ),
+              Text(
+                'Help Center',
+                style: TextStyle(
+                    fontSize: 16.sp,
+                    color: Colors.black54,
+                    fontWeight: FontWeight.bold),
+              ),
+              Spacer(),
+              IconButton(
+                icon: const Icon(
+                  Icons.arrow_forward_ios,
+                  size: 28,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) {
+                        return const HelpCenterScreen();
+                      },
+                      transitionDuration: const Duration(seconds: 1),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        const begin =
+                            Offset(10.0, 0.0); // slide in from the right
+                        const end = Offset.zero;
+                        const curve = Curves.easeInOutQuart;
+
+                        var tween = Tween(begin: begin, end: end)
+                            .chain(CurveTween(curve: curve));
+                        var offsetAnimation = animation.drive(tween);
+
+                        return SlideTransition(
+                          position: offsetAnimation,
+                          child: child,
+                        );
+                      },
                     ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) {
-                            return const HelpCenterScreen();
-                          },
-                          transitionDuration: const Duration(seconds: 1),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            const begin =
-                                Offset(10.0, 0.0); // slide in from the right
-                            const end = Offset.zero;
-                            const curve = Curves.easeInOutQuart;
-
-                            var tween = Tween(begin: begin, end: end)
-                                .chain(CurveTween(curve: curve));
-                            var offsetAnimation = animation.drive(tween);
-
-                            return SlideTransition(
-                              position: offsetAnimation,
-                              child: child,
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  )),
+                  );
+                },
+              ),
             ],
           ),
-        ),
-        Padding(
-          padding: EdgeInsets.fromLTRB(0, 3.h, 0, 0),
-          child: Row(
+          SizedBox(
+            height: 10,
+          ),
+          Row(
             children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0),
-                child: const Icon(
-                  Icons.settings,
-                  color: Colors.red,
-                  size: 30,
-                ),
+              SizedBox(
+                width: 20,
               ),
-              Padding(
-                  padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0.h),
-                  child: Text(
-                    'Settings',
-                    style: TextStyle(
-                        fontSize: 13.sp,
-                        color: Colors.black54,
-                        fontWeight: FontWeight.bold),
-                  )),
-              Padding(
-                  padding: EdgeInsets.fromLTRB(49.w, 0.h, 0, 0.h),
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.arrow_forward_ios,
-                      size: 28,
+              const Icon(
+                Icons.settings,
+                color: Colors.red,
+                size: 30,
+              ),
+              SizedBox(
+                width: 20,
+              ),
+              Text(
+                'Settings',
+                style: TextStyle(
+                    fontSize: 16.sp,
+                    color: Colors.black54,
+                    fontWeight: FontWeight.bold),
+              ),
+              Spacer(),
+              IconButton(
+                icon: const Icon(
+                  Icons.arrow_forward_ios,
+                  size: 28,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) {
+                        return const SettingsScreen();
+                      },
+                      transitionDuration: const Duration(seconds: 1),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        const begin =
+                            Offset(10.0, 0.0); // slide in from the right
+                        const end = Offset.zero;
+                        const curve = Curves.easeInOutQuart;
+
+                        var tween = Tween(begin: begin, end: end)
+                            .chain(CurveTween(curve: curve));
+                        var offsetAnimation = animation.drive(tween);
+
+                        return SlideTransition(
+                          position: offsetAnimation,
+                          child: child,
+                        );
+                      },
                     ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) {
-                            return const SettingsScreen();
-                          },
-                          transitionDuration: const Duration(seconds: 1),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            const begin =
-                                Offset(10.0, 0.0); // slide in from the right
-                            const end = Offset.zero;
-                            const curve = Curves.easeInOutQuart;
-
-                            var tween = Tween(begin: begin, end: end)
-                                .chain(CurveTween(curve: curve));
-                            var offsetAnimation = animation.drive(tween);
-
-                            return SlideTransition(
-                              position: offsetAnimation,
-                              child: child,
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  )),
+                  );
+                },
+              ),
             ],
           ),
-        ),
-        Padding(
-          padding: EdgeInsets.fromLTRB(0, 3.h, 0, 0),
-          child: Row(
+          SizedBox(
+            height: 10,
+          ),
+          Row(
             children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0),
-                child: const Icon(
-                  Icons.logout,
-                  color: Colors.red,
-                  size: 30,
-                ),
+              SizedBox(
+                width: 20,
               ),
-              Padding(
-                  padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0.h),
-                  child: Text(
-                    'Log Out',
-                    style: TextStyle(
-                        fontSize: 13.sp,
-                        color: Colors.black54,
-                        fontWeight: FontWeight.bold),
-                  )),
-              Padding(
-                  padding: EdgeInsets.fromLTRB(49.5.w, 0.h, 0, 0.h),
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.arrow_forward_ios,
-                      size: 28,
-                    ),
-                    onPressed: () async {
-                      _showLogoutDialog(context);
-                    },
-                  )),
+              const Icon(
+                Icons.logout,
+                color: Colors.red,
+                size: 30,
+              ),
+              SizedBox(
+                width: 20,
+              ),
+              Text(
+                'Log Out',
+                style: TextStyle(
+                    fontSize: 16.sp,
+                    color: Colors.black54,
+                    fontWeight: FontWeight.bold),
+              ),
+              Spacer(),
+              IconButton(
+                icon: const Icon(
+                  Icons.arrow_forward_ios,
+                  size: 28,
+                ),
+                onPressed: () async {
+                  _showLogoutDialog(context);
+                },
+              ),
             ],
           ),
-        ),
-      ]),
+        ]),
+      ),
     );
   }
 

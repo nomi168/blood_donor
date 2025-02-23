@@ -88,6 +88,7 @@ dependencies:
   local_auth: ^2.3.0
   easy_stepper: ^0.8.5+1
   shared_preferences_android: ^2.4.4
+  get: ^4.6.6
 
   
  
@@ -152,6 +153,11 @@ flutter:
    - images/Banners/1.jpeg
    - images/Banners/2.jpeg
    - images/Banners/3.jpeg
+   - images/svg/
+   - images/
+   - images/pdf/
+   - images/json/
+   - images/Banners/
    
 
 

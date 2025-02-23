@@ -1,8 +1,8 @@
 // ignore_for_file: file_names, use_build_context_synchronously
 import 'package:blood_donor/Json%20Data/GlobalVariable.dart';
-import 'package:blood_donor/Screens/Authentication%20Screen/OTPForget.dart';
-import 'package:blood_donor/Screens/Authentication%20Screen/SignupScreen.dart';
 import 'package:blood_donor/Screens/Main%20Screen/Dashoard/Dashboatd.dart';
+import 'package:blood_donor/Screens/auth/presentation/screens/OTPForget.dart';
+import 'package:blood_donor/Screens/auth/presentation/screens/SignupScreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -192,13 +192,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(62.w, 0, 0, 0),
+            Container(
+              alignment: Alignment.centerRight,
+              margin: EdgeInsets.only(right: 10),
               child: TextButton(
                 child: Text(
                   'Forgot Password',
                   style: TextStyle(
-                    fontSize: 10.sp,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                     color: const Color(0xFFDE0A1E),
                     fontStyle: FontStyle.italic,
@@ -232,61 +233,56 @@ class _LoginScreenState extends State<LoginScreen> {
                 },
               ),
             ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(5.w, 0.h, 5.w, 0),
-              child: Material(
-                elevation: 3.5,
-                shadowColor: Colors.black,
-                borderRadius: BorderRadius.circular(10.0),
-                child: ElevatedButton(
-                  onPressed: () {
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 20),
+              child: ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    showCircularProgressIndicator = true;
+                  });
+                  if (_formKey.currentState?.validate() ?? false) {
+                    loginToFirestore();
+                  } else {
                     setState(() {
-                      showCircularProgressIndicator = true;
+                      showCircularProgressIndicator = false;
                     });
-                    if (_formKey.currentState?.validate() ?? false) {
-                      loginToFirestore();
-                    } else {
-                      setState(() {
-                        showCircularProgressIndicator = false;
-                      });
-                    }
-                  },
-                  style: ButtonStyle(
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
+                  }
+                },
+                style: ButtonStyle(
+                  shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                  padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
+                    EdgeInsets.symmetric(vertical: 13.5, horizontal: 0),
+                  ),
+                  backgroundColor:
+                      WidgetStateProperty.all<Color>(const Color(0xFFDE0A1E)),
+                ),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    if (showCircularProgressIndicator)
+                      const SizedBox(
+                        height: 22.0,
+                        width: 22.0,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.0,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
                       ),
-                    ),
-                    padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                      EdgeInsets.symmetric(vertical: 13.5, horizontal: 0),
-                    ),
-                    backgroundColor: MaterialStateProperty.all<Color>(
-                        const Color(0xFFDE0A1E)),
-                  ),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      if (showCircularProgressIndicator)
-                        const SizedBox(
-                          height: 22.0,
-                          width: 22.0,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.0,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
+                    if (!showCircularProgressIndicator)
+                      Text(
+                        'Continue',
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
-                      if (!showCircularProgressIndicator)
-                        Text(
-                          'Continue',
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                    ],
-                  ),
+                      ),
+                  ],
                 ),
               ),
             ),
@@ -300,7 +296,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Text(
                       'If you want to create account:',
                       style: TextStyle(
-                          fontSize: 12.sp, fontWeight: FontWeight.bold),
+                          fontSize: 16.sp, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -317,7 +313,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Text(
                         'Sign Up',
                         style: TextStyle(
-                            fontSize: 12.sp,
+                            fontSize: 16.sp,
                             fontWeight: FontWeight.bold,
                             color: Colors.red),
                       ),
@@ -392,6 +388,7 @@ class _LoginScreenState extends State<LoginScreen> {
         email: email,
         password: password,
       );
+      userCredential;
 
       DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
           .collection('users')

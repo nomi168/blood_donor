@@ -172,17 +172,19 @@ class _NewFeedScreenState extends State<NewFeedScreen> {
                                   pageBuilder:
                                       (context, animation, secondaryAnimation) {
                                     return MapOnDonator(
-                                        id: id,
-                                        name: name,
-                                        image: image,
-                                        email: email,
-                                        blood: blood,
-                                        location: location,
-                                        hosname: hosname,
-                                        rating: rating.toString(),
-                                        time: time,
-                                        date: date,
-                                        note: note);
+                                      id: id,
+                                      name: name,
+                                      image: image,
+                                      email: email,
+                                      blood: blood,
+                                      location: location,
+                                      hosname: hosname,
+                                      rating: rating.toString(),
+                                      time: time,
+                                      date: date,
+                                      note: note,
+                                      number: '',
+                                    );
                                   },
                                   transitionDuration:
                                       const Duration(seconds: 1),

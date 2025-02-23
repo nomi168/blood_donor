@@ -176,7 +176,7 @@ class _EditProfileState extends State<EditProfile> {
                         child: Text(
                           'Camera',
                           style: TextStyle(
-                              fontSize: 13.sp,
+                              fontSize: 16.sp,
                               fontWeight: FontWeight.bold,
                               color: Colors.black45),
                         ),
@@ -216,7 +216,7 @@ class _EditProfileState extends State<EditProfile> {
                         child: Text(
                           'Gallery',
                           style: TextStyle(
-                              fontSize: 13.sp,
+                              fontSize: 16.sp,
                               fontWeight: FontWeight.bold,
                               color: Colors.black45),
                         ),
@@ -257,6 +257,7 @@ class _EditProfileState extends State<EditProfile> {
               Padding(
                 padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
                 child: Material(
+                  color: Colors.white,
                   elevation: 2.5, // Add shadow/elevation
                   borderRadius:
                       BorderRadius.circular(10.0), // Add border radius
@@ -288,6 +289,7 @@ class _EditProfileState extends State<EditProfile> {
               Padding(
                 padding: EdgeInsets.fromLTRB(5.w, 2.4.h, 5.w, 0),
                 child: Material(
+                  color: Colors.white,
                   elevation: 2.5, // Add shadow/elevation
                   borderRadius:
                       BorderRadius.circular(10.0), // Add border radius
@@ -320,6 +322,7 @@ class _EditProfileState extends State<EditProfile> {
               Padding(
                   padding: EdgeInsets.fromLTRB(5.w, 2.4.h, 5.w, 0),
                   child: Material(
+                    color: Colors.white,
                     elevation: 2.5,
                     borderRadius: BorderRadius.circular(10.0),
                     child: DropdownButtonFormField(
@@ -440,16 +443,16 @@ class _EditProfileState extends State<EditProfile> {
                     // }
                   },
                   style: ButtonStyle(
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                       RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                     ),
-                    padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                    padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
                       // ignore: prefer_const_constructors
                       EdgeInsets.symmetric(vertical: 13.5, horizontal: 0),
                     ),
-                    backgroundColor: MaterialStateProperty.all<Color>(
+                    backgroundColor: WidgetStateProperty.all<Color>(
                         const Color(0xFFDE0A1E)), // Change button color
                   ),
                   child: Stack(
@@ -469,7 +472,7 @@ class _EditProfileState extends State<EditProfile> {
                         Text(
                           'Continue',
                           style: TextStyle(
-                            fontSize: 12.sp,
+                            fontSize: 16.sp,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -495,19 +498,26 @@ class _EditProfileState extends State<EditProfile> {
         // Get the document reference
         DocumentSnapshot documentSnapshot = querySnapshot.docs.first;
         String documentId = documentSnapshot.id;
-        String profileImageUrl = image!.path.toString();
+        String profileImageUrl = '';
+        if (image == null) {
+          profileImageUrl = widget.image;
+        } else {
+          profileImageUrl = image!.path.toString();
+        }
 
         // // ignore: unnecessary_null_comparison
         // ignore: unnecessary_null_comparison
         if (profileImageUrl != null) {
-          final File imageFile = File(profileImageUrl);
+          if (image != null) {
+            final File imageFile = File(profileImageUrl);
 
-          final storageRef = FirebaseStorage.instance
-              .ref()
-              .child('profile_images/${widget.id}.jpg');
+            final storageRef = FirebaseStorage.instance
+                .ref()
+                .child('profile_images/${widget.id}.jpg');
 
-          await storageRef.putFile(imageFile);
-          profileImageUrl = await storageRef.getDownloadURL();
+            await storageRef.putFile(imageFile);
+            profileImageUrl = await storageRef.getDownloadURL();
+          }
         }
 
         // Update the data in the document

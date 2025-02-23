@@ -32,22 +32,24 @@ class MapOnDonator extends StatefulWidget {
   final String hosname;
   final String note;
   final String email;
+  final String number;
 
   // ignore: non_constant_identifier_names
-  const MapOnDonator({
-    Key? key,
-    required this.name,
-    required this.image,
-    required this.blood,
-    required this.location,
-    required this.hosname,
-    required this.rating,
-    required this.time,
-    required this.date,
-    required this.id,
-    required this.note,
-    required this.email,
-  }) : super(key: key);
+  const MapOnDonator(
+      {Key? key,
+      required this.name,
+      required this.image,
+      required this.blood,
+      required this.location,
+      required this.hosname,
+      required this.rating,
+      required this.time,
+      required this.date,
+      required this.id,
+      required this.note,
+      required this.email,
+      required this.number})
+      : super(key: key);
 
   @override
   // ignore: library_private_types_in_public_api
@@ -156,7 +158,7 @@ class _MapOnDonatorState extends State<MapOnDonator> {
               border: Border.all(width: 0.5, color: Color(0xFFDDDDDD)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 10,
                   offset: Offset(0, 4),
                 ),
@@ -258,7 +260,7 @@ class _MapOnDonatorState extends State<MapOnDonator> {
               border: Border.all(width: 0.5, color: Color(0xFFDDDDDD)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 10,
                   offset: Offset(0, 4),
                 ),
@@ -402,7 +404,7 @@ class _MapOnDonatorState extends State<MapOnDonator> {
                 _acceptRequest();
               },
               style: ButtonStyle(
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                   RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0),
                   ),
@@ -415,7 +417,7 @@ class _MapOnDonatorState extends State<MapOnDonator> {
                 //       vertical: 2.h, horizontal: 32.w),
                 // ),
                 backgroundColor:
-                    MaterialStateProperty.all<Color>(const Color(0xFFDE0A1E)),
+                    WidgetStateProperty.all<Color>(const Color(0xFFDE0A1E)),
               ),
               child: Stack(
                 alignment: Alignment.center,
@@ -433,7 +435,7 @@ class _MapOnDonatorState extends State<MapOnDonator> {
                     Text(
                       'Accept',
                       style: TextStyle(
-                        fontSize: 12.sp,
+                        fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
@@ -476,8 +478,8 @@ class _MapOnDonatorState extends State<MapOnDonator> {
             SizedBox(height: 20),
             ElevatedButton(
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.red),
-                textStyle: MaterialStateProperty.all(
+                backgroundColor: WidgetStateProperty.all(Colors.red),
+                textStyle: WidgetStateProperty.all(
                   TextStyle(color: Colors.white),
                 ),
               ),
@@ -874,7 +876,9 @@ class _MapOnDonatorState extends State<MapOnDonator> {
           'time1': widget.time,
           'acceptrating': accepterrating,
           'acceptblood': blood,
-          "status": false
+          'status': false,
+          'sendernumber': widget.number,
+          'received_status': false
         });
         print('Nomi');
 

@@ -85,276 +85,301 @@ class _FeedState extends State<Feed> {
 
   @override
   Widget build(BuildContext context) {
-    return Sizer(
-      builder: (context, oreintation, deviceType) {
-        return Scaffold(
-          appBar: AppBar(
-            actions: [
-              // IconButton to show path
-              IconButton(
-                onPressed: () {
-                  showPath(widget.location);
-                },
-                icon: const Icon(Icons.directions),
-              ),
-              Padding(
-                  padding: EdgeInsets.fromLTRB(0.w, 0, 0, 0),
-                  child: IconButton(
-                    onPressed: _goToCurrentLocation,
-                    icon: const Icon(
-                      Icons.my_location,
-                      size: 35,
-                      color: Colors.black54,
-                    ),
-                  )),
-              // Switch for light/dark mode
-              Switch(
-                value: isLightMode,
-                onChanged: (value) {
-                  setState(() {
-                    isLightMode = value;
-                  });
-                  _toggleMapMode();
-                },
-              ),
+    return Scaffold(
+      appBar: AppBar(
+        actions: [
+          // IconButton to show path
+          IconButton(
+            onPressed: () {
+              showPath(widget.location);
+            },
+            icon: const Icon(Icons.directions),
+          ),
+          Padding(
+              padding: EdgeInsets.fromLTRB(0.w, 0, 0, 0),
+              child: IconButton(
+                onPressed: _goToCurrentLocation,
+                icon: const Icon(
+                  Icons.my_location,
+                  size: 35,
+                  color: Colors.black54,
+                ),
+              )),
+          // Switch for light/dark mode
+          Switch(
+            value: isLightMode,
+            onChanged: (value) {
+              setState(() {
+                isLightMode = value;
+              });
+              _toggleMapMode();
+            },
+          ),
+        ],
+      ),
+      backgroundColor: Colors.white,
+      body: Stack(children: [
+        Container(
+          color: const Color.fromRGBO(244, 67, 54, 1),
+          height: 35.h,
+          width: 100.w,
+          child: GoogleMap(
+            mapType: isLightMode ? MapType.normal : MapType.hybrid,
+            initialCameraPosition: _kGooglePlex,
+            polylines: Set<Polyline>.of(polylines),
+            circles: Set<Circle>.of(circles),
+            onMapCreated: (GoogleMapController controller) {
+              _controller.complete(controller);
+            },
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(5.w, 30.h, 5.w, 0),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10.0),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.grey,
+                  spreadRadius: 2,
+                  blurRadius: 5,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            height: 11.h,
+            width: 100.w,
+            child: Stack(
+              children: [
+                Padding(
+                    padding: EdgeInsets.fromLTRB(7.w, 1.5.h, 0, 3.h),
+                    child: CircleAvatar(
+                        radius: 28,
+                        backgroundImage: NetworkImage(widget.image))),
+                Padding(
+                    padding: EdgeInsets.fromLTRB(27.w, 1.h, 0, 3.h),
+                    child: Text(
+                      widget.name,
+                      style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black),
+                    )),
+                Padding(
+                    padding: EdgeInsets.fromLTRB(27.w, 4.h, 0, 3.h),
+                    child: Text(
+                      widget.hospital,
+                      style: TextStyle(fontSize: 15.sp, color: Colors.black),
+                    )),
+                Padding(
+                    padding: EdgeInsets.fromLTRB(27.w, 6.5.h, 0, 3.h),
+                    child: const Icon(Icons.star,
+                        size: 20, color: Color(0xFFDE0A1E))),
+                Padding(
+                    padding: EdgeInsets.fromLTRB(34.w, 6.5.h, 0, 0.h),
+                    child: Text(
+                      widget.rating,
+                      style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFFDE0A1E)),
+                    )),
+                // Padding(
+                //     padding: EdgeInsets.fromLTRB(75.w, 0.h, 0, 3.h),
+                //     child: IconButton(
+                //       icon: const Icon(
+                //         Icons.messenger,
+                //         size: 22,
+                //         color: Color(0xFFDE0A1E),
+                //       ),
+                //       onPressed: () {},
+                //     )),
+              ],
+            ),
+          ),
+        ),
+        Padding(
+            padding: EdgeInsets.fromLTRB(5.w, 42.h, 0, 0.h),
+            child: Text(
+              'Donation Details',
+              style: TextStyle(
+                  fontSize: 16.sp,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold),
+            )),
+        Padding(
+            padding: EdgeInsets.fromLTRB(5.w, 46.h, 0, 0.h),
+            child: Text(
+              'Location-',
+              style: TextStyle(
+                  fontSize: 16.sp,
+                  color: Colors.black54,
+                  fontWeight: FontWeight.bold),
+            )),
+        Padding(
+            padding: EdgeInsets.fromLTRB(23.w, 46.h, 0, 0.h),
+            child: Text(
+              widget.location,
+              style: TextStyle(
+                  fontSize: 16.sp,
+                  color: Colors.black54,
+                  fontWeight: FontWeight.bold),
+            )),
+        Padding(
+            padding: EdgeInsets.fromLTRB(5.w, 50.h, 0, 0.h),
+            child: Text(
+              'Schedule-',
+              style: TextStyle(
+                  fontSize: 16.sp,
+                  color: Colors.black54,
+                  fontWeight: FontWeight.bold),
+            )),
+        Padding(
+            padding: EdgeInsets.fromLTRB(25.w, 50.h, 0, 0.h),
+            child: Text(
+              widget.date,
+              style: TextStyle(
+                  fontSize: 16.sp,
+                  color: Colors.black54,
+                  fontWeight: FontWeight.bold),
+            )),
+        Padding(
+            padding: EdgeInsets.fromLTRB(47.w, 50.h, 0, 0.h),
+            child: Text(
+              ', ${widget.time}',
+              style: TextStyle(
+                  fontSize: 16.sp,
+                  color: Colors.black54,
+                  fontWeight: FontWeight.bold),
+            )),
+        Padding(
+            padding: EdgeInsets.fromLTRB(5.w, 57.h, 0, 0.h),
+            child: Text(
+              'Share Your Feedback',
+              style: TextStyle(
+                  fontSize: 16.sp,
+                  color: Colors.black54,
+                  fontWeight: FontWeight.bold),
+            )),
+        Padding(
+          padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0.h),
+          child: Row(
+            children: [
+              buildStar(1),
+              buildStar(2),
+              buildStar(3),
+              buildStar(4),
+              buildStar(5),
             ],
           ),
-          backgroundColor: Colors.white,
-          body: Stack(children: [
-            Container(
-              color: const Color.fromRGBO(244, 67, 54, 1),
-              height: 35.h,
+        ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(5.w, 65.h, 5.w, 0),
+          child: Material(
+            elevation: 7.0,
+            borderRadius: BorderRadius.circular(10.0),
+            child: TextField(
+              controller: review,
+              decoration: InputDecoration(
+                contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16.0, vertical: 30.0),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide: const BorderSide(color: Colors.grey),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide: const BorderSide(color: Colors.blue),
+                ),
+                hintText: 'Tell us how was your expericence wuth the seeker',
+              ),
+            ),
+          ),
+        ),
+        Padding(
+            padding: EdgeInsets.fromLTRB(5.w, 78.h, 5.w, 2.h),
+            child: SizedBox(
+              height: 8.h,
               width: 100.w,
-              child: GoogleMap(
-                mapType: isLightMode ? MapType.normal : MapType.hybrid,
-                initialCameraPosition: _kGooglePlex,
-                polylines: Set<Polyline>.of(polylines),
-                circles: Set<Circle>.of(circles),
-                onMapCreated: (GoogleMapController controller) {
-                  _controller.complete(controller);
-                },
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(5.w, 30.h, 5.w, 0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10.0),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.grey,
-                      spreadRadius: 2,
-                      blurRadius: 5,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
-                height: 11.h,
-                width: 100.w,
-                child: Stack(
-                  children: [
-                    Padding(
-                        padding: EdgeInsets.fromLTRB(7.w, 1.5.h, 0, 3.h),
-                        child: CircleAvatar(
-                            radius: 28,
-                            backgroundImage: NetworkImage(widget.image))),
-                    Padding(
-                        padding: EdgeInsets.fromLTRB(27.w, 1.h, 0, 3.h),
-                        child: Text(
-                          widget.name,
-                          style: TextStyle(
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
-                        )),
-                    Padding(
-                        padding: EdgeInsets.fromLTRB(27.w, 4.h, 0, 3.h),
-                        child: Text(
-                          widget.hospital,
-                          style:
-                              TextStyle(fontSize: 11.sp, color: Colors.black),
-                        )),
-                    Padding(
-                        padding: EdgeInsets.fromLTRB(27.w, 6.5.h, 0, 3.h),
-                        child: const Icon(Icons.star,
-                            size: 20, color: Color(0xFFDE0A1E))),
-                    Padding(
-                        padding: EdgeInsets.fromLTRB(34.w, 6.5.h, 0, 0.h),
-                        child: Text(
-                          widget.rating,
-                          style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFFDE0A1E)),
-                        )),
-                    // Padding(
-                    //     padding: EdgeInsets.fromLTRB(75.w, 0.h, 0, 3.h),
-                    //     child: IconButton(
-                    //       icon: const Icon(
-                    //         Icons.messenger,
-                    //         size: 22,
-                    //         color: Color(0xFFDE0A1E),
-                    //       ),
-                    //       onPressed: () {},
-                    //     )),
-                  ],
-                ),
-              ),
-            ),
-            Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 42.h, 0, 0.h),
-                child: Text(
-                  'Donation Details',
-                  style: TextStyle(
-                      fontSize: 13.sp,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold),
-                )),
-            Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 46.h, 0, 0.h),
-                child: Text(
-                  'Location-',
-                  style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Colors.black54,
-                      fontWeight: FontWeight.bold),
-                )),
-            Padding(
-                padding: EdgeInsets.fromLTRB(23.w, 46.h, 0, 0.h),
-                child: Text(
-                  widget.location,
-                  style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Colors.black54,
-                      fontWeight: FontWeight.bold),
-                )),
-            Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 50.h, 0, 0.h),
-                child: Text(
-                  'Schedule-',
-                  style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Colors.black54,
-                      fontWeight: FontWeight.bold),
-                )),
-            Padding(
-                padding: EdgeInsets.fromLTRB(25.w, 50.h, 0, 0.h),
-                child: Text(
-                  widget.date,
-                  style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Colors.black54,
-                      fontWeight: FontWeight.bold),
-                )),
-            Padding(
-                padding: EdgeInsets.fromLTRB(47.w, 50.h, 0, 0.h),
-                child: Text(
-                  ', ${widget.time}',
-                  style: TextStyle(
-                      fontSize: 12.sp,
-                      color: Colors.black54,
-                      fontWeight: FontWeight.bold),
-                )),
-            Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 57.h, 0, 0.h),
-                child: Text(
-                  'Share Your Feedback',
-                  style: TextStyle(
-                      fontSize: 13.sp,
-                      color: Colors.black54,
-                      fontWeight: FontWeight.bold),
-                )),
-            Padding(
-              padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0.h),
-              child: Row(
-                children: [
-                  buildStar(1),
-                  buildStar(2),
-                  buildStar(3),
-                  buildStar(4),
-                  buildStar(5),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(5.w, 65.h, 5.w, 0),
               child: Material(
-                elevation: 7.0,
-                borderRadius: BorderRadius.circular(10.0),
-                child: TextField(
-                  controller: review,
-                  decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 30.0),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: const BorderSide(color: Colors.grey),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: const BorderSide(color: Colors.blue),
-                    ),
-                    hintText:
-                        'Tell us how was your expericence wuth the seeker',
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 78.h, 5.w, 2.h),
-                child: SizedBox(
-                  height: 8.h,
-                  width: 100.w,
-                  child: Material(
-                      borderRadius:
-                          BorderRadius.circular(10.0), // Add border radius
-                      elevation: 5.0,
-                      color: const Color(0xFFDE0A1E),
-                      child: Row(
-                        children: [
-                          Padding(
-                              padding: EdgeInsets.fromLTRB(5.w, 0, 0, 0),
-                              child: TextButton(
-                                child: Text(
-                                  'Cancel Request',
-                                  style: TextStyle(
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white70),
-                                ),
-                                onPressed: () async {
-                                  await deleteAcceptRequest();
-                                },
-                              )),
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(3.w, 0, 0, 0),
-                            child: const VerticalDivider(
-                              color: Colors.white, // Adjust the color as needed
-                              thickness: 2.0, // Adjust the thickness as needed
+                  borderRadius:
+                      BorderRadius.circular(10.0), // Add border radius
+                  elevation: 5.0,
+                  color: const Color(0xFFDE0A1E),
+                  child: Row(
+                    children: [
+                      Padding(
+                          padding: EdgeInsets.fromLTRB(5.w, 0, 0, 0),
+                          child: TextButton(
+                            child: Text(
+                              'Cancel Request',
+                              style: TextStyle(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white70),
                             ),
-                          ),
-                          Padding(
-                              padding: EdgeInsets.fromLTRB(10.w, 0, 0, 0),
-                              child: TextButton(
-                                child: Text(
-                                  'Donated',
-                                  style: TextStyle(
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white),
-                                ),
-                                onPressed: () {
-                                  _showConfirmationDialog(context);
-                                },
-                              ))
-                        ],
-                      )),
-                ))
-          ]),
-        );
-      },
+                            onPressed: () async {
+                              await deleteAcceptRequest();
+                            },
+                          )),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(3.w, 0, 0, 0),
+                        child: const VerticalDivider(
+                          color: Colors.white, // Adjust the color as needed
+                          thickness: 2.0, // Adjust the thickness as needed
+                        ),
+                      ),
+                      Padding(
+                          padding: EdgeInsets.fromLTRB(10.w, 0, 0, 0),
+                          child: TextButton(
+                            child: Text(
+                              'Donated',
+                              style: TextStyle(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                            onPressed: () async {
+                              bool? result = await getReceivedStatus();
+                              if (result) {
+                                _showConfirmationDialog(context);
+                              } else {
+                                EasyLoading.showError(
+                                    'The taker has not received it at your location.');
+                              }
+                            },
+                          ))
+                    ],
+                  )),
+            ))
+      ]),
     );
+  }
+
+  Future<bool> getReceivedStatus() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('acceptdonation')
+          .where('acceptemail', isEqualTo: widget.donoremail)
+          .where('email', isEqualTo: widget.email)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Get the first document
+        DocumentSnapshot userDoc = querySnapshot.docs.first;
+
+        if (userDoc.exists && userDoc['received_status'] == true) {
+          return true;
+        }
+      } else {
+        print('No documents found in the acceptdonation collection');
+      }
+    } catch (e) {
+      print('Error fetching received status: $e');
+    }
+
+    return false; // Return false if no valid document is found
   }
 
   Future<void> _getCurrentLocation() async {
@@ -813,24 +838,23 @@ class _FeedState extends State<Feed> {
                         );
                       },
                       style: ButtonStyle(
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                         ),
-                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                        padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
                           // Increase horizontal padding
                           // ignore: prefer_const_constructors
                           EdgeInsets.symmetric(vertical: 2.h, horizontal: 25.w),
                         ),
-                        backgroundColor: MaterialStateProperty.all<Color>(
+                        backgroundColor: WidgetStateProperty.all<Color>(
                             const Color(0xFFDE0A1E)),
                       ),
                       child: Text(
                         'Yes',
                         style: TextStyle(
-                          fontSize: 12.sp,
+                          fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -849,24 +873,23 @@ class _FeedState extends State<Feed> {
                         Navigator.pop(context);
                       },
                       style: ButtonStyle(
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                         ),
-                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                        padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
                           // Increase horizontal padding
                           // ignore: prefer_const_constructors
                           EdgeInsets.symmetric(vertical: 2.h, horizontal: 26.w),
                         ),
                         backgroundColor:
-                            MaterialStateProperty.all<Color>(Colors.black12),
+                            WidgetStateProperty.all<Color>(Colors.black12),
                       ),
                       child: Text(
                         'No',
                         style: TextStyle(
-                          fontSize: 12.sp,
+                          fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),

@@ -3,7 +3,7 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:blood_donor/Screens/Authentication%20Screen/LoginScreen.dart';
+import 'package:blood_donor/Screens/auth/presentation/screens/LoginScreen.dart';
 import 'package:blood_donor/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';

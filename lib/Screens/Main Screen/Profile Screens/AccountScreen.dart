@@ -164,140 +164,133 @@ class _AccountScreenState extends State<AccountScreen>
                               ),
                             )),
                       ),
+                      SizedBox(
+                        height: 10,
+                      ),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Padding(
-                              padding: EdgeInsets.fromLTRB(0.w, 1.h, 0, 0),
-                              child: Center(
-                                child: Text(
-                                  '$fullname',
-                                  style: TextStyle(
-                                      fontSize: 15.sp,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white),
-                                ),
-                              )),
+                          Text(
+                            '$fullname',
+                            style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
                           if (useractive)
-                            Padding(
-                                padding: EdgeInsets.fromLTRB(2.w, 1.h, 0, 0),
-                                child: Container(
-                                  width: 10.0,
-                                  height: 10.0,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: useractive
-                                        ? Colors.green
-                                        : Colors.white,
-                                  ),
-                                )),
+                            Container(
+                              width: 10.0,
+                              height: 10.0,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: useractive ? Colors.green : Colors.white,
+                              ),
+                            ),
                         ],
                       ),
                       if (phonenumber.isNotEmpty)
-                        Padding(
-                            padding: EdgeInsets.fromLTRB(0, 0.h, 0, 0),
-                            child: Center(
-                                child: Text(
-                              '$phonenumber',
-                              style: TextStyle(
-                                  fontSize: 15.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
-                            ))),
+                        Text(
+                          '$phonenumber',
+                          style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                        ),
                     ],
                   )),
-              Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 30.h, 5.w, 0.h),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10.0),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.grey,
-                        spreadRadius: 2,
-                        blurRadius: 5,
-                        offset: Offset(0, 2),
+              Container(
+                margin: EdgeInsets.only(top: 250, left: 30, right: 30),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10.0),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.grey,
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                height: 11.h,
+                width: 100.w,
+                child: Stack(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(10.w, 0, 0, 3.h),
+                      child: Image.network(
+                        'https://t4.ftcdn.net/jpg/01/05/48/99/360_F_105489957_HLDAbr6hatX6iKvR4DEZ38YVZJHXl8As.jpg',
+                        width: 13.w,
+                        height: 13.h,
                       ),
-                    ],
-                  ),
-                  height: 11.h,
-                  width: 100.w,
-                  child: Stack(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(10.w, 0, 0, 3.h),
-                        child: Image.network(
-                          'https://t4.ftcdn.net/jpg/01/05/48/99/360_F_105489957_HLDAbr6hatX6iKvR4DEZ38YVZJHXl8As.jpg',
-                          width: 13.w,
-                          height: 13.h,
-                        ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(35.w, 0, 0, 3.h),
+                      child: Image.network(
+                        'https://img.freepik.com/free-vector/blood-donor-day-poster-with-heart-blood-drop_1017-25357.jpg',
+                        width: 13.w,
+                        height: 13.h,
                       ),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(35.w, 0, 0, 3.h),
-                        child: Image.network(
-                          'https://img.freepik.com/free-vector/blood-donor-day-poster-with-heart-blood-drop_1017-25357.jpg',
-                          width: 13.w,
-                          height: 13.h,
-                        ),
+                    ),
+                    userType == 'donor'
+                        ? Padding(
+                            padding: EdgeInsets.fromLTRB(57.w, 2.h, 0, 0.h),
+                            child: nextDonationDate == null
+                                ? Text(
+                                    'donate now',
+                                    style: TextStyle(
+                                        color: PRIMARY_COLOR,
+                                        fontWeight: FontWeight.w500),
+                                  )
+                                : Text(
+                                    remainingTime.isNegative
+                                        ? "You are eligible to donate now!"
+                                        : " ${remainingTime.inDays} d, "
+                                            "${remainingTime.inHours % 24} h, ${remainingTime.inMinutes % 60} minutes, "
+                                            "${remainingTime.inSeconds % 60} sec",
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                          )
+                        : SizedBox(),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(10.w, 7.5.h, 0, 0.h),
+                      child: Text(
+                        '$blood Group',
+                        style: TextStyle(
+                            fontSize: 15.sp,
+                            color: Colors.black54,
+                            fontWeight: FontWeight.bold),
                       ),
-                      userType == 'donor'
-                          ? Padding(
-                              padding: EdgeInsets.fromLTRB(57.w, 2.h, 0, 0.h),
-                              child: nextDonationDate == null
-                                  ? Text(
-                                      'donate now',
-                                      style: TextStyle(
-                                          color: PRIMARY_COLOR,
-                                          fontWeight: FontWeight.w500),
-                                    )
-                                  : Text(
-                                      remainingTime.isNegative
-                                          ? "You are eligible to donate now!"
-                                          : " ${remainingTime.inDays} d, "
-                                              "${remainingTime.inHours % 24} h, ${remainingTime.inMinutes % 60} minutes, "
-                                              "${remainingTime.inSeconds % 60} sec",
-                                      style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500),
-                                    ),
-                            )
-                          : SizedBox(),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(10.w, 7.5.h, 0, 0.h),
+                    ),
+                    Padding(
+                        padding: EdgeInsets.fromLTRB(32.w, 7.5.h, 0, 0.h),
+                        child: Consumer<Profile>(
+                          builder: (context, value, child) {
+                            return Text(
+                              value.life,
+                              style: TextStyle(
+                                  fontSize: 15.sp,
+                                  color: Colors.black54,
+                                  fontWeight: FontWeight.bold),
+                            );
+                          },
+                        )),
+                    Padding(
+                        padding: EdgeInsets.fromLTRB(58.w, 7.5.h, 0, 0.h),
                         child: Text(
-                          '$blood Group',
+                          'Next Donation',
                           style: TextStyle(
-                              fontSize: 10.sp,
+                              fontSize: 15.sp,
                               color: Colors.black54,
                               fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Padding(
-                          padding: EdgeInsets.fromLTRB(32.w, 7.5.h, 0, 0.h),
-                          child: Consumer<Profile>(
-                            builder: (context, value, child) {
-                              return Text(
-                                value.life,
-                                style: TextStyle(
-                                    fontSize: 10.sp,
-                                    color: Colors.black54,
-                                    fontWeight: FontWeight.bold),
-                              );
-                            },
-                          )),
-                      Padding(
-                          padding: EdgeInsets.fromLTRB(58.w, 7.5.h, 0, 0.h),
-                          child: Text(
-                            'Next Donation',
-                            style: TextStyle(
-                                fontSize: 10.sp,
-                                color: Colors.black54,
-                                fontWeight: FontWeight.bold),
-                          )),
-                    ],
-                  ),
+                        )),
+                  ],
                 ),
               ),
             ],
@@ -412,369 +405,366 @@ class _AccountScreenState extends State<AccountScreen>
                 ),
               )
             : SizedBox(),
-
-//
+        SizedBox(
+          height: 20,
+        ),
         userType == 'donor'
-            ? Row(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(5.w, 2.h, 0, 0),
-                    child: const Icon(
+            ? Container(
+                margin: EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  children: [
+                    Icon(
                       Icons.event_available,
                       color: Colors.red,
                       size: 30,
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(5.w, 2.h, 0, 0.h),
-                    child: Text(
+                    SizedBox(
+                      width: 20,
+                    ),
+                    Text(
                       'Available To Donate',
                       style: TextStyle(
-                        fontSize: 13.sp,
+                        fontSize: 16.sp,
                         color: Colors.black54,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                  Spacer(),
-                  Padding(
-                      padding: EdgeInsets.fromLTRB(0.w, 2.h, 5.w, 0.h),
-                      child: Container(
-                        height: 40,
-                        width: 120,
-                        decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
-                            borderRadius: BorderRadius.circular(08)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            // First container
+                    Spacer(),
+                    Container(
+                      height: 40,
+                      width: 120,
+                      decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(08)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          // First container
 
-                            // Second container
-                            Container(
-                              height: 30,
-                              width: 50,
-                              decoration: BoxDecoration(
-                                color: availablility == true
-                                    ? PRIMARY_COLOR
-                                    : Colors.white,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Center(
-                                child: Text('No',
-                                    style: TextStyle(
-                                        color: availablility == true
-                                            ? Colors.white
-                                            : Colors.black)),
-                              ),
+                          // Second container
+                          Container(
+                            height: 30,
+                            width: 50,
+                            decoration: BoxDecoration(
+                              color: availablility == true
+                                  ? PRIMARY_COLOR
+                                  : Colors.white,
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                            Container(
-                              height: 30,
-                              width: 50,
-                              decoration: BoxDecoration(
-                                color: availablility == false
-                                    ? PRIMARY_COLOR
-                                    : Colors
-                                        .white, // Grey if condition is true, Red otherwise
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Center(
-                                child: Text('Yes',
-                                    style: TextStyle(
-                                        color: availablility == false
-                                            ? Colors.white
-                                            : Colors.black)),
-                              ),
+                            child: Center(
+                              child: Text('No',
+                                  style: TextStyle(
+                                      color: availablility == true
+                                          ? Colors.white
+                                          : Colors.black)),
                             ),
-                          ],
-                        ),
-                      )),
-                ],
+                          ),
+                          Container(
+                            height: 30,
+                            width: 50,
+                            decoration: BoxDecoration(
+                              color: availablility == false
+                                  ? PRIMARY_COLOR
+                                  : Colors
+                                      .white, // Grey if condition is true, Red otherwise
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Center(
+                              child: Text('Yes',
+                                  style: TextStyle(
+                                      color: availablility == false
+                                          ? Colors.white
+                                          : Colors.black)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               )
             : SizedBox(
                 height: 5.h,
               ),
-
-        Row(
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0),
-              child: const Icon(
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            children: [
+              const Icon(
                 Icons.location_on,
                 color: Colors.red,
                 size: 30,
               ),
-            ),
-            Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0.h),
-                child: Text(
-                  'Manage Address',
-                  style: TextStyle(
-                      fontSize: 13.sp,
-                      color: Colors.black54,
-                      fontWeight: FontWeight.bold),
-                )),
-            Padding(
-                padding: EdgeInsets.fromLTRB(30.w, 0.h, 0, 0.h),
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.arrow_forward_ios,
-                    size: 28,
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                        pageBuilder: (context, animation, secondaryAnimation) {
-                          return const ManageAddressScreen();
-                        },
-                        transitionDuration: const Duration(seconds: 1),
-                        transitionsBuilder:
-                            (context, animation, secondaryAnimation, child) {
-                          const begin =
-                              Offset(10.0, 0.0); // slide in from the right
-                          const end = Offset.zero;
-                          const curve = Curves.easeInOutQuart;
+              SizedBox(
+                width: 20,
+              ),
+              Text(
+                'Manage Address',
+                style: TextStyle(
+                    fontSize: 16.sp,
+                    color: Colors.black54,
+                    fontWeight: FontWeight.bold),
+              ),
+              Spacer(),
+              IconButton(
+                icon: const Icon(
+                  Icons.arrow_forward_ios,
+                  size: 28,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) {
+                        return const ManageAddressScreen();
+                      },
+                      transitionDuration: const Duration(seconds: 1),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        const begin =
+                            Offset(10.0, 0.0); // slide in from the right
+                        const end = Offset.zero;
+                        const curve = Curves.easeInOutQuart;
 
-                          var tween = Tween(begin: begin, end: end)
-                              .chain(CurveTween(curve: curve));
-                          var offsetAnimation = animation.drive(tween);
+                        var tween = Tween(begin: begin, end: end)
+                            .chain(CurveTween(curve: curve));
+                        var offsetAnimation = animation.drive(tween);
 
-                          return SlideTransition(
-                            position: offsetAnimation,
-                            child: child,
-                          );
-                        },
-                      ),
-                    );
-                  },
-                )),
-          ],
+                        return SlideTransition(
+                          position: offsetAnimation,
+                          child: child,
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
-        Row(
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0),
-              child: const Icon(
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            children: [
+              const Icon(
                 Icons.point_of_sale,
                 color: Colors.red,
                 size: 30,
               ),
-            ),
-            Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0.h),
-                child: Text(
-                  'Reward Points',
-                  style: TextStyle(
-                      fontSize: 13.sp,
-                      color: Colors.black54,
-                      fontWeight: FontWeight.bold),
-                )),
-            Padding(
-                padding: EdgeInsets.fromLTRB(35.w, 0.h, 0, 0.h),
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.arrow_forward_ios,
-                    size: 28,
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                        pageBuilder: (context, animation, secondaryAnimation) {
-                          return const RewardPointsScreen();
-                        },
-                        transitionDuration: const Duration(seconds: 1),
-                        transitionsBuilder:
-                            (context, animation, secondaryAnimation, child) {
-                          const begin =
-                              Offset(10.0, 0.0); // slide in from the right
-                          const end = Offset.zero;
-                          const curve = Curves.easeInOutQuart;
+              SizedBox(
+                width: 20,
+              ),
+              Text(
+                'Reward Points',
+                style: TextStyle(
+                    fontSize: 16.sp,
+                    color: Colors.black54,
+                    fontWeight: FontWeight.bold),
+              ),
+              Spacer(),
+              IconButton(
+                icon: const Icon(
+                  Icons.arrow_forward_ios,
+                  size: 28,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) {
+                        return const RewardPointsScreen();
+                      },
+                      transitionDuration: const Duration(seconds: 1),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        const begin =
+                            Offset(10.0, 0.0); // slide in from the right
+                        const end = Offset.zero;
+                        const curve = Curves.easeInOutQuart;
 
-                          var tween = Tween(begin: begin, end: end)
-                              .chain(CurveTween(curve: curve));
-                          var offsetAnimation = animation.drive(tween);
+                        var tween = Tween(begin: begin, end: end)
+                            .chain(CurveTween(curve: curve));
+                        var offsetAnimation = animation.drive(tween);
 
-                          return SlideTransition(
-                            position: offsetAnimation,
-                            child: child,
-                          );
-                        },
-                      ),
-                    );
-                  },
-                )),
-          ],
+                        return SlideTransition(
+                          position: offsetAnimation,
+                          child: child,
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
-
-        Row(
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0),
-              child: const Icon(
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            children: [
+              const Icon(
                 Icons.card_membership,
                 color: Colors.red,
                 size: 30,
               ),
-            ),
-            Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0.h),
-                child: Text(
-                  'Refferral Invitation',
-                  style: TextStyle(
-                      fontSize: 13.sp,
-                      color: Colors.black54,
-                      fontWeight: FontWeight.bold),
-                )),
-            Padding(
-                padding: EdgeInsets.fromLTRB(26.w, 0.h, 0, 0.h),
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.arrow_forward_ios,
-                    size: 28,
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                        pageBuilder: (context, animation, secondaryAnimation) {
-                          return const RefferalInvitation();
-                        },
-                        transitionDuration: const Duration(seconds: 1),
-                        transitionsBuilder:
-                            (context, animation, secondaryAnimation, child) {
-                          const begin =
-                              Offset(10.0, 0.0); // slide in from the right
-                          const end = Offset.zero;
-                          const curve = Curves.easeInOutQuart;
+              SizedBox(
+                width: 20,
+              ),
+              Text(
+                'Refferral Invitation',
+                style: TextStyle(
+                    fontSize: 16.sp,
+                    color: Colors.black54,
+                    fontWeight: FontWeight.bold),
+              ),
+              Spacer(),
+              IconButton(
+                icon: const Icon(
+                  Icons.arrow_forward_ios,
+                  size: 28,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) {
+                        return const RefferalInvitation();
+                      },
+                      transitionDuration: const Duration(seconds: 1),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        const begin =
+                            Offset(10.0, 0.0); // slide in from the right
+                        const end = Offset.zero;
+                        const curve = Curves.easeInOutQuart;
 
-                          var tween = Tween(begin: begin, end: end)
-                              .chain(CurveTween(curve: curve));
-                          var offsetAnimation = animation.drive(tween);
+                        var tween = Tween(begin: begin, end: end)
+                            .chain(CurveTween(curve: curve));
+                        var offsetAnimation = animation.drive(tween);
 
-                          return SlideTransition(
-                            position: offsetAnimation,
-                            child: child,
-                          );
-                        },
-                      ),
-                    );
-                  },
-                )),
-          ],
+                        return SlideTransition(
+                          position: offsetAnimation,
+                          child: child,
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
-        Row(
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0),
-              child: const Icon(
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            children: [
+              const Icon(
                 Icons.history,
                 color: Colors.red,
                 size: 30,
               ),
-            ),
-            Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0.h),
-                child: Text(
-                  'History',
-                  style: TextStyle(
-                      fontSize: 13.sp,
-                      color: Colors.black54,
-                      fontWeight: FontWeight.bold),
-                )),
-            Padding(
-                padding: EdgeInsets.fromLTRB(49.5.w, 0.h, 0, 0.h),
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.arrow_forward_ios,
-                    size: 28,
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                        pageBuilder: (context, animation, secondaryAnimation) {
-                          return const HistoryScreen();
-                        },
-                        transitionDuration: const Duration(seconds: 1),
-                        transitionsBuilder:
-                            (context, animation, secondaryAnimation, child) {
-                          const begin =
-                              Offset(10.0, 0.0); // slide in from the right
-                          const end = Offset.zero;
-                          const curve = Curves.easeInOutQuart;
+              SizedBox(
+                width: 20,
+              ),
+              Text(
+                'History',
+                style: TextStyle(
+                    fontSize: 16.sp,
+                    color: Colors.black54,
+                    fontWeight: FontWeight.bold),
+              ),
+              Spacer(),
+              IconButton(
+                icon: const Icon(
+                  Icons.arrow_forward_ios,
+                  size: 28,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) {
+                        return const HistoryScreen();
+                      },
+                      transitionDuration: const Duration(seconds: 1),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        const begin =
+                            Offset(10.0, 0.0); // slide in from the right
+                        const end = Offset.zero;
+                        const curve = Curves.easeInOutQuart;
 
-                          var tween = Tween(begin: begin, end: end)
-                              .chain(CurveTween(curve: curve));
-                          var offsetAnimation = animation.drive(tween);
+                        var tween = Tween(begin: begin, end: end)
+                            .chain(CurveTween(curve: curve));
+                        var offsetAnimation = animation.drive(tween);
 
-                          return SlideTransition(
-                            position: offsetAnimation,
-                            child: child,
-                          );
-                        },
-                      ),
-                    );
-                  },
-                )),
-          ],
+                        return SlideTransition(
+                          position: offsetAnimation,
+                          child: child,
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
-        Row(
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0),
-              child: const Icon(
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            children: [
+              const Icon(
                 Icons.payment,
                 color: Colors.red,
                 size: 30,
               ),
-            ),
-            Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 0.h, 0, 0.h),
-                child: Text(
-                  'Payment Info',
-                  style: TextStyle(
-                      fontSize: 13.sp,
-                      color: Colors.black54,
-                      fontWeight: FontWeight.bold),
-                )),
-            Padding(
-                padding: EdgeInsets.fromLTRB(37.w, 0.h, 0, 0.h),
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.arrow_forward_ios,
-                    size: 28,
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                        pageBuilder: (context, animation, secondaryAnimation) {
-                          return const PaymentInfoScreen();
-                        },
-                        transitionDuration: const Duration(seconds: 1),
-                        transitionsBuilder:
-                            (context, animation, secondaryAnimation, child) {
-                          const begin =
-                              Offset(10.0, 0.0); // slide in from the right
-                          const end = Offset.zero;
-                          const curve = Curves.easeInOutQuart;
+              SizedBox(
+                width: 20,
+              ),
+              Text(
+                'Payment Info',
+                style: TextStyle(
+                    fontSize: 16.sp,
+                    color: Colors.black54,
+                    fontWeight: FontWeight.bold),
+              ),
+              Spacer(),
+              IconButton(
+                icon: const Icon(
+                  Icons.arrow_forward_ios,
+                  size: 28,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) {
+                        return const PaymentInfoScreen();
+                      },
+                      transitionDuration: const Duration(seconds: 1),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        const begin =
+                            Offset(10.0, 0.0); // slide in from the right
+                        const end = Offset.zero;
+                        const curve = Curves.easeInOutQuart;
 
-                          var tween = Tween(begin: begin, end: end)
-                              .chain(CurveTween(curve: curve));
-                          var offsetAnimation = animation.drive(tween);
+                        var tween = Tween(begin: begin, end: end)
+                            .chain(CurveTween(curve: curve));
+                        var offsetAnimation = animation.drive(tween);
 
-                          return SlideTransition(
-                            position: offsetAnimation,
-                            child: child,
-                          );
-                        },
-                      ),
-                    );
-                  },
-                )),
-          ],
+                        return SlideTransition(
+                          position: offsetAnimation,
+                          child: child,
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
         )
       ]),
     );
@@ -1027,12 +1017,13 @@ class _AccountScreenState extends State<AccountScreen>
         'email': email,
         'status': true,
       });
-      EasyLoading.dismiss();
+
       return true;
     } catch (error) {
       print("Error in createDonorSwitcher: $error");
-      EasyLoading.dismiss();
       return false;
+    } finally {
+      await EasyLoading.dismiss();
     }
   }
 

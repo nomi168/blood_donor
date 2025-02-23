@@ -16,71 +16,71 @@ class _PaymentInfoScreenState extends State<PaymentInfoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(children: [
-        Row(
-          children: [
-            Padding(
-                padding: EdgeInsets.fromLTRB(2.w, 5.h, 0, 0),
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.arrow_back_ios_new,
-                    size: 30,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(
-                      context,
-                      PageRouteBuilder(
-                        pageBuilder: (context, animation, secondaryAnimation) {
-                          return const AccountScreen();
-                        },
-                        transitionDuration: const Duration(seconds: 1),
-                        transitionsBuilder:
-                            (context, animation, secondaryAnimation, child) {
-                          const begin =
-                              Offset(-10.0, 0.0); // slide in from the left
-                          const end = Offset.zero;
-                          const curve = Curves.easeInOutQuart;
+      body: SafeArea(
+        child: Column(children: [
+          Row(
+            children: [
+              Padding(
+                  padding: EdgeInsets.fromLTRB(2.w, 0.h, 0, 0),
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.arrow_back_ios_new,
+                      size: 30,
+                    ),
+                    onPressed: () {
+                      Navigator.pop(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) {
+                            return const AccountScreen();
+                          },
+                          transitionDuration: const Duration(seconds: 1),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            const begin =
+                                Offset(-10.0, 0.0); // slide in from the left
+                            const end = Offset.zero;
+                            const curve = Curves.easeInOutQuart;
 
-                          var tween = Tween(begin: begin, end: end)
-                              .chain(CurveTween(curve: curve));
-                          var offsetAnimation = animation.drive(tween);
+                            var tween = Tween(begin: begin, end: end)
+                                .chain(CurveTween(curve: curve));
+                            var offsetAnimation = animation.drive(tween);
 
-                          return SlideTransition(
-                            position: offsetAnimation,
-                            child: child,
-                          );
-                        },
-                      ),
-                    );
-                  },
-                )),
-            Padding(
-              padding: EdgeInsets.fromLTRB(20.w, 5.h, 0, 0),
-              child: Text(
-                'Payment Info',
-                style: TextStyle(
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black54),
-              ),
-            )
-          ],
-        ),
-        Padding(
-          padding: EdgeInsets.fromLTRB(0, 3.h, 0, 0),
-          child: Image.asset('images/image1.jpeg'),
-        ),
-        Padding(
-          padding: EdgeInsets.fromLTRB(0, 3.h, 0, 0),
-          child: Text(
+                            return SlideTransition(
+                              position: offsetAnimation,
+                              child: child,
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  )),
+              Padding(
+                padding: EdgeInsets.fromLTRB(20.w, 0.h, 0, 0),
+                child: Text(
+                  'Payment Info',
+                  style: TextStyle(
+                      fontSize: 17.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54),
+                ),
+              )
+            ],
+          ),
+          Image.asset('images/image1.jpeg'),
+          SizedBox(
+            height: 30,
+          ),
+          Text(
             'Coming Soon',
             style: TextStyle(
-                fontSize: 15.sp,
+                fontSize: 16.sp,
                 fontWeight: FontWeight.bold,
                 color: Colors.red),
-          ),
-        )
-      ]),
+          )
+        ]),
+      ),
     );
   }
 }

@@ -27,14 +27,13 @@ class _SplashScreenState extends State<SplashScreen> {
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(0.w, 15.h, 0.w, 0.h),
-              child: Center(
-                child: Image.asset(
-                  'images/bloodsplash.png',
-                  height: 50.h,
-                  width: 50.w,
-                ),
+            SizedBox(
+              height: 250,
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 120),
+              child: Image.asset(
+                'images/bloodsplash.png',
               ),
             ),
             // const SizedBox(
@@ -52,11 +51,14 @@ class _SplashScreenState extends State<SplashScreen> {
             // Stack(
             //   children: animatedTextWidgets,
             // ),
+            // SizedBox(
+            //   height: 100,
+            // ),
             Padding(
-              padding: EdgeInsets.fromLTRB(10.w, 25.h, 10.w, 0.h),
+              padding: EdgeInsets.fromLTRB(10.w, 30.h, 10.w, 0.h),
               child: ElevatedButton(
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(
+                  backgroundColor: WidgetStateProperty.all<Color>(
                     const Color(0xFFDE0A1E),
                   ),
                 ),

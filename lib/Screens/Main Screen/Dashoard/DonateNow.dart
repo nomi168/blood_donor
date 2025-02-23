@@ -27,6 +27,7 @@ class DonateNow extends StatefulWidget {
   final String note;
   final String id;
   final String email;
+  final String takerNumber;
   const DonateNow(
       {super.key,
       required this.name,
@@ -39,7 +40,8 @@ class DonateNow extends StatefulWidget {
       required this.rating,
       required this.note,
       required this.id,
-      required this.email});
+      required this.email,
+      required this.takerNumber});
 
   @override
   State<DonateNow> createState() => _DonateNowState();
@@ -150,14 +152,14 @@ class _DonateNowState extends State<DonateNow> {
                         padding: EdgeInsets.fromLTRB(22.w, 2.h, 0.w, 0),
                         child: Text(widget.name,
                             style: TextStyle(
-                                fontSize: 14.sp,
+                                fontSize: 16.sp,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black))),
                     Padding(
                         padding: EdgeInsets.fromLTRB(22.w, 5.h, 0.w, 0),
                         child: Text(widget.location,
                             style: TextStyle(
-                                fontSize: 12.sp,
+                                fontSize: 16.sp,
                                 fontWeight: FontWeight.normal,
                                 color: Colors.black54))),
                     // Padding(
@@ -179,38 +181,38 @@ class _DonateNowState extends State<DonateNow> {
                         padding: EdgeInsets.fromLTRB(30.w, 8.3.h, 0.w, 0),
                         child: Text(widget.rating,
                             style: TextStyle(
-                                fontSize: 12.sp,
+                                fontSize: 16.sp,
                                 fontWeight: FontWeight.bold,
                                 color: const Color(0xFFDE0A1E)))),
                     Padding(
                         padding: EdgeInsets.fromLTRB(78.w, 8.5.h, 0.w, 0),
                         child: Text(widget.blood,
                             style: TextStyle(
-                                fontSize: 15.sp,
+                                fontSize: 16.sp,
                                 fontWeight: FontWeight.bold,
                                 color: const Color(0xFFDE0A1E)))),
                     Padding(
                         padding: EdgeInsets.fromLTRB(2.w, 12.h, 0.w, 0),
                         child: Text('Donation Details',
                             style: TextStyle(
-                                fontSize: 12.sp,
+                                fontSize: 16.sp,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black))),
                     Padding(
                         padding: EdgeInsets.fromLTRB(2.w, 14.h, 0.w, 0),
                         child: Text(widget.hospital,
                             style: TextStyle(
-                                fontSize: 12.sp, color: Colors.black))),
+                                fontSize: 16.sp, color: Colors.black))),
                     Padding(
                         padding: EdgeInsets.fromLTRB(2.w, 16.h, 0.w, 0),
                         child: Text(widget.location,
                             style: TextStyle(
-                                fontSize: 12.sp, color: Colors.black))),
+                                fontSize: 16.sp, color: Colors.black))),
                     Padding(
                         padding: EdgeInsets.fromLTRB(2.w, 19.h, 0.w, 0),
                         child: Text('TIme: ${widget.time}, ${widget.date}',
                             style: TextStyle(
-                                fontSize: 12.sp,
+                                fontSize: 16.sp,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black54))),
 
@@ -218,7 +220,7 @@ class _DonateNowState extends State<DonateNow> {
                         padding: EdgeInsets.fromLTRB(2.w, 21.h, 0.w, 0),
                         child: Text(widget.note,
                             style: TextStyle(
-                                fontSize: 12.sp,
+                                fontSize: 16.sp,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black54))),
                     Padding(
@@ -233,8 +235,8 @@ class _DonateNowState extends State<DonateNow> {
                             _acceptRequest();
                           },
                           style: ButtonStyle(
-                            shape: MaterialStateProperty.all<
-                                RoundedRectangleBorder>(
+                            shape:
+                                WidgetStateProperty.all<RoundedRectangleBorder>(
                               RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10.0),
                               ),
@@ -246,7 +248,7 @@ class _DonateNowState extends State<DonateNow> {
                             //         // EdgeInsets.symmetric(
                             //         //     vertical: 2.h, horizontal: 40.w),
                             //         ),
-                            backgroundColor: MaterialStateProperty.all<Color>(
+                            backgroundColor: WidgetStateProperty.all<Color>(
                                 const Color(0xFFDE0A1E)),
                           ),
                           child: Stack(
@@ -266,7 +268,7 @@ class _DonateNowState extends State<DonateNow> {
                                 Text(
                                   'Donate Now',
                                   style: TextStyle(
-                                    fontSize: 12.sp,
+                                    fontSize: 16.sp,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                   ),
@@ -641,7 +643,9 @@ class _DonateNowState extends State<DonateNow> {
           'time1': widget.time,
           'acceptrating': accepterrating,
           'acceptblood': blood,
-          "status": false
+          'status': false,
+          'sendernumber': widget.takerNumber,
+          'received_status': false,
         });
         _showDonatePopup();
         print('Nomi');

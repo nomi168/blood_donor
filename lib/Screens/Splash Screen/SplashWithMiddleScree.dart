@@ -1,8 +1,8 @@
 // ignore_for_file: file_names
 
-import 'package:blood_donor/Screens/Authentication%20Screen/SignupScreen.dart';
 import 'package:blood_donor/Screens/Splash%20Screen/SplashWithEndScreen.dart';
 import 'package:blood_donor/Screens/Splash%20Screen/StartWithSplashScreen.dart';
+import 'package:blood_donor/Screens/auth/presentation/screens/SignupScreen.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
@@ -39,7 +39,7 @@ class _SplashMiddleScreenState extends State<SplashMiddleScreen> {
               child: Text(
                 'You can track your donors location and',
                 style: TextStyle(
-                    fontSize: 12.sp,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                     color: Colors.black54),
               ),
@@ -50,7 +50,7 @@ class _SplashMiddleScreenState extends State<SplashMiddleScreen> {
               child: Text(
                 'send to them neccessary information to reach',
                 style: TextStyle(
-                    fontSize: 12.sp,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                     color: Colors.black54),
               ),
@@ -61,7 +61,7 @@ class _SplashMiddleScreenState extends State<SplashMiddleScreen> {
               child: Text(
                 'to destination properly.',
                 style: TextStyle(
-                    fontSize: 12.sp,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                     color: Colors.black54),
               ),
@@ -110,6 +110,9 @@ class _SplashMiddleScreenState extends State<SplashMiddleScreen> {
             ),
           ),
         ),
+        SizedBox(
+          height: 10,
+        ),
         Row(
           children: [
             Padding(
@@ -145,7 +148,7 @@ class _SplashMiddleScreenState extends State<SplashMiddleScreen> {
                 child: Text(
                   'Prew',
                   style: TextStyle(
-                      fontSize: 15.sp,
+                      fontSize: 17.sp,
                       color: Colors.black54,
                       fontWeight: FontWeight.bold),
                 ),
@@ -200,7 +203,7 @@ class _SplashMiddleScreenState extends State<SplashMiddleScreen> {
                 child: Text(
                   'Skip',
                   style: TextStyle(
-                      fontSize: 15.sp,
+                      fontSize: 17.sp,
                       color: Colors.black54,
                       fontWeight: FontWeight.bold),
                 ),

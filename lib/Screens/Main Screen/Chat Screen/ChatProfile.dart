@@ -37,7 +37,7 @@ class _ChatProfileState extends State<ChatProfile> with WidgetsBindingObserver {
             child: Text(
               'Inbox',
               style: TextStyle(
-                  fontSize: 15.sp,
+                  fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
                   color: Colors.black54),
             )),
@@ -46,7 +46,7 @@ class _ChatProfileState extends State<ChatProfile> with WidgetsBindingObserver {
             child: Text(
               'No Person Inbox',
               style: TextStyle(
-                  fontSize: 15.sp,
+                  fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
                   color: Colors.black54),
             ),
@@ -69,6 +69,7 @@ class _ChatProfileState extends State<ChatProfile> with WidgetsBindingObserver {
                                 String sendemail = chat.senderemail;
                                 String receiveremail = chat.receiveremail;
                                 String senderimage = chat.senderimage;
+                                String accept_number = chat.accept_number;
 
                                 Navigator.of(context, rootNavigator: true).push(
                                   PageRouteBuilder(
@@ -82,6 +83,9 @@ class _ChatProfileState extends State<ChatProfile> with WidgetsBindingObserver {
                                         sendemail: sendemail,
                                         receiveremail: receiveremail,
                                         senderimage: senderimage,
+                                        accept_number: accept_number,
+
+                                        // senderPhoneNumber: chat.,
                                       );
                                     },
                                     transitionDuration:
@@ -151,6 +155,7 @@ class _ChatProfileState extends State<ChatProfile> with WidgetsBindingObserver {
                                 String sendemail = chat.senderemail;
                                 String receiveremail = chat.receiveremail;
                                 String senderimage = chat.senderimage;
+                                String accept_number = chat.accept_number;
                                 Navigator.of(context, rootNavigator: true).push(
                                   PageRouteBuilder(
                                     pageBuilder: (context, animation,
@@ -163,6 +168,7 @@ class _ChatProfileState extends State<ChatProfile> with WidgetsBindingObserver {
                                         sendemail: sendemail,
                                         receiveremail: receiveremail,
                                         senderimage: senderimage,
+                                        accept_number: accept_number,
                                       );
                                     },
                                     transitionDuration:
@@ -261,7 +267,8 @@ class _ChatProfileState extends State<ChatProfile> with WidgetsBindingObserver {
                     date: doc['date'],
                     time: doc['time'],
                     acceptname: doc['acceptername'],
-                    senderimage: doc['senderimage']);
+                    senderimage: doc['senderimage'],
+                    accept_number: doc['receiver_number']);
               }).toList();
             });
           } else {
@@ -296,7 +303,8 @@ class _ChatProfileState extends State<ChatProfile> with WidgetsBindingObserver {
                     date: doc['date'],
                     time: doc['time'],
                     acceptname: doc['acceptername'],
-                    senderimage: doc['senderimage']);
+                    senderimage: doc['senderimage'],
+                    accept_number: doc['sender_number']);
               }).toList();
             });
             print(chatrequestData);
@@ -353,7 +361,6 @@ class _ChatProfileState extends State<ChatProfile> with WidgetsBindingObserver {
   //       sendPushNotification(chatUser, type == Type.text ? msg : 'image'));
   // }
 }
-
 
 // Function to send a message
 // void sendMessage(String senderEmail, String receiverEmail, String messageContent) async {

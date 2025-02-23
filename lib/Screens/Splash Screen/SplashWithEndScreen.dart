@@ -1,7 +1,7 @@
 // ignore_for_file: file_names
 
-import 'package:blood_donor/Screens/Authentication%20Screen/SignupScreen.dart';
 import 'package:blood_donor/Screens/Splash%20Screen/SplashWithMiddleScree.dart';
+import 'package:blood_donor/Screens/auth/presentation/screens/SignupScreen.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
@@ -38,7 +38,7 @@ class _SplashEndScreenState extends State<SplashEndScreen> {
               child: Text(
                 'In case of emergency, you can find',
                 style: TextStyle(
-                    fontSize: 12.sp,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                     color: Colors.black54),
               ),
@@ -49,7 +49,7 @@ class _SplashEndScreenState extends State<SplashEndScreen> {
               child: Text(
                 'donor who are active 24/7',
                 style: TextStyle(
-                    fontSize: 12.sp,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                     color: Colors.black54),
               ),
@@ -98,6 +98,9 @@ class _SplashEndScreenState extends State<SplashEndScreen> {
             ),
           ),
         ),
+        SizedBox(
+          height: 10,
+        ),
         Row(
           children: [
             Padding(
@@ -133,7 +136,7 @@ class _SplashEndScreenState extends State<SplashEndScreen> {
                 child: Text(
                   'Prew',
                   style: TextStyle(
-                      fontSize: 15.sp,
+                      fontSize: 17.sp,
                       color: Colors.black54,
                       fontWeight: FontWeight.bold),
                 ),
@@ -188,7 +191,7 @@ class _SplashEndScreenState extends State<SplashEndScreen> {
                 child: Text(
                   'Skip',
                   style: TextStyle(
-                      fontSize: 15.sp,
+                      fontSize: 17.sp,
                       color: Colors.black54,
                       fontWeight: FontWeight.bold),
                 ),

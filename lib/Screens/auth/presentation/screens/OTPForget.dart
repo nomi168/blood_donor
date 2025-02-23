@@ -1,6 +1,6 @@
 // ignore_for_file: file_names, use_build_context_synchronously
 
-import 'package:blood_donor/Screens/Authentication%20Screen/ForgetScreen.dart';
+import 'package:blood_donor/Screens/auth/presentation/screens/ForgetScreen.dart';
 import 'package:email_otp/email_otp.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
@@ -21,9 +21,8 @@ class _OTPForgetScreenState extends State<OTPForgetScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: ListView(
-        children: [
+        backgroundColor: Colors.white,
+        body: ListView(children: [
           Padding(
             padding: EdgeInsets.fromLTRB(0.w, 15.h, 0.w, 0),
             child: Center(
@@ -192,102 +191,95 @@ class _OTPForgetScreenState extends State<OTPForgetScreen> {
           //     },
           //   )),
           // ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
-            child: Material(
-              elevation: 10.0,
-              shadowColor: Colors.black,
-              borderRadius: BorderRadius.circular(10.0),
-              child: ElevatedButton(
-                onPressed: () async {
-                  // if (await myauth.verifyOTP(otp: otp.text) == true) {
-                  //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  //     content: Text("OTP is verified"),
-                  //   ));
-                  //   String em = email.text;
-                  //   Navigator.push(
-                  //     context,
-                  //     PageRouteBuilder(
-                  //       pageBuilder: (context, animation, secondaryAnimation) {
-                  //         return ForgetScreen(email: em);
-                  //       },
-                  //       transitionDuration: const Duration(seconds: 1),
-                  //       transitionsBuilder:
-                  //           (context, animation, secondaryAnimation, child) {
-                  //         const begin =
-                  //             Offset(10.0, 0.0); // slide in from the right
-                  //         const end = Offset.zero;
-                  //         const curve = Curves.easeInOutQuart;
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            child: ElevatedButton(
+              onPressed: () async {
+                // if (await myauth.verifyOTP(otp: otp.text) == true) {
+                //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                //     content: Text("OTP is verified"),
+                //   ));
+                //   String em = email.text;
+                //   Navigator.push(
+                //     context,
+                //     PageRouteBuilder(
+                //       pageBuilder: (context, animation, secondaryAnimation) {
+                //         return ForgetScreen(email: em);
+                //       },
+                //       transitionDuration: const Duration(seconds: 1),
+                //       transitionsBuilder:
+                //           (context, animation, secondaryAnimation, child) {
+                //         const begin =
+                //             Offset(10.0, 0.0); // slide in from the right
+                //         const end = Offset.zero;
+                //         const curve = Curves.easeInOutQuart;
 
-                  //         var tween = Tween(begin: begin, end: end)
-                  //             .chain(CurveTween(curve: curve));
-                  //         var offsetAnimation = animation.drive(tween);
+                //         var tween = Tween(begin: begin, end: end)
+                //             .chain(CurveTween(curve: curve));
+                //         var offsetAnimation = animation.drive(tween);
 
-                  //         return SlideTransition(
-                  //           position: offsetAnimation,
-                  //           child: child,
-                  //         );
-                  //       },
-                  //     ),
-                  //   );
-                  // } else {
-                  //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  //     content: Text("Invalid OTP"),
-                  //   ));
-                  // }
-                  String em = email.text;
-                  Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) {
-                        return ForgetScreen(email: em);
-                      },
-                      transitionDuration: const Duration(seconds: 1),
-                      transitionsBuilder:
-                          (context, animation, secondaryAnimation, child) {
-                        const begin =
-                            Offset(10.0, 0.0); // slide in from the right
-                        const end = Offset.zero;
-                        const curve = Curves.easeInOutQuart;
+                //         return SlideTransition(
+                //           position: offsetAnimation,
+                //           child: child,
+                //         );
+                //       },
+                //     ),
+                //   );
+                // } else {
+                //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                //     content: Text("Invalid OTP"),
+                //   ));
+                // }
+                String em = email.text;
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) {
+                      return ForgetScreen(email: em);
+                    },
+                    transitionDuration: const Duration(seconds: 1),
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      const begin =
+                          Offset(10.0, 0.0); // slide in from the right
+                      const end = Offset.zero;
+                      const curve = Curves.easeInOutQuart;
 
-                        var tween = Tween(begin: begin, end: end)
-                            .chain(CurveTween(curve: curve));
-                        var offsetAnimation = animation.drive(tween);
+                      var tween = Tween(begin: begin, end: end)
+                          .chain(CurveTween(curve: curve));
+                      var offsetAnimation = animation.drive(tween);
 
-                        return SlideTransition(
-                          position: offsetAnimation,
-                          child: child,
-                        );
-                      },
-                    ),
-                  );
-                },
-                style: ButtonStyle(
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
+                      return SlideTransition(
+                        position: offsetAnimation,
+                        child: child,
+                      );
+                    },
                   ),
-                  padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                    // ignore: prefer_const_constructors
-                    EdgeInsets.symmetric(vertical: 13.5, horizontal: 35.w),
+                );
+              },
+              style: ButtonStyle(
+                shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
                   ),
-                  backgroundColor: MaterialStateProperty.all<Color>(
-                      const Color(0xFFDE0A1E)), // Change button color
                 ),
-                child: Text(
-                  'Continue',
-                  style: TextStyle(
-                    fontSize: 12.sp, // Adjust the font size
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+                padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
+                  // ignore: prefer_const_constructors
+                  EdgeInsets.symmetric(vertical: 13.5, horizontal: 35.w),
+                ),
+                backgroundColor: WidgetStateProperty.all<Color>(
+                    const Color(0xFFDE0A1E)), // Change button color
+              ),
+              child: Text(
+                'Continue',
+                style: TextStyle(
+                  fontSize: 16.sp, // Adjust the font size
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
             ),
           ),
-        ],
-      ),
-    );
+        ]));
   }
 }

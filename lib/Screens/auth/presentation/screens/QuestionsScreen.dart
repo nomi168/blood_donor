@@ -13,7 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../Provider/Page.dart';
+import '../../../../Provider/Page.dart';
 
 class QuestionsScreen extends StatefulWidget {
   final String email;

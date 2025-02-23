@@ -1,8 +1,12 @@
 // ignore_for_file: file_names
 
 import 'package:blood_donor/Screens/Main%20Screen/Dashoard/Dashboatd.dart';
+import 'package:blood_donor/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 class ForgetScreen extends StatefulWidget {
@@ -132,42 +136,37 @@ class _ForgetScreenState extends State<ForgetScreen> {
                   ),
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
-                child: Material(
-                  elevation: 10.0,
-                  shadowColor: Colors.black,
-                  borderRadius: BorderRadius.circular(10.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (_formkey.currentState?.validate() ?? false) {
-                        if (pass.text == cpass.text) {
-                          ForgetPassword();
-                        } else {
-                          _showAlertDialog2(context);
-                        }
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (_formkey.currentState?.validate() ?? false) {
+                      if (pass.text == cpass.text) {
+                        ForgetPassword();
+                      } else {
+                        _showAlertDialog2(context);
                       }
-                    },
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
+                    }
+                  },
+                  style: ButtonStyle(
+                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
                       ),
-                      padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                        // ignore: prefer_const_constructors
-                        EdgeInsets.symmetric(vertical: 13.5, horizontal: 0),
-                      ),
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                          Colors.red), // Change button color
                     ),
-                    child: Text(
-                      'Continue',
-                      style: TextStyle(
-                        fontSize: 12.sp, // Adjust the font size
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                    padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
+                      // ignore: prefer_const_constructors
+                      EdgeInsets.symmetric(vertical: 13.5, horizontal: 0),
+                    ),
+                    backgroundColor: WidgetStateProperty.all<Color>(
+                        const Color(0xFFDE0A1E)), // Change button color
+                  ),
+                  child: Text(
+                    'Continue',
+                    style: TextStyle(
+                      fontSize: 16.sp, // Adjust the font size
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -176,53 +175,66 @@ class _ForgetScreenState extends State<ForgetScreen> {
   }
 
   // ignore: non_constant_identifier_names
-  void ForgetPassword() async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    String email = widget.email.trim();
-
-    CollectionReference users = firestore.collection('users');
-    QuerySnapshot existingUsers =
-        await users.where('email', isEqualTo: email).get();
-
-    if (existingUsers.docs.isNotEmpty) {
-      // User found, update password
-      DocumentSnapshot userDoc = existingUsers.docs.first;
-      String userId = userDoc.id;
-
-      await users.doc(userId).update({
-        'password': pass.text
-        // replace _newPassword with your password variable
-      });
-
-      // After updating the password, proceed with the login
-      // ignore: use_build_context_synchronously
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) {
-            return const Dashboard();
-          },
-          transitionDuration: const Duration(seconds: 1),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            const begin = Offset(10.0, 0.0); // slide in from the right
-            const end = Offset.zero;
-            const curve = Curves.easeInOutQuart;
-
-            var tween =
-                Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-            var offsetAnimation = animation.drive(tween);
-
-            return SlideTransition(
-              position: offsetAnimation,
-              child: child,
-            );
-          },
-        ),
+  Future<void> ForgetPassword() async {
+    try {
+      showLoader('please wait');
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      String email = widget.email.trim();
+      await FirebaseAuth.instance.sendPasswordResetEmail(
+        email: email,
       );
-    } else {
-      // User not found or incorrect email, show an alert or handle accordingly
-      // ignore: use_build_context_synchronously
-      _showAlertDialog1(context);
+
+      CollectionReference users = firestore.collection('users');
+      QuerySnapshot existingUsers =
+          await users.where('email', isEqualTo: email).get();
+
+      if (existingUsers.docs.isNotEmpty) {
+        // User found, update password
+        DocumentSnapshot userDoc = existingUsers.docs.first;
+        String userId = userDoc.id;
+
+        await users.doc(userId).update({
+          'password': pass.text
+          // replace _newPassword with your password variable
+        });
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('user_email', email);
+
+        // After updating the password, proceed with the login
+        // ignore: use_build_context_synchronously
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) {
+              return const Dashboard();
+            },
+            transitionDuration: const Duration(seconds: 1),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(10.0, 0.0); // slide in from the right
+              const end = Offset.zero;
+              const curve = Curves.easeInOutQuart;
+
+              var tween =
+                  Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+              var offsetAnimation = animation.drive(tween);
+
+              return SlideTransition(
+                position: offsetAnimation,
+                child: child,
+              );
+            },
+          ),
+        );
+      } else {
+        // User not found or incorrect email, show an alert or handle accordingly
+        // ignore: use_build_context_synchronously
+        _showAlertDialog1(context);
+      }
+    } catch (e) {
+      EasyLoading.showError("Error: $e");
+    } finally {
+      await EasyLoading.dismiss();
     }
   }
 

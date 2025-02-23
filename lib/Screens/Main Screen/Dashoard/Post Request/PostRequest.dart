@@ -138,7 +138,7 @@ class _PostRequestState extends State<PostRequest> {
                       'Post A Request',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 15.sp,
+                          fontSize: 17.sp,
                           color: Colors.black54),
                     ),
                   )
@@ -376,87 +376,85 @@ class _PostRequestState extends State<PostRequest> {
                   ),
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(5.w, 5.h, 5.w, 0),
-                child: Material(
-                  elevation: 10.0,
-                  shadowColor: Colors.black,
-                  borderRadius: BorderRadius.circular(10.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (_form.currentState?.validate() ?? false) {
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder:
-                                (context, animation, secondaryAnimation) {
-                              return CheckMap(
-                                  takerlocation: location.text,
-                                  takerid: takerid,
-                                  fullname: fullname,
-                                  picture: picture,
-                                  takeremail: takeremail,
-                                  number: nunber,
-                                  hospitalname: hospital.text,
-                                  date: selectedDate
-                                      .toLocal()
-                                      .toString()
-                                      .split(' ')[0],
-                                  time: selectedTime.format(context),
-                                  note: note.text,
-                                  blood: blood.text,
-                                  rating: rating,
-                                  status: false);
-                            },
-                            transitionDuration: const Duration(seconds: 1),
-                            transitionsBuilder: (context, animation,
-                                secondaryAnimation, child) {
-                              const begin =
-                                  Offset(10.0, 0.0); // slide in from the right
-                              const end = Offset.zero;
-                              const curve = Curves.easeInOutQuart;
+              SizedBox(
+                height: 20,
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (_form.currentState?.validate() ?? false) {
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) {
+                            return CheckMap(
+                                takerlocation: location.text,
+                                takerid: takerid,
+                                fullname: fullname,
+                                picture: picture,
+                                takeremail: takeremail,
+                                number: nunber,
+                                hospitalname: hospital.text,
+                                date: selectedDate
+                                    .toLocal()
+                                    .toString()
+                                    .split(' ')[0],
+                                time: selectedTime.format(context),
+                                note: note.text,
+                                blood: blood.text,
+                                rating: rating,
+                                status: false);
+                          },
+                          transitionDuration: const Duration(seconds: 1),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            const begin =
+                                Offset(10.0, 0.0); // slide in from the right
+                            const end = Offset.zero;
+                            const curve = Curves.easeInOutQuart;
 
-                              var tween = Tween(begin: begin, end: end)
-                                  .chain(CurveTween(curve: curve));
-                              var offsetAnimation = animation.drive(tween);
+                            var tween = Tween(begin: begin, end: end)
+                                .chain(CurveTween(curve: curve));
+                            var offsetAnimation = animation.drive(tween);
 
-                              return SlideTransition(
-                                position: offsetAnimation,
-                                child: child,
-                              );
-                            },
-                          ),
-                        );
-                        // _addRequest();
-                      }
-                    },
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
+                            return SlideTransition(
+                              position: offsetAnimation,
+                              child: child,
+                            );
+                          },
+                        ),
+                      );
+                      // _addRequest();
+                    }
+                  },
+                  style: ButtonStyle(
+                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                    padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
+                      // Increase horizontal padding
+                      // ignore: prefer_const_constructors
+                      EdgeInsets.symmetric(vertical: 2.h, horizontal: 32.w),
+                    ),
+                    backgroundColor:
+                        WidgetStateProperty.all<Color>(const Color(0xFFDE0A1E)),
+                  ),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Text(
+                        'Send Request',
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
-                      padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                        // Increase horizontal padding
-                        // ignore: prefer_const_constructors
-                        EdgeInsets.symmetric(vertical: 2.h, horizontal: 32.w),
-                      ),
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                          const Color(0xFFDE0A1E)),
-                    ),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Text(
-                          'Send Request',
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
+                    ],
                   ),
                 ),
               ),

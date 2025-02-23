@@ -1,7 +1,7 @@
 // ignore_for_file: file_names
 
-import 'package:blood_donor/Screens/Authentication%20Screen/SignupScreen.dart';
 import 'package:blood_donor/Screens/Splash%20Screen/SplashWithMiddleScree.dart';
+import 'package:blood_donor/Screens/auth/presentation/screens/SignupScreen.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
@@ -41,7 +41,7 @@ class _StartWithSplashScreenState extends State<StartWithSplashScreen> {
               child: Text(
                 'Easy to find available donors nearby.',
                 style: TextStyle(
-                    fontSize: 12.sp,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                     color: Colors.black54),
               ),
@@ -53,7 +53,7 @@ class _StartWithSplashScreenState extends State<StartWithSplashScreen> {
               child: Text(
                 'Verified donors willing to help.',
                 style: TextStyle(
-                    fontSize: 12.sp,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                     color: Colors.black54),
               ),
@@ -124,18 +124,23 @@ class _StartWithSplashScreenState extends State<StartWithSplashScreen> {
               Padding(
                 padding: EdgeInsets.fromLTRB(25.w, 15.h, 0, 0),
                 child: InkWell(
-                  onTap: () {
+                  splashColor: Colors.transparent,
+                  splashFactory: NoSplash.splashFactory,
+                  onTap: () async {
+                    print("Nomi");
+
                     Navigator.push(
                       context,
                       PageRouteBuilder(
                         pageBuilder: (context, animation, secondaryAnimation) {
                           return const SignupScreen();
                         },
-                        transitionDuration: const Duration(seconds: 1),
+                        transitionDuration:
+                            Duration(seconds: 1), // Faster transition
                         transitionsBuilder:
                             (context, animation, secondaryAnimation, child) {
                           const begin =
-                              Offset(10.0, 0.0); // slide in from the right
+                              Offset(1.0, 0.0); // slide in from the right
                           const end = Offset.zero;
                           const curve = Curves.easeInOutQuart;
 
@@ -154,7 +159,7 @@ class _StartWithSplashScreenState extends State<StartWithSplashScreen> {
                   child: Text(
                     'Skip',
                     style: TextStyle(
-                        fontSize: 15.sp,
+                        fontSize: 17.sp,
                         color: Colors.black54,
                         fontWeight: FontWeight.bold),
                   ),

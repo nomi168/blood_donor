@@ -10,6 +10,7 @@ class ChatRequest {
   final String sendernumber;
   final String time;
   final String status;
+  final String receipient_number;
 
   ChatRequest(
       {required this.receiver_id,
@@ -22,5 +23,6 @@ class ChatRequest {
       required this.sendernumber,
       required this.receiveremail,
       required this.status,
-      required this.time});
+      required this.time,
+      required this.receipient_number});
 }

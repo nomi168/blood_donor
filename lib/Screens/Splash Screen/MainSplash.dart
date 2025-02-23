@@ -13,24 +13,31 @@ class MainSplash extends StatefulWidget {
 }
 
 class _MainSplashState extends State<MainSplash> {
+  String appVersion = "";
   @override
   void initState() {
     super.initState();
-    getAppVersion();
+    _getAppVersion();
     navigateAfterDelay();
   }
 
   String version = '';
   PackageInfo? packageInfo;
-
-  getAppVersion() async {
-    packageInfo = await PackageInfo.fromPlatform();
-
-    if (packageInfo != null) {
-      version = packageInfo!.version.toString();
-    }
-    setState(() {});
+  Future<void> _getAppVersion() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    setState(() {
+      appVersion = "${packageInfo.version}";
+    });
   }
+
+  // getAppVersion() async {
+  //   packageInfo = await PackageInfo.fromPlatform();
+
+  //   if (packageInfo != null) {
+  //     version = packageInfo!.version.toString();
+  //   }
+  //   setState(() {});
+  // }
 
   void navigateAfterDelay() {
     Future.delayed(const Duration(seconds: 6), () {
@@ -72,7 +79,7 @@ class _MainSplashState extends State<MainSplash> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Padding(
-              padding: EdgeInsets.fromLTRB(0.w, 25.h, 0.w, 0.h),
+              padding: EdgeInsets.fromLTRB(5.w, 25.h, 5.w, 0.h),
               child: Center(
                 child: Image.asset(
                   'images/bloodsplash.png',
@@ -86,9 +93,9 @@ class _MainSplashState extends State<MainSplash> {
             ),
 
             Text(
-              "version: $version",
+              "version: $appVersion",
               style: TextStyle(
-                fontSize: 15.sp,
+                fontSize: 17.sp,
                 color: Colors.red,
                 fontWeight: FontWeight.bold,
               ),

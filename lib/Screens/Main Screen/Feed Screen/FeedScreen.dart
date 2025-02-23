@@ -352,18 +352,18 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
                   DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
 
               return ChatRequest(
-                receiver_id: doc['receiver_id'],
-                sender_id: doc['sender_id'],
-                senderemail: doc['senderEmail'],
-                receivername: doc['name'],
-                receiverimage: doc['receiverimage'],
-                senderimage: doc['image'],
-                sendername: doc['senderName'],
-                sendernumber: doc['senderNumber'],
-                receiveremail: doc['recipientEmail'],
-                status: doc['status'],
-                time: formattedTime,
-              );
+                  receiver_id: doc['receiver_id'],
+                  sender_id: doc['sender_id'],
+                  senderemail: doc['senderEmail'],
+                  receivername: doc['name'],
+                  receiverimage: doc['receiverimage'],
+                  senderimage: doc['image'],
+                  sendername: doc['senderName'],
+                  sendernumber: doc['senderNumber'],
+                  receiveremail: doc['recipientEmail'],
+                  status: doc['status'],
+                  time: formattedTime,
+                  receipient_number: doc['recipientNumber']);
             }).toList();
           });
         }
@@ -523,7 +523,7 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
                                 children: [
                                   ElevatedButton(
                                     style: ButtonStyle(
-                                      shape: MaterialStateProperty.all<
+                                      shape: WidgetStateProperty.all<
                                           RoundedRectangleBorder>(
                                         RoundedRectangleBorder(
                                           borderRadius:
@@ -531,7 +531,7 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
                                         ),
                                       ),
                                       backgroundColor:
-                                          MaterialStateProperty.all<Color>(
+                                          WidgetStateProperty.all<Color>(
                                               const Color(0xFFDE0A1E)),
                                     ),
                                     child: Text(
@@ -549,7 +549,7 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
                                   Expanded(
                                       child: ElevatedButton(
                                     style: ButtonStyle(
-                                      shape: MaterialStateProperty.all<
+                                      shape: WidgetStateProperty.all<
                                           RoundedRectangleBorder>(
                                         RoundedRectangleBorder(
                                           borderRadius:
@@ -557,7 +557,7 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
                                         ),
                                       ),
                                       backgroundColor:
-                                          MaterialStateProperty.all<Color>(
+                                          WidgetStateProperty.all<Color>(
                                               const Color(0xFFDE0A1E)),
                                     ),
                                     child: Text(
@@ -576,6 +576,10 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
                                         String senderimage = chat.senderimage;
                                         String senderid = chat.sender_id;
                                         String receiverid = chat.receiver_id;
+                                        String accept_number =
+                                            chat.sendernumber;
+                                        String receipient_number =
+                                            chat.receipient_number;
 
                                         // Send chat request
                                         await AcceptChat(
@@ -586,7 +590,9 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
                                             acceptname,
                                             senderimage,
                                             senderid,
-                                            receiverid);
+                                            receiverid,
+                                            accept_number,
+                                            receipient_number);
                                       } else {
                                         print('Invalid index: $index');
                                       }
@@ -664,7 +670,8 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
       String image,
       String rname,
       String rimage,
-      String id) async {
+      String id,
+      String receiver_number) async {
     try {
       final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -690,6 +697,7 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
         'name': rname,
         'receiverimage': rimage,
         'recipientEmail': recipientEmail,
+        'recipientNumber': receiver_number,
         'senderName': name,
         'senderNumber': number,
         'image': image,
@@ -779,7 +787,9 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
       String acceptn,
       String image1,
       String send_id,
-      String receive_id) async {
+      String receive_id,
+      String acceptNumber,
+      String receipient_number) async {
     try {
       final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -824,7 +834,10 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
           'time': formattedTime,
           'image': image,
           'acceptername': acceptn,
-          'senderimage': image1
+          'senderimage': image1,
+          'sender_number': acceptNumber,
+          'receiver_number': receipient_number
+          // 'number':
         });
         String documentId = docRef.id;
         SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -1000,7 +1013,7 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
                               Border.all(width: 0.5, color: Color(0xFFDDDDDD)),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withValues(alpha: 0.1),
                               blurRadius: 10,
                               offset: Offset(0, 4),
                             ),
@@ -1182,6 +1195,9 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
                                           feedsData[index].imageURL;
                                       String id = feedsData[index].tak_id!;
                                       receiver_id = id;
+                                      String number1 = number;
+                                      String acceptant_number = taker.number;
+                                      print("my number: $acceptant_number");
 
                                       if (userType == 'donor') {
                                         // Send chat request
@@ -1189,11 +1205,12 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
                                             userEmail!,
                                             recipientEmail,
                                             profilename,
-                                            number,
+                                            number1,
                                             image,
                                             rename,
                                             recimage,
-                                            id);
+                                            id,
+                                            acceptant_number);
                                       } else {
                                         EasyLoading.showError(
                                           'Only donors can send chat requests.',
@@ -1240,6 +1257,7 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
                                     String time = feedsData[index].time;
                                     String date = feedsData[index].date;
                                     String note = feedsData[index].note;
+                                    String number = feedsData[index].number;
                                     // String taker_id =
                                     //     feedsData[index]
                                     //         .t_id
@@ -1268,6 +1286,7 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
                                                 time: time,
                                                 date: date,
                                                 note: note,
+                                                number: number,
                                               );
                                             },
                                             transitionDuration:
@@ -1368,8 +1387,8 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
             SizedBox(height: 20),
             ElevatedButton(
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.red),
-                textStyle: MaterialStateProperty.all(
+                backgroundColor: WidgetStateProperty.all(Colors.red),
+                textStyle: WidgetStateProperty.all(
                   TextStyle(color: Colors.white),
                 ),
               ),

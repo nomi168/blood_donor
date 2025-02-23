@@ -153,9 +153,10 @@ class _Feed1State extends State<Feed1> {
         ),
         Container(
           decoration: BoxDecoration(
-            color: Color(0xFF3F3F3).withOpacity(0.2),
+            color: Color(0xFF3F3F3).withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(10.0),
-            border: Border.all(width: 1, color: Colors.grey.withOpacity(0.5)),
+            border:
+                Border.all(width: 1, color: Colors.grey.withValues(alpha: 0.5)),
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.shade200,
@@ -198,13 +199,13 @@ class _Feed1State extends State<Feed1> {
                   Text(
                     widget.name,
                     style: TextStyle(
-                        fontSize: 14.sp,
+                        fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
                         color: Colors.black),
                   ),
                   Text(
                     widget.hospital,
-                    style: TextStyle(fontSize: 11.sp, color: Colors.black),
+                    style: TextStyle(fontSize: 16.sp, color: Colors.black),
                   ),
                 ],
               ),
@@ -217,7 +218,7 @@ class _Feed1State extends State<Feed1> {
         Text(
           'Donation Details',
           style: TextStyle(
-              fontSize: 14.sp,
+              fontSize: 16.sp,
               color: Colors.black,
               fontWeight: FontWeight.bold),
         ),
@@ -226,9 +227,10 @@ class _Feed1State extends State<Feed1> {
         ),
         Container(
           decoration: BoxDecoration(
-            color: Color(0xFF3F3F3).withOpacity(0.2),
+            color: Color(0xFF3F3F3).withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(10.0),
-            border: Border.all(width: 1, color: Colors.grey.withOpacity(0.5)),
+            border:
+                Border.all(width: 1, color: Colors.grey.withValues(alpha: 0.5)),
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.shade200,
@@ -275,7 +277,7 @@ class _Feed1State extends State<Feed1> {
                     'Schedule-',
                     style: TextStyle(
                         fontSize: 14,
-                        color: Colors.black.withOpacity(0.7),
+                        color: Colors.black.withValues(alpha: 0.7),
                         fontWeight: FontWeight.w500),
                   ),
                   Spacer(),
@@ -309,7 +311,7 @@ class _Feed1State extends State<Feed1> {
                     'Review-',
                     style: TextStyle(
                         fontSize: 14,
-                        color: Colors.black.withOpacity(0.7),
+                        color: Colors.black.withValues(alpha: 0.7),
                         fontWeight: FontWeight.w500),
                   ),
                   Spacer(),
@@ -328,9 +330,10 @@ class _Feed1State extends State<Feed1> {
         ),
         Container(
           decoration: BoxDecoration(
-            color: Color(0xFF3F3F3).withOpacity(0.2),
+            color: Color(0xFF3F3F3).withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(10.0),
-            border: Border.all(width: 1, color: Colors.grey.withOpacity(0.5)),
+            border:
+                Border.all(width: 1, color: Colors.grey.withValues(alpha: 0.5)),
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.shade200,
@@ -381,7 +384,7 @@ class _Feed1State extends State<Feed1> {
                     child: Text(
                       'Cancel Request',
                       style: TextStyle(
-                          fontSize: 12.sp,
+                          fontSize: 16.sp,
                           fontWeight: FontWeight.w500,
                           color: Colors.black54),
                     ),
@@ -394,7 +397,13 @@ class _Feed1State extends State<Feed1> {
               Expanded(
                 child: InkWell(
                   onTap: () async {
-                    _showConfirmationDialog(context);
+                    bool? result = await getReceivedStatus();
+                    if (result) {
+                      _showConfirmationDialog(context);
+                    } else {
+                      EasyLoading.showError(
+                          'The taker has not received it at your location.');
+                    }
                   },
                   child: Container(
                     padding:
@@ -407,7 +416,7 @@ class _Feed1State extends State<Feed1> {
                     child: Text(
                       'Continue',
                       style: TextStyle(
-                          fontSize: 12.sp,
+                          fontSize: 16.sp,
                           fontWeight: FontWeight.w500,
                           color: Colors.white),
                     ),
@@ -468,6 +477,31 @@ class _Feed1State extends State<Feed1> {
         //     ))
       ]),
     );
+  }
+
+  Future<bool> getReceivedStatus() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('acceptdonation')
+          .where('acceptemail', isEqualTo: widget.donoremail)
+          .where('email', isEqualTo: widget.email)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Get the first document
+        DocumentSnapshot userDoc = querySnapshot.docs.first;
+
+        if (userDoc.exists && userDoc['received_status'] == true) {
+          return true;
+        }
+      } else {
+        print('No documents found in the acceptdonation collection');
+      }
+    } catch (e) {
+      print('Error fetching received status: $e');
+    }
+
+    return false; // Return false if no valid document is found
   }
 
   Future<void> deleteAcceptRequest() async {
@@ -867,7 +901,7 @@ class _Feed1State extends State<Feed1> {
                   child: Text(
                     'Congratulations',
                     style: TextStyle(
-                      fontSize: 12.sp,
+                      fontSize: 16.sp,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -877,96 +911,90 @@ class _Feed1State extends State<Feed1> {
                   child: Text(
                     'You have Successfully donated blood to the seeker',
                     style: TextStyle(
-                      fontSize: 12.sp,
+                      fontSize: 16.sp,
                     ),
                     textAlign: TextAlign.center,
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.fromLTRB(0.w, 3.h, 3.w, 0),
-                  child: Material(
-                    elevation: 10.0,
-                    shadowColor: Colors.black,
-                    borderRadius: BorderRadius.circular(10.0),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        String name = widget.name;
-                        String image = widget.image;
-                        String blood = widget.blood;
-                        String hospital = widget.hospital;
-                        String location = widget.location;
-                        String date = widget.date;
-                        String time = widget.time;
-                        String rating = widget.rating;
-                        String note = widget.note;
-                        String review1 = review.text;
-                        String id = widget.id;
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder:
-                                (context, animation, secondaryAnimation) {
-                              return Review1(
-                                  name: name,
-                                  image: image,
-                                  blood: blood,
-                                  hospital: hospital,
-                                  location: location,
-                                  date: date,
-                                  time: time,
-                                  rating: rating,
-                                  note: note,
-                                  review: review1,
-                                  email: widget.email,
-                                  donorname: widget.donorname,
-                                  donoremail: widget.donoremail,
-                                  donorblood: widget.donorblood,
-                                  donorimage: widget.donorimage,
-                                  id: id,
-                                  takerid: widget.takerid);
-                            },
-                            transitionDuration: const Duration(seconds: 1),
-                            transitionsBuilder: (context, animation,
-                                secondaryAnimation, child) {
-                              const begin =
-                                  Offset(10.0, 0.0); // slide in from the right
-                              const end = Offset.zero;
-                              const curve = Curves.easeInOutQuart;
+                  child: ElevatedButton(
+                    onPressed: () {
+                      String name = widget.name;
+                      String image = widget.image;
+                      String blood = widget.blood;
+                      String hospital = widget.hospital;
+                      String location = widget.location;
+                      String date = widget.date;
+                      String time = widget.time;
+                      String rating = widget.rating;
+                      String note = widget.note;
+                      String review1 = review.text;
+                      String id = widget.id;
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) {
+                            return Review1(
+                                name: name,
+                                image: image,
+                                blood: blood,
+                                hospital: hospital,
+                                location: location,
+                                date: date,
+                                time: time,
+                                rating: rating,
+                                note: note,
+                                review: review1,
+                                email: widget.email,
+                                donorname: widget.donorname,
+                                donoremail: widget.donoremail,
+                                donorblood: widget.donorblood,
+                                donorimage: widget.donorimage,
+                                id: id,
+                                takerid: widget.takerid);
+                          },
+                          transitionDuration: const Duration(seconds: 1),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            const begin =
+                                Offset(10.0, 0.0); // slide in from the right
+                            const end = Offset.zero;
+                            const curve = Curves.easeInOutQuart;
 
-                              var tween = Tween(begin: begin, end: end)
-                                  .chain(CurveTween(curve: curve));
-                              var offsetAnimation = animation.drive(tween);
+                            var tween = Tween(begin: begin, end: end)
+                                .chain(CurveTween(curve: curve));
+                            var offsetAnimation = animation.drive(tween);
 
-                              return SlideTransition(
-                                position: offsetAnimation,
-                                child: child,
-                              );
-                            },
-                          ),
-                        );
-                      },
-                      style: ButtonStyle(
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
+                            return SlideTransition(
+                              position: offsetAnimation,
+                              child: child,
+                            );
+                          },
                         ),
-                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                          // Increase horizontal padding
-                          // ignore: prefer_const_constructors
-                          EdgeInsets.symmetric(vertical: 2.h, horizontal: 25.w),
+                      );
+                    },
+                    style: ButtonStyle(
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
                         ),
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                            const Color(0xFFDE0A1E)),
                       ),
-                      child: Text(
-                        'Done',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                      padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
+                        // Increase horizontal padding
+                        // ignore: prefer_const_constructors
+                        EdgeInsets.symmetric(vertical: 2.h, horizontal: 25.w),
+                      ),
+                      backgroundColor: WidgetStateProperty.all<Color>(
+                          const Color(0xFFDE0A1E)),
+                    ),
+                    child: Text(
+                      'Done',
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
                   ),

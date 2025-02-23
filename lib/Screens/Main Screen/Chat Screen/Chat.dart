@@ -16,6 +16,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'HeroScreen.dart';
 
@@ -27,17 +28,18 @@ class ChatScree1 extends StatefulWidget {
   final String sendemail;
   final String receiveremail;
   final String senderimage;
+  final String accept_number;
 
-  const ChatScree1({
-    super.key,
-    required this.image,
-    required this.name,
-    required this.sendemail,
-    required this.receiveremail,
-    required this.senderimage,
-    required this.sender_id,
-    required this.receiver_id,
-  });
+  const ChatScree1(
+      {super.key,
+      required this.image,
+      required this.name,
+      required this.sendemail,
+      required this.receiveremail,
+      required this.senderimage,
+      required this.sender_id,
+      required this.receiver_id,
+      required this.accept_number});
 
   @override
   State<ChatScree1> createState() => _ChatScree1State();
@@ -115,6 +117,18 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
     }
   }
 
+  final String phoneNumber = "+923435764171"; // Replace with your number
+
+  void openWhatsApp(String number) async {
+    Uri uri = Uri.parse("https://wa.me/$number");
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      throw "Could not launch WhatsApp";
+    }
+  }
+
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -186,7 +200,7 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
                       child: Text(
                         widget.name,
                         style: TextStyle(
-                            fontSize: 14.sp,
+                            fontSize: 16.sp,
                             fontWeight: FontWeight.bold,
                             color: Colors.black54),
                       )),
@@ -202,7 +216,7 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
                         child: Text(
                           useractive ? 'Online' : 'Offline',
                           style: TextStyle(
-                            fontSize: 10,
+                            fontSize: 12,
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
                           ),
@@ -212,12 +226,18 @@ class _ChatScree1State extends State<ChatScree1> with WidgetsBindingObserver {
                   ),
                 ],
               ),
-              // Spacer(),
-              // InkWell(
-              //     splashColor: Colors.transparent,
-              //     splashFactory: NoSplash.splashFactory,
-              //     onTap: () {},
-              //     child: Icon())
+              Spacer(),
+              InkWell(
+                splashColor: Colors.transparent,
+                splashFactory: NoSplash.splashFactory,
+                onTap: () {
+                  openWhatsApp(widget.accept_number);
+                },
+                child: Image.network(
+                    height: 20,
+                    width: 20,
+                    'https://cdn-icons-png.freepik.com/256/15707/15707917.png?semt=ais_hybrid'),
+              ),
             ],
           ),
         ),

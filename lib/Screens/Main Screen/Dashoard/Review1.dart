@@ -201,13 +201,13 @@ class _Review1State extends State<Review1> {
                     Text(
                       widget.name,
                       style: TextStyle(
-                          fontSize: 14.sp,
+                          fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
                           color: Colors.black),
                     ),
                     Text(
                       widget.hospital,
-                      style: TextStyle(fontSize: 11.sp, color: Colors.black),
+                      style: TextStyle(fontSize: 16.sp, color: Colors.black),
                     ),
                   ],
                 ),
@@ -220,7 +220,7 @@ class _Review1State extends State<Review1> {
           Text(
             'Donation Details',
             style: TextStyle(
-                fontSize: 14.sp,
+                fontSize: 16.sp,
                 color: Colors.black,
                 fontWeight: FontWeight.bold),
           ),
@@ -415,35 +415,30 @@ class _Review1State extends State<Review1> {
           ),
           Padding(
             padding: EdgeInsets.fromLTRB(5.w, 0.h, 5.w, 0),
-            child: Material(
-              elevation: 10.0,
-              shadowColor: Colors.black,
-              borderRadius: BorderRadius.circular(10.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  updateAcceptDonationData();
-                },
-                style: ButtonStyle(
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
+            child: ElevatedButton(
+              onPressed: () {
+                updateAcceptDonationData();
+              },
+              style: ButtonStyle(
+                shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
                   ),
-                  padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                    // Increase horizontal padding
-                    // ignore: prefer_const_constructors
-                    EdgeInsets.symmetric(vertical: 2.2.h, horizontal: 25.w),
-                  ),
-                  backgroundColor:
-                      MaterialStateProperty.all<Color>(const Color(0xFFDE0A1E)),
                 ),
-                child: Text(
-                  'Submit Your Review',
-                  style: TextStyle(
-                    fontSize: 10.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+                padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
+                  // Increase horizontal padding
+                  // ignore: prefer_const_constructors
+                  EdgeInsets.symmetric(vertical: 2.2.h, horizontal: 25.w),
+                ),
+                backgroundColor:
+                    WidgetStateProperty.all<Color>(const Color(0xFFDE0A1E)),
+              ),
+              child: Text(
+                'Submit Your Review',
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
             ),

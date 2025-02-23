@@ -60,7 +60,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
               child: Text(
                 'Help Center',
                 style: TextStyle(
-                    fontSize: 15.sp,
+                    fontSize: 17.sp,
                     fontWeight: FontWeight.bold,
                     color: Colors.black54),
               ),
@@ -79,7 +79,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
             child: Text(
               'E-blood is an online blood donation app where user can donate blood anywhere and anytime.',
               style: TextStyle(
-                  fontSize: 12.sp,
+                  fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
                   color: Colors.red),
             )),
@@ -95,7 +95,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
           child: Text(
             '24/7',
             style: TextStyle(
-                fontSize: 12.sp,
+                fontSize: 16.sp,
                 fontWeight: FontWeight.bold,
                 color: Colors.red),
           ),
@@ -106,14 +106,14 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
         Text(
           'Need Help',
           style: TextStyle(
-              fontSize: 13.sp,
+              fontSize: 16.sp,
               fontWeight: FontWeight.bold,
               color: Colors.black),
         ),
         Text(
           'Tell us how we can help you',
           style: TextStyle(
-              fontSize: 13.sp, fontWeight: FontWeight.bold, color: Colors.red),
+              fontSize: 16.sp, fontWeight: FontWeight.bold, color: Colors.red),
         ),
         SizedBox(
           height: 5,
@@ -121,9 +121,10 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
         Container(
           margin: EdgeInsets.symmetric(horizontal: 40),
           child: Text(
+            textAlign: TextAlign.center,
             'It looks like you are experiencing problem while using our app.We are here to help so please get in touch with us.',
             style: TextStyle(
-                fontSize: 11.sp,
+                fontSize: 16.sp,
                 fontWeight: FontWeight.normal,
                 color: Colors.black),
           ),

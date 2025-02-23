@@ -165,7 +165,7 @@ class _ReviewState extends State<Review> {
                         child: Text(
                           widget.name,
                           style: TextStyle(
-                              fontSize: 15.sp,
+                              fontSize: 16.sp,
                               fontWeight: FontWeight.bold,
                               color: Colors.black),
                         )),
@@ -174,7 +174,7 @@ class _ReviewState extends State<Review> {
                         child: Text(
                           widget.hospital,
                           style:
-                              TextStyle(fontSize: 12.sp, color: Colors.black),
+                              TextStyle(fontSize: 16.sp, color: Colors.black),
                         )),
                     Padding(
                         padding: EdgeInsets.fromLTRB(27.w, 6.h, 0, 3.h),
@@ -185,7 +185,7 @@ class _ReviewState extends State<Review> {
                         child: Text(
                           widget.rating,
                           style: TextStyle(
-                              fontSize: 12.sp,
+                              fontSize: 16.sp,
                               fontWeight: FontWeight.bold,
                               color: const Color(0xFFDE0A1E)),
                         )),
@@ -208,7 +208,7 @@ class _ReviewState extends State<Review> {
                 child: Text(
                   'Donation Details',
                   style: TextStyle(
-                      fontSize: 13.sp,
+                      fontSize: 16.sp,
                       color: Colors.black,
                       fontWeight: FontWeight.bold),
                 )),
@@ -217,7 +217,7 @@ class _ReviewState extends State<Review> {
                 child: Text(
                   'Location-',
                   style: TextStyle(
-                      fontSize: 12.sp,
+                      fontSize: 16.sp,
                       color: Colors.black54,
                       fontWeight: FontWeight.bold),
                 )),
@@ -226,7 +226,7 @@ class _ReviewState extends State<Review> {
                 child: Text(
                   widget.location,
                   style: TextStyle(
-                      fontSize: 12.sp,
+                      fontSize: 16.sp,
                       color: Colors.black54,
                       fontWeight: FontWeight.bold),
                 )),
@@ -235,7 +235,7 @@ class _ReviewState extends State<Review> {
                 child: Text(
                   'Schedule-',
                   style: TextStyle(
-                      fontSize: 12.sp,
+                      fontSize: 16.sp,
                       color: Colors.black54,
                       fontWeight: FontWeight.bold),
                 )),
@@ -244,7 +244,7 @@ class _ReviewState extends State<Review> {
                 child: Text(
                   'Review- ${widget.review}',
                   style: TextStyle(
-                      fontSize: 12.sp,
+                      fontSize: 16.sp,
                       color: Colors.black54,
                       fontWeight: FontWeight.bold),
                 )),
@@ -253,7 +253,7 @@ class _ReviewState extends State<Review> {
                 child: Text(
                   widget.date,
                   style: TextStyle(
-                      fontSize: 12.sp,
+                      fontSize: 16.sp,
                       color: Colors.black54,
                       fontWeight: FontWeight.bold),
                 )),
@@ -262,7 +262,7 @@ class _ReviewState extends State<Review> {
                 child: Text(
                   ',  ${widget.time}',
                   style: TextStyle(
-                      fontSize: 12.sp,
+                      fontSize: 16.sp,
                       color: Colors.black54,
                       fontWeight: FontWeight.bold),
                 )),
@@ -271,7 +271,7 @@ class _ReviewState extends State<Review> {
                 child: Text(
                   'Share Your Feedback',
                   style: TextStyle(
-                      fontSize: 13.sp,
+                      fontSize: 16.sp,
                       color: Colors.black54,
                       fontWeight: FontWeight.bold),
                 )),
@@ -312,37 +312,32 @@ class _ReviewState extends State<Review> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.fromLTRB(10.w, 81.h, 5.w, 0),
-              child: Material(
-                elevation: 10.0,
-                shadowColor: Colors.black,
-                borderRadius: BorderRadius.circular(10.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    // ignore: non_constant_identifier_names
-                    updateAcceptDonationData();
-                  },
-                  style: ButtonStyle(
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
+              padding: EdgeInsets.fromLTRB(5.w, 78.h, 5.w, 0),
+              child: ElevatedButton(
+                onPressed: () {
+                  // ignore: non_constant_identifier_names
+                  updateAcceptDonationData();
+                },
+                style: ButtonStyle(
+                  shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
                     ),
-                    padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                      // Increase horizontal padding
-                      // ignore: prefer_const_constructors
-                      EdgeInsets.symmetric(vertical: 2.2.h, horizontal: 25.w),
-                    ),
-                    backgroundColor: MaterialStateProperty.all<Color>(
-                        const Color(0xFFDE0A1E)),
                   ),
-                  child: Text(
-                    'Submit Your Review',
-                    style: TextStyle(
-                      fontSize: 10.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+                  padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
+                    // Increase horizontal padding
+                    // ignore: prefer_const_constructors
+                    EdgeInsets.symmetric(vertical: 2.2.h, horizontal: 25.w),
+                  ),
+                  backgroundColor:
+                      WidgetStateProperty.all<Color>(const Color(0xFFDE0A1E)),
+                ),
+                child: Text(
+                  'Submit Your Review',
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
               ),

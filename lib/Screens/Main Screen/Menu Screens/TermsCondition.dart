@@ -160,7 +160,7 @@ class _TermsConditionScreenState extends State<TermsConditionScreen> {
               child: Center(
                 child: Text(
                   title,
-                  style: TextStyle(fontSize: 15.sp),
+                  style: TextStyle(fontSize: 16.sp),
                 ),
               ),
             ),

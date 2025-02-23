@@ -61,7 +61,7 @@ class _PrivacyPolicyState extends State<PrivacyPolicy> {
                   child: Text(
                     'Privacy & Policy',
                     style: TextStyle(
-                        fontSize: 14.sp,
+                        fontSize: 17.sp,
                         fontWeight: FontWeight.bold,
                         color: Colors.black54),
                   )),
