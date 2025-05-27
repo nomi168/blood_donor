@@ -10,7 +10,7 @@ void showCustomSnackBar(BuildContext context, String message, bool status) {
       content: Text(message),
       backgroundColor: status ? Colors.green : Colors.red,
       behavior: SnackBarBehavior.floating,
-      margin: EdgeInsets.only(bottom: 100.0, left: 20.0, right: 20.0),
+      margin: EdgeInsets.only(bottom: 20.0, left: 20.0, right: 20.0),
     ),
   );
 }

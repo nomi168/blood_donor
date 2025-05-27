@@ -1,32 +1,97 @@
 // ignore_for_file: use_key_in_widget_constructors
 
-import 'package:blood_donor/Provider/FirebaseAuth.dart';
-import 'package:blood_donor/Provider/Page.dart';
-import 'package:blood_donor/Provider/Profile.dart';
-import 'package:blood_donor/Provider/RewardPoints.dart';
-import 'package:blood_donor/Screens/Splash%20Screen/SplashScreen.dart';
+import 'dart:developer';
+
+import 'package:blood_donor/Services/notification_storage.dart';
+import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
+import 'package:blood_donor/features/dashboard/Main%20Screen/notifications/data/model/notificationModel.dart';
+import 'package:blood_donor/features/dashboard/Main%20Screen/notifications/presentation/constroller/notification_controller.dart';
+import 'package:blood_donor/features/dashboard/Main%20Screen/notifications/presentation/enum/notification_enum.dart';
+import 'package:blood_donor/features/dashboard/Main%20Screen/notifications/presentation/screens/notification_screen.dart';
+import 'package:blood_donor/features/splashscreens/presentation/screens/splash_screen.dart';
 import 'package:blood_donor/firebase_options.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'Screens/Splash Screen/MainSplash.dart';
+import 'features/splashscreens/main_splash_screen.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+bool isFromNotification = false;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.android);
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await FirebaseAppCheck.instance.activate();
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    print("Received notification: ${message.notification?.title}");
-    print("Notification body: ${message.notification?.body}");
-    // Handle the received notification
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? userUid = prefs.getString('user_uid');
+  if (userUid != null && userUid.isNotEmpty) {
+    await Get.put(UserController(), permanent: true);
+  }
+
+  NotificationStorage.initializeNotificationsStorage1();
+  Get.put(NotificationsProvider(), permanent: true);
+  await FirebaseMessaging.instance.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
+  FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+  FirebaseAnalyticsObserver observer =
+      FirebaseAnalyticsObserver(analytics: analytics);
+
+  FirebaseMessaging.onBackgroundMessage(myBackgroundMessageHandler);
+
+  FirebaseMessaging.instance.getInitialMessage().then((val) async {
+    if (val != null) {
+      isFromNotification = true;
+    }
+  });
+
+  FirebaseMessaging.onMessageOpenedApp.listen((val) async {
+    log("on Message opened.............................");
+
+    handleMessage();
+  });
+  FirebaseMessaging.onMessage.listen((event) async {
+    log("on Message.............................");
+    log("Foreground notification");
+    await NotificationStorage.initializeNotificationsStorage1();
+    NotificationType? notificationType;
+    log("Event is ${event.data["type"]}");
+
+    switch (event.data["type"]) {
+      case 'request_notification':
+        notificationType = NotificationType.order;
+        break;
+      case 'accept_notification':
+        notificationType = NotificationType.promotion;
+        break;
+
+      default:
+        break;
+    }
+    if (event.data['type'] != "chat") {
+      await NotificationStorage.pushNewNotification(NotificationModel(
+          id: 12,
+          notificationType: notificationType ?? NotificationType.order,
+          title: event.notification!.title ?? "",
+          content: event.notification!.body ?? ""));
+    }
+
+    await NotificationsProvider.to.loadNotifications();
   });
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.transparent, // Set the status bar color
@@ -35,17 +100,68 @@ void main() async {
     // systemNavigationBarColor: Colors.blue, // Set the navigation bar color
     systemNavigationBarIconBrightness: Brightness.dark, // For Android
   ));
-  FirebaseMessaging.onBackgroundMessage(_fireaseMessagingBackgroundHandler);
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  String? userUid = prefs.getString('user_uid');
 
   runApp(MyApp(userUid: userUid));
 }
 
 @pragma('vm:entry-point')
-Future<void> _fireaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.android);
-  print(message.notification!.title.toString());
+Future<void> myBackgroundMessageHandler(RemoteMessage message) async {
+  log("on Bankground handler.............................");
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  await NotificationStorage.initializeNotificationsStorage1();
+
+  NotificationType? notificationType;
+  switch (message.data['type']) {
+    case 'request_notification':
+      notificationType = NotificationType.order;
+      break;
+    case 'accept_notification':
+      notificationType = NotificationType.promotion;
+      break;
+
+    // Add more cases as needed
+    default:
+      break;
+  }
+
+  if (message.data['type'] != "chat") {
+    await NotificationStorage.pushNewNotification(NotificationModel(
+        id: 12,
+        notificationType: notificationType ?? NotificationType.order,
+        title: message.notification!.title ?? "",
+        content: message.notification!.body ?? ""));
+  }
+}
+
+bool isBottomSheetOpen = false;
+Future<void> handleMessage() async {
+  if (!isBottomSheetOpen) {
+    isBottomSheetOpen = true;
+
+    BuildContext? context = navigatorKey.currentContext;
+
+    if (context != null) {
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
+
+      showBarModalBottomSheet(
+        animationCurve: Curves.easeInBack,
+        barrierColor: Colors.black.withValues(alpha: 0.5),
+        context: context,
+        builder: (context) {
+          return const NotificationScreen(); // Your Notifications widget
+        },
+      ).whenComplete(() {
+        isBottomSheetOpen = false;
+      });
+    } else {
+      debugPrint("⚠️ navigatorKey.currentContext is null");
+    }
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -54,19 +170,21 @@ class MyApp extends StatelessWidget {
   MyApp({required this.userUid});
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => MyPageProvider()),
-        ChangeNotifierProvider(create: (_) => Profile()),
-        ChangeNotifierProvider(create: (_) => RewardPoints()),
-      ],
-      child: MaterialApp(
-        navigatorKey: navigatorKey,
-        debugShowCheckedModeBanner: false,
-        home: userUid != null ? const MainSplash() : SplashScreen(),
-        builder: EasyLoading.init(),
-      ),
+    return ScreenUtilInit(
+      child: userUid != null ? const MainSplash() : SplashScreen(),
+      designSize: const Size(360, 690),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      // Use builder only if you need to use library outside ScreenUtilInit context
+      builder: (_, child) {
+        return GetMaterialApp(
+          navigatorKey: navigatorKey,
+          debugShowCheckedModeBanner: false,
+          home: child,
+          // home: userUid != null ? const MainSplash() : SplashScreen(),
+          builder: EasyLoading.init(),
+        );
+      },
     );
   }
 }
