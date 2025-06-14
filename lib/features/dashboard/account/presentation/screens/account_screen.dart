@@ -243,21 +243,26 @@ class _AccountScreenState extends State<AccountScreen>
                         Padding(
                             padding: EdgeInsets.fromLTRB(32.w, 7.5.h, 0, 0.h),
                             child: Text(
-                              '0 Saved Life',
+                              UserController.to.userModel!.type == 'taker'
+                                  ? 'taker blood'
+                                  : '${UserController.to.userModel!.bloodcount.toString()} life save',
                               style: TextStyle(
                                   fontSize: 15.sp,
                                   color: Colors.black54,
                                   fontWeight: FontWeight.bold),
                             )),
-                        Padding(
-                            padding: EdgeInsets.fromLTRB(58.w, 7.5.h, 0, 0.h),
-                            child: Text(
-                              'Next Donation',
-                              style: TextStyle(
-                                  fontSize: 15.sp,
-                                  color: Colors.black54,
-                                  fontWeight: FontWeight.bold),
-                            )),
+                        UserController.to.userModel!.type == 'donor'
+                            ? Padding(
+                                padding:
+                                    EdgeInsets.fromLTRB(58.w, 7.5.h, 0, 0.h),
+                                child: Text(
+                                  'Next Donation',
+                                  style: TextStyle(
+                                      fontSize: 15.sp,
+                                      color: Colors.black54,
+                                      fontWeight: FontWeight.bold),
+                                ))
+                            : SizedBox(),
                       ],
                     ),
                   ),

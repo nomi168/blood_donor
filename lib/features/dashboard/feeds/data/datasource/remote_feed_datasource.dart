@@ -87,17 +87,16 @@ class RemoteFeedDatasource {
         String name = '${userDoc['firstname']} ${userDoc['lastname']}';
 
         var data = {
-          'message': {
-            'token': userDoc['deviceToken'],
-            'notification': {
+          "message": {
+            "token": userDoc['deviceToken'],
+            "notification": {
               'title': 'New Blood Request',
               'body': 'You have a new request from $name',
             },
-            'data': {'type': 'request_notification', 'id': 'Nomi12345'}
+            // "data": {'type': 'request_notification', 'id': 'Nomi12345'}
           }
         };
 
-        // Generate OAuth2 token using service account
         var jsonString = await rootBundle.loadString('images/json/key1.json');
         var clientCredentials =
             auth.ServiceAccountCredentials.fromJson(jsonString);
@@ -406,6 +405,7 @@ class RemoteFeedDatasource {
 
   Future<void> deleteExpiredRequests() async {
     try {
+        dynamic payload = {'status': true};
       final firestore = FirebaseFirestore.instance;
       // Calculate the timestamp for 24 hours ago
       DateTime twentyFourHoursAgo =
@@ -421,7 +421,7 @@ class RemoteFeedDatasource {
 
       // Delete each expired document
       for (var doc in querySnapshot.docs) {
-        await firestore.collection('taker').doc(doc.id).delete();
+        await firestore.collection('taker').doc(doc.id).update(payload);
       }
     } catch (e) {
       rethrow;

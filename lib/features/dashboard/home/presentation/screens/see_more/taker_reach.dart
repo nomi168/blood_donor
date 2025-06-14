@@ -195,6 +195,8 @@ class TakerReachScreen extends StatelessWidget {
                                   controller.minutes,
                                   controller.seconds);
                           if (response) {
+                            showCustomSnackBar(context,
+                                'notification successfully sending', true);
                             controller.isReceived = true;
                             controller.update();
                           }
@@ -230,8 +232,13 @@ class TakerReachScreen extends StatelessWidget {
                       splashColor: Colors.transparent,
                       splashFactory: NoSplash.splashFactory,
                       onTap: () async {
-                        await controller.sendNotificationToDonorReached(
-                            acceptModel.donorEmail);
+                        bool result =
+                            await controller.sendNotificationToDonorReached(
+                                acceptModel.donorEmail);
+                        if (result) {
+                          showCustomSnackBar(context,
+                              'notification successfully sending', true);
+                        }
                       },
                       child: Container(
                         alignment: Alignment.center,
@@ -291,6 +298,9 @@ class TakerReachScreen extends StatelessWidget {
                               },
                             ),
                           );
+                        }
+                        else {
+                          showCustomSnackBar(context, 'Please wait, the donor is on the way to your location.', false);
                         }
                       },
                       child: Container(

@@ -3,9 +3,9 @@ import 'package:blood_donor/core/validate_test_field.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/signup_controller.dart';
 import 'package:blood_donor/features/auth/presentation/screens/login_screen.dart';
 import 'package:blood_donor/features/auth/presentation/screens/otp_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
@@ -72,11 +72,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                         )
                       ],
-                    )
-                        .animate()
-                        .fadeIn(duration: 600.ms)
-                        .then(delay: 200.ms) // baseline=800ms
-                        .slide(begin: Offset(1, 0), end: Offset.zero),
+                    ),
                     SizedBox(
                       height: 5.h,
                     ),
@@ -109,11 +105,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           validator: validateFirstName,
                         ),
-                      )
-                          .animate()
-                          .fadeIn(duration: 600.ms)
-                          .then(delay: 200.ms) // baseline=800ms
-                          .slide(begin: Offset(1, 0), end: Offset.zero),
+                      ),
                     ),
                     SizedBox(
                       height: 10.h,
@@ -150,11 +142,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           validator: validateLastName,
                         ),
-                      )
-                          .animate()
-                          .fadeIn(duration: 600.ms)
-                          .then(delay: 200.ms) // baseline=800ms
-                          .slide(begin: Offset(1, 0), end: Offset.zero),
+                      ),
                     ),
                     SizedBox(
                       width: 5.w,
@@ -202,11 +190,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           return null; // Return null for valid input
                         },
                       ),
-                    )
-                        .animate()
-                        .fadeIn(duration: 600.ms)
-                        .then(delay: 200.ms) // baseline=800ms
-                        .slide(begin: Offset(1, 0), end: Offset.zero),
+                    ),
                     Container(
                       margin: EdgeInsets.symmetric(horizontal: 5.w),
                       child: Material(
@@ -241,11 +225,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           validator: validateEmail,
                         ),
                       ),
-                    )
-                        .animate()
-                        .fadeIn(duration: 600.ms)
-                        .then(delay: 200.ms) // baseline=800ms
-                        .slide(begin: Offset(1, 0), end: Offset.zero),
+                    ),
                     SizedBox(
                       height: 10.h,
                     ),
@@ -285,11 +265,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           validator: validateLocation,
                         ),
                       ),
-                    )
-                        .animate()
-                        .fadeIn(duration: 600.ms)
-                        .then(delay: 200.ms) // baseline=800ms
-                        .slide(begin: Offset(1, 0), end: Offset.zero),
+                    ),
                     SizedBox(
                       height: 5.h,
                     ),
@@ -303,11 +279,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             color: Colors.black,
                             fontWeight: FontWeight.bold),
                       ),
-                    )
-                        .animate()
-                        .fadeIn(duration: 600.ms)
-                        .then(delay: 200.ms) // baseline=800ms
-                        .slide(begin: Offset(1, 0), end: Offset.zero),
+                    ),
                     SizedBox(
                       height: 10.h,
                     ),
@@ -352,11 +324,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           },
                         ),
                       ),
-                    )
-                        .animate()
-                        .fadeIn(duration: 600.ms)
-                        .then(delay: 200.ms) // baseline=800ms
-                        .slide(begin: Offset(1, 0), end: Offset.zero),
+                    ),
                     SizedBox(
                       height: 10.h,
                     ),
@@ -401,11 +369,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           },
                         ),
                       ),
-                    )
-                        .animate()
-                        .fadeIn(duration: 600.ms)
-                        .then(delay: 200.ms) // baseline=800ms
-                        .slide(begin: Offset(1, 0), end: Offset.zero),
+                    ),
                     SizedBox(
                       height: 10.h,
                     ),
@@ -458,11 +422,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               ),
                             ),
                           ),
-                        )
-                            .animate()
-                            .fadeIn(duration: 600.ms)
-                            .then(delay: 200.ms) // baseline=800ms
-                            .slide(begin: Offset(1, 0), end: Offset.zero),
+                        ),
                         SizedBox(
                           width: 5.w,
                         ),
@@ -513,11 +473,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               ),
                             ),
                           ),
-                        )
-                            .animate()
-                            .fadeIn(duration: 600.ms)
-                            .then(delay: 200.ms) // baseline=800ms
-                            .slide(begin: Offset(1, 0), end: Offset.zero),
+                        ),
                         SizedBox(
                           width: 5.w,
                         ),
@@ -548,6 +504,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     'gender': controller.selectedIndex,
                                     'password': controller.password.text.trim(),
                                     'image': controller.image,
+                                    'blood_count': 0,
+                                    'created_at':
+                                        Timestamp.fromDate(DateTime.now()),
                                   };
                                   showCustomSnackBar(
                                       context, "email is valid", true);
@@ -626,11 +585,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               color: Colors.white),
                         ),
                       ),
-                    )
-                        .animate()
-                        .fadeIn(duration: 600.ms)
-                        .then(delay: 200.ms) // baseline=800ms
-                        .slide(begin: Offset(1, 0), end: Offset.zero),
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -661,10 +616,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         )
                       ],
                     )
-                        .animate()
-                        .fadeIn(duration: 600.ms)
-                        .then(delay: 200.ms) // baseline=800ms
-                        .slide(begin: Offset(1, 0), end: Offset.zero)
                   ],
                 ),
               ),

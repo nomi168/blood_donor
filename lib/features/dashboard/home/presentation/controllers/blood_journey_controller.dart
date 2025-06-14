@@ -240,7 +240,7 @@ class BloodJourneyController extends GetxController {
     }
   }
 
-  Future<bool> getReceivedStatus(dynamic payload) async {
+  Future<bool> getReceivedStatus(Map<String,dynamic> payload) async {
     try {
       showLoader('checking status...');
       return await _homeRepository.getReceivedStatus(payload);

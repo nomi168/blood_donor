@@ -4,6 +4,7 @@ import 'package:blood_donor/features/auth/presentation/controllers/user_controll
 import 'package:blood_donor/features/dashboard/account/data/models/history_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 
 class RemoteAccountDatasource {
   RemoteAccountDatasource._privateController();
@@ -168,35 +169,46 @@ class RemoteAccountDatasource {
 
   Future<bool> updateProfile(Map<String, dynamic> payload) async {
     try {
-      // Query Firestore to get the document that matches the user's email
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('users')
           .where('id', isEqualTo: UserController.to.userModel!.id)
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        // Get the document reference
         DocumentSnapshot documentSnapshot = querySnapshot.docs.first;
         String documentId = documentSnapshot.id;
-        final File imageFile = File(payload['image']);
 
-        final storageRef = FirebaseStorage.instance
-            .ref()
-            .child('profile_images/${UserController.to.userModel!.id}.jpg');
+        // If payload['image'] is a valid file path and the file exists, upload it
+        final String imagePath = payload['image'];
+        if (!imagePath.startsWith('http')) {
+          final File imageFile = File(imagePath);
 
-        await storageRef.putFile(imageFile);
-        String image = await storageRef.getDownloadURL();
-        payload['image'] = image;
+          if (imageFile.existsSync()) {
+            final storageRef = FirebaseStorage.instance
+                .ref()
+                .child('profile_images/${UserController.to.userModel!.id}.jpg');
+
+            await storageRef.putFile(imageFile);
+            String imageUrl = await storageRef.getDownloadURL();
+            payload['image'] = imageUrl;
+          } else {
+            debugPrint("❌ Image file does not exist at: $imagePath");
+            // You can also choose to remove it from payload or handle differently
+            return false;
+          }
+        }
 
         await FirebaseFirestore.instance
             .collection('users')
             .doc(documentId)
             .update(payload);
+
         return true;
       } else {
         return false;
       }
     } catch (e) {
+      debugPrint("❌ Update Profile Error: $e");
       rethrow;
     }
   }

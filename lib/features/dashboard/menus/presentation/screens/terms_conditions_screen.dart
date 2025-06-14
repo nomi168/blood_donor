@@ -63,7 +63,7 @@ class TermsConditionScreen extends StatelessWidget {
                     child: Text(
                       'Terms & Condition',
                       style: TextStyle(
-                          fontSize: 15.sp,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Colors.black54),
                     ),
@@ -71,10 +71,12 @@ class TermsConditionScreen extends StatelessWidget {
                 ],
               ),
               controller.termsConditionModel == null
-                  ? Center(
-                      child: CircularProgressIndicator(
-                        color: PRIMARY_COLOR,
-                        strokeWidth: 4,
+                  ? Expanded(
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: PRIMARY_COLOR,
+                          strokeWidth: 4,
+                        ),
                       ),
                     )
                   : Column(
@@ -113,7 +115,44 @@ class TermsConditionScreen extends StatelessWidget {
                             controller.termsConditionModel!.hygiene,
                             (value) {}),
                       ],
-                    )
+                    ),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                child: Text(
+                  'Terms and Condition',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black45,
+                          blurRadius: 2.0,
+                          spreadRadius: 2.0,
+                        ),
+                      ],
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(06)),
+                  margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  child: SingleChildScrollView(
+                    child: Text(
+                      textAlign: controller.adminTermsconditionModel == null?
+                      TextAlign.center:TextAlign.justify,
+                      controller.adminTermsconditionModel == null
+                          ? 'please wait...'
+                          : controller.adminTermsconditionModel!.termsCondition,
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black87),
+                    ),
+                  ),
+                ),
+              ),
             ],
           );
         },

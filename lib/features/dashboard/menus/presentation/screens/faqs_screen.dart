@@ -1,4 +1,7 @@
 import 'package:blood_donor/constants.dart';
+import 'package:blood_donor/core/utils/api_response.dart';
+import 'package:blood_donor/features/dashboard/menus/data/models/faqs_model.dart';
+import 'package:blood_donor/features/dashboard/menus/domain/term_condition_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
@@ -18,64 +21,45 @@ class _FAQsScreenState extends State<FAQsScreen>
   late AnimationController _controller;
   late Animation<Offset> _offsetAnimation;
   Set<int> expandedItems = Set();
-
-  List<Map<String, String>> faqsList = [
-    {
-      "question": "What is E Blood?",
-      "answer":
-          "BloodDonationHub is a centralized platform where you can find nearby blood donation centers, register to donate, and track your donation history."
-    },
-    {
-      "question": "How do I create an account on E Blood?",
-      "answer":
-          "No need to create an account. Simply click on the “Sign In” button, enter your details, and follow the prompts to verify your email. Once verified, you can log in and start scheduling donations."
-    },
-    {
-      "question": "How do I register for a blood donation?",
-      "answer":
-          "Once you find a suitable donation center, click on the “Register to Donate” button on its page. You will receive a confirmation, and you can track your upcoming appointments in your account."
-    },
-    {
-      "question": "How do I update my donation details?",
-      "answer":
-          "When your donation is completed, you’ll receive a confirmation notification. You can update your health or personal details in the “Profile” section by clicking the “Update” button."
-    },
-    {
-      "question":
-          "What should I do if I'm unable to donate blood after registering?",
-      "answer":
-          "If you encounter any issues, such as health problems or scheduling conflicts, please contact the donation center to cancel or reschedule your appointment."
-    },
-    {
-      "question": "How can I contact support for blood donation queries?",
-      "answer":
-          "You can contact our support team via the “nafeesmazhar1661@gmail.com”, or reach out to us through chat platforms like WhatsApp for immediate assistance."
-    },
-    {
-      "question": "How does Eblood ensure the safety of my donations?",
-      "answer":
-          "All donations follow strict health protocols to ensure the safety of both the donor and recipient. The blood donation process is monitored, and equipment is sterilized. How is my personal information protected?\nWe take your privacy seriously. All personal information is encrypted and stored securely. We never share your data with third parties without your consent."
-    }
-  ];
+  final TermConditionRepository _repository = TermConditionRepository();
+  List<FaqModel> faqsList = [];
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    if (faqsList.isNotEmpty) {
-      _controller = AnimationController(
-        duration: const Duration(seconds: 2),
-        vsync: this,
-      );
-      _offsetAnimation = Tween<Offset>(
-        begin: const Offset(1.0, 0.0),
-        end: Offset.zero,
-      ).animate(
-        CurvedAnimation(
-          parent: _controller,
-          curve: Curves.easeInOut,
-        ),
-      );
-      _controller.forward();
+    getFaqsList();
+
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    );
+    _offsetAnimation = Tween<Offset>(
+      begin: const Offset(1.0, 0.0),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOut,
+      ),
+    );
+    _controller.forward();
+  }
+
+  Future<void> getFaqsList() async {
+    faqsList.clear();
+    isLoading = true;
+    faqsList = await getFaqsData();
+    isLoading = false;
+    setState(() {});
+  }
+
+  Future<List<FaqModel>> getFaqsData() async {
+    try {
+      return await _repository.getUserData();
+    } catch (e) {
+      Helper.handleError(e, 'Error while getting faqs data!');
+      return [];
     }
   }
 
@@ -87,11 +71,9 @@ class _FAQsScreenState extends State<FAQsScreen>
 
   @override
   Widget build(BuildContext context) {
-    List<Map<String, String>> filteredFaqsList = faqsList.where((faq) {
-      return faq['question']!
-              .toLowerCase()
-              .contains(searchQuery.toLowerCase()) ||
-          faq['answer']!.toLowerCase().contains(searchQuery.toLowerCase());
+    List<FaqModel> filteredFaqsList = faqsList.where((faq) {
+      return faq.question.toLowerCase().contains(searchQuery.toLowerCase()) ||
+          faq.answer.toLowerCase().contains(searchQuery.toLowerCase());
     }).toList();
     return Scaffold(
       backgroundColor: Colors.white,
@@ -204,7 +186,7 @@ class _FAQsScreenState extends State<FAQsScreen>
                           children: [
                             // FAQ question
                             Text(
-                              faq['question'] ?? "",
+                              faq.question,
                               style: const TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.w500,
@@ -213,7 +195,7 @@ class _FAQsScreenState extends State<FAQsScreen>
                             const SizedBox(height: 5),
 
                             Text(
-                              faq['answer'] ?? "",
+                              faq.answer,
                               style: const TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.w500,
@@ -224,7 +206,7 @@ class _FAQsScreenState extends State<FAQsScreen>
                                   ? TextOverflow.visible
                                   : TextOverflow.ellipsis,
                             ),
-                            if (faq['answer']!.length > 110)
+                            if (faq.answer.length > 110)
                               Center(
                                   child: GestureDetector(
                                       onTap: () {

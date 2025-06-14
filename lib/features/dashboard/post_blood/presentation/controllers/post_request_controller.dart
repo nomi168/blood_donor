@@ -19,7 +19,7 @@ class PostRequestController extends GetxController {
   TextEditingController blood = TextEditingController();
   TextEditingController unit = TextEditingController();
 
-  List<String> bloodType = ['blood', 'platelets'];
+  List<String> bloodType = ['blood', 'platelets','exchange blood'];
   String selectedBlood = '';
 
   bool isToggled = false;

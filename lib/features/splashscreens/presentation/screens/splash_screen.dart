@@ -30,21 +30,35 @@ class _SplashScreenState extends State<SplashScreen> {
             SizedBox(
               height: 220,
             ),
-            Center(
-              child: Container(
-                height: 40.h,
-                width: 40.w,
-                child: SvgPicture.asset(
-                  'images/svg/Logo.svg',
-                ),
+            TweenAnimationBuilder<Offset>(
+              tween: Tween<Offset>(
+                begin: const Offset(0, -2), // Starts above the screen
+                end: Offset.zero, // Ends at normal position
               ),
+              duration: const Duration(seconds: 2),
+              curve: Curves.easeOut,
+              builder: (context, offset, child) {
+                return Transform.translate(
+                  offset: Offset(0, offset.dy * 100), // Move vertically
+                  child: Center(
+                    child: Container(
+                      height: 40.h,
+                      width: 40.w,
+                      child: SvgPicture.asset(
+                        'images/svg/Logo.svg',
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
+
             SizedBox(
               height: 10,
             ),
-            Stack(
-              children: animatedTextWidgets,
-            ),
+            // Stack(
+            //   children: animatedTextWidgets,
+            // ),
             SizedBox(
               height: 70,
             ),
@@ -147,35 +161,4 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
     );
   }
-
-  // List<Widget> _buildAnimatedText() {
-  //   final String text = 'BLOOD FINDER';
-  //   const double spacing = 20.0; // Adjust the spacing as needed
-  //   return List.generate(
-  //     text.length,
-  //     (index) => TweenAnimationBuilder(
-  //       tween: Tween<double>(begin: -1.0, end: 1.0),
-  //       duration: const Duration(seconds: 5),
-  //       builder: (context, value, child) {
-  //         return Transform.translate(
-  //           offset: Offset(
-  //               index * spacing, value * 100.0), // Adjust the spacing here
-  //           child: Opacity(
-  //               opacity: value > 0.0 ? value : 1.0,
-  //               child: Padding(
-  //                 padding: EdgeInsets.only(right: 55.w),
-  //                 child: Text(
-  //                   text[index],
-  //                   style: TextStyle(
-  //                     fontSize: 20.sp,
-  //                     color: Colors.red,
-  //                     fontWeight: FontWeight.bold,
-  //                   ),
-  //                 ),
-  //               )),
-  //         );
-  //       },
-  //     ),
-  //   );
-  // }
 }

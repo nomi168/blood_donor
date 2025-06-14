@@ -326,7 +326,7 @@ class BloodJourneyScreen extends StatelessWidget {
                     Expanded(
                       child: InkWell(
                         onTap: () async {
-                          dynamic payload = {
+                          Map<String,dynamic> payload = {
                             'donor_email': donateModel.donorEmail,
                             'email': donateModel.email
                           };

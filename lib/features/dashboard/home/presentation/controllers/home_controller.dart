@@ -4,14 +4,17 @@ import 'package:blood_donor/core/utils/api_response.dart';
 import 'package:blood_donor/core/utils/console_logs.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:blood_donor/features/dashboard/feeds/presentation/screens/notification.dart';
+import 'package:blood_donor/features/dashboard/home/data/models/active_user_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/donor_accept_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/taker_model.dart';
 import 'package:blood_donor/features/dashboard/home/domain/home_repository.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 
 class HomeController extends GetxController {
   final HomeRepository _homeRepository = HomeRepository();
@@ -24,6 +27,7 @@ class HomeController extends GetxController {
   List<FeedTakerModel> takerList = [];
   List<DonateAcceptModel> donorList = [];
   List<DonateAcceptModel> seeList = [];
+  List<ActiveUserModel> activeUserModel = [];
 
   List<String> bloodGroups = [
     'A+',
@@ -49,18 +53,73 @@ class HomeController extends GetxController {
   bool? isAvailability;
 
   @override
+  @override
   void onInit() {
-    final user = UserController.to.userModel;
-    if (user != null) {
-      if (user.type == 'donor') {
-        getInitDonorData();
-      } else {
-        getInitTakerData();
+    super.onInit();
+
+    Future.microtask(() async {
+      final user = UserController.to.userModel;
+
+      // If user is not immediately available, wait for it
+      if (user == null) {
+        waitForUser(); // You should implement this future
+      }
+
+      final updatedUser = UserController.to.userModel;
+
+      if (updatedUser != null) {
+        if (updatedUser.type == 'donor') {
+          await getInitDonorData();
+        } else {
+          await getInitTakerData();
+        }
+
+        await getNotificationToken();
+        await getTodayActiveUsersList();
+      }
+    });
+  }
+
+  Future<void> waitForUser() async {
+    while (UserController.to.userModel == null) {
+      await Future.delayed(Duration(milliseconds: 100));
+    }
+  }
+
+  Future<void> getTodayActiveUsersList() async {
+    activeUserModel.clear();
+    activeUserModel = await getTodayActiveUsers();
+    if (activeUserModel.isEmpty) {
+      dynamic payload = {
+        'email': UserController.to.userModel!.email,
+        'today': Timestamp.fromDate(DateTime.now())
+      };
+      await addActiveTodayUser(payload);
+    } else {
+      final String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+      for (var time in activeUserModel) {
+        final Timestamp? timestamp = time.today;
+
+        if (timestamp != null) {
+          final String docDate =
+              DateFormat('yyyy-MM-dd').format(timestamp.toDate());
+
+          if (docDate == today) {
+            break;
+          } else {
+            dynamic payload = {
+              'email': UserController.to.userModel!.email,
+              'today': Timestamp.fromDate(DateTime.now())
+            };
+            await addActiveTodayUser(payload);
+            break;
+          }
+        }
       }
     }
-    getNotificationToken();
 
-    super.onInit();
+    update();
   }
 
   Future<void> getTakerListByBlood() async {
@@ -240,6 +299,23 @@ class HomeController extends GetxController {
       return await _homeRepository.deleteExpiredRequests();
     } catch (e) {
       Helper.handleError(e, 'Error while deleting exipry request!');
+    }
+  }
+
+  Future<List<ActiveUserModel>> getTodayActiveUsers() async {
+    try {
+      return await _homeRepository.getTodayActiveUsers();
+    } catch (e) {
+      Helper.handleError(e, 'Error while getting user data!');
+      return [];
+    }
+  }
+
+  Future<void> addActiveTodayUser(dynamic payload) async {
+    try {
+      return await _homeRepository.addTodateActiveUser(payload);
+    } catch (e) {
+      Helper.handleError(e, 'Error while getting user data!');
     }
   }
 }

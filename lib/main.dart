@@ -8,6 +8,7 @@ import 'package:blood_donor/features/dashboard/Main%20Screen/notifications/data/
 import 'package:blood_donor/features/dashboard/Main%20Screen/notifications/presentation/constroller/notification_controller.dart';
 import 'package:blood_donor/features/dashboard/Main%20Screen/notifications/presentation/enum/notification_enum.dart';
 import 'package:blood_donor/features/dashboard/Main%20Screen/notifications/presentation/screens/notification_screen.dart';
+import 'package:blood_donor/features/dashboard/feeds/presentation/screens/notification.dart';
 import 'package:blood_donor/features/splashscreens/presentation/screens/splash_screen.dart';
 import 'package:blood_donor/firebase_options.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -39,15 +40,7 @@ void main() async {
 
   NotificationStorage.initializeNotificationsStorage1();
   Get.put(NotificationsProvider(), permanent: true);
-  await FirebaseMessaging.instance.requestPermission(
-    alert: true,
-    announcement: false,
-    badge: true,
-    carPlay: false,
-    criticalAlert: false,
-    provisional: false,
-    sound: true,
-  );
+  NotificationServices.requestNotificationPermission();
   FirebaseAnalytics analytics = FirebaseAnalytics.instance;
   FirebaseAnalyticsObserver observer =
       FirebaseAnalyticsObserver(analytics: analytics);
@@ -68,7 +61,12 @@ void main() async {
   FirebaseMessaging.onMessage.listen((event) async {
     log("on Message.............................");
     log("Foreground notification");
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+
     await NotificationStorage.initializeNotificationsStorage1();
+    await NotificationServices().showNotification(event);
     NotificationType? notificationType;
     log("Event is ${event.data["type"]}");
 

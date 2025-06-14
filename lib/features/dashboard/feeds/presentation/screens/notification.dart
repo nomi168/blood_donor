@@ -1,6 +1,4 @@
 import 'dart:math';
-
-import 'package:blood_donor/features/dashboard/feeds/presentation/screens/feed_tab_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -11,15 +9,16 @@ class NotificationServices {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  void requestNotificationPermission() async {
-    NotificationSettings settings = await messaging.requestPermission(
-        alert: true,
-        announcement: true,
-        badge: true,
-        carPlay: true,
-        criticalAlert: true,
-        provisional: true,
-        sound: true);
+  static void requestNotificationPermission() async {
+    NotificationSettings settings = await FirebaseMessaging.instance
+        .requestPermission(
+            alert: true,
+            announcement: true,
+            badge: true,
+            carPlay: true,
+            criticalAlert: true,
+            provisional: true,
+            sound: true);
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       print('User granted permission');
     } else if (settings.authorizationStatus == AuthorizationStatus.authorized) {
@@ -38,9 +37,7 @@ class NotificationServices {
         android: androidInitializationSettings, iOS: iosInitializationSettings);
 
     await _flutterLocalNotificationsPlugin.initialize(initializationSetting,
-        onDidReceiveNotificationResponse: (payload) {
-      handleMessage(context, message);
-    });
+        onDidReceiveNotificationResponse: (payload) {});
   }
 
   Future<String> getDeviceToken() async {
@@ -53,6 +50,27 @@ class NotificationServices {
       event.toString();
     });
   }
+  //  static void showLocalNotification(RemoteMessage message) {
+  //   RemoteNotification? notification = message.notification;
+  //   AndroidNotification? android = message.notification?.android;
+
+  //   if (notification != null && android != null) {
+  //     _flutterLocalNotificationsPlugin.show(
+  //       notification.hashCode,
+  //       notification.title,
+  //       notification.body,
+  //       const NotificationDetails(
+  //         android: AndroidNotificationDetails(
+  //           'default_channel', // channel id
+  //           'General Notifications', // channel name
+  //           channelDescription: 'This channel is used for general notifications.',
+  //           importance: Importance.max,
+  //           priority: Priority.high,
+  //         ),
+  //       ),
+  //     );
+  //   }
+  // }
 
   void firebaseInit(BuildContext context) {
     FirebaseMessaging.onMessage.listen((message) {
@@ -94,31 +112,6 @@ class NotificationServices {
           message.notification!.title.toString(),
           message.notification!.body.toString(),
           notificationDetails);
-    });
-  }
-
-  void handleMessage(BuildContext context, RemoteMessage message) {
-    if (message.data['type'] == 'msj') {
-      print('Nomiww');
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => FeedScreen(
-                    id: message.data['id'],
-                  )));
-    }
-  }
-
-  Future<void> setupInteractMessage(BuildContext context) async {
-    RemoteMessage? initialMessage =
-        await FirebaseMessaging.instance.getInitialMessage();
-
-    if (initialMessage != null) {
-      handleMessage(context, initialMessage);
-    }
-
-    FirebaseMessaging.onMessageOpenedApp.listen((event) {
-      handleMessage(context, event);
     });
   }
 }

@@ -255,18 +255,25 @@ class EditProfileScreen extends StatelessWidget {
                               context, 'please enter location', false);
                           return;
                         }
-                        if (controller.selectedBloodGroup.isEmpty) {
+                        if (controller.selectedBloodGroup == null ||
+                            controller.selectedBloodGroup.trim().isEmpty) {
                           showCustomSnackBar(
-                              context, 'please select group type', false);
+                              context, 'Please select a blood group.', false);
                           return;
                         }
+
+
                         Map<String, dynamic> payload = {
                           'firstname': controller.fname.text.trim(),
                           'lastname': controller.lname.text.trim(),
                           'location': controller.location.text.trim(),
                           'blood': controller.selectedBloodGroup,
-                          'image': controller.image!.path,
+                          'image': controller.image == null ||
+                                  controller.image!.path.isEmpty
+                              ? model.image
+                              : controller.image!.path,
                         };
+
                         bool result = await controller.updateProfile(payload);
                         if (result) {
                           showCustomSnackBar(

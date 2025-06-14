@@ -1,6 +1,7 @@
 import 'package:blood_donor/common/widgets/custon_snakbar.dart';
 import 'package:blood_donor/core/utils/console_logs.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
+import 'package:blood_donor/features/dashboard/home/data/models/active_user_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/donor_accept_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/taker_model.dart';
 import 'package:blood_donor/main.dart';
@@ -31,8 +32,8 @@ class RemoteHomeDatasource {
               .add(FeedTakerModel.fromJson(doc.data() as Map<String, dynamic>));
         }
       } else {
-        showCustomSnackBar(navigatorKey.currentContext!,
-            message: 'No data found!');
+        // showCustomSnackBar(navigatorKey.currentContext!,
+        //     message: 'No data found!');
       }
       return takerList;
     } catch (e) {
@@ -127,8 +128,8 @@ class RemoteHomeDatasource {
               DonateAcceptModel.fromJson(doc.data() as Map<String, dynamic>));
         }
       } else {
-        showCustomSnackBar(navigatorKey.currentContext!,
-            message: 'No data found!');
+        // showCustomSnackBar(navigatorKey.currentContext!,
+        //     message: 'No data found!');
       }
       return donorList;
     } catch (e) {
@@ -253,19 +254,18 @@ class RemoteHomeDatasource {
     }
   }
 
-  Future<bool> getReceivedStatus(dynamic payload) async {
+  Future<bool> getReceivedStatus(Map<String, dynamic> payload) async {
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('acceptdonation')
-          .where('donate_email', isEqualTo: payload['donate_email'])
+          .where('donor_email', isEqualTo: payload['donor_email'])
           .where('email', isEqualTo: payload['email'])
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
         // Get the first document
         DocumentSnapshot userDoc = querySnapshot.docs.first;
-
-        if (userDoc.exists && userDoc['received_status'] == true) {
+        if (userDoc['received_status'] == true) {
           return true;
         }
       } else {
@@ -530,6 +530,7 @@ class RemoteHomeDatasource {
 
   Future<void> deleteExpiredRequests() async {
     try {
+      dynamic payload = {'status': true};
       final firestore = FirebaseFirestore.instance;
       // Calculate the timestamp for 24 hours ago
       DateTime twentyFourHoursAgo =
@@ -545,7 +546,7 @@ class RemoteHomeDatasource {
 
       // Delete each expired document
       for (var doc in querySnapshot.docs) {
-        await firestore.collection('taker').doc(doc.id).delete();
+        await firestore.collection('taker').doc(doc.id).update(payload);
       }
     } catch (e) {
       rethrow;
@@ -572,6 +573,78 @@ class RemoteHomeDatasource {
           message: 'No data found!',
         );
         return null;
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<ActiveUserModel>> getTodayActiveUsers() async {
+    try {
+      List<ActiveUserModel> userList = [];
+
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('active_users')
+          .where('email', isEqualTo: UserController.to.userModel!.email)
+          .get();
+
+      for (var doc in snapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+
+        userList.add(ActiveUserModel.fromJson(data));
+      }
+
+      return userList;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> addTodateActiveUser(dynamic payload) async {
+    try {
+      final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+      await _firestore.collection('active_users').add(payload);
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  Future<int?> getDonorBloodCount() async {
+    try {
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: UserController.to.userModel!.email)
+          .get();
+
+      if (snapshot.docs.isNotEmpty) {
+        int bloodCount = snapshot.docs.first['blood_count'];
+        return bloodCount;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> updateDonorBloodCount(int count) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: UserController.to.userModel!.email)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Get the document reference
+        DocumentSnapshot documentSnapshot = querySnapshot.docs.first;
+        String documentId = documentSnapshot.id;
+
+        // Update the data in the document
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(documentId)
+            .update({'blood_count': count});
       }
     } catch (e) {
       rethrow;

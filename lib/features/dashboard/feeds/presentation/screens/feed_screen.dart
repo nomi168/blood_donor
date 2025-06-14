@@ -232,81 +232,86 @@ class FeedsScreen extends StatelessWidget {
                                   SizedBox(
                                     height: 5,
                                   ),
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 5, vertical: 5),
-                                    decoration: BoxDecoration(
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey
-                                                .withValues(alpha: 0.1),
-                                            spreadRadius: 2,
-                                            blurRadius: 5,
-                                            offset: Offset(0, 3),
-                                          ),
-                                        ],
-                                        borderRadius: BorderRadius.circular(06),
-                                        border: Border.all(
-                                            color: Colors.grey.shade300)),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.pin_drop,
-                                          color: Colors.black54,
-                                        ),
-                                        SizedBox(
-                                          width: 5,
-                                        ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Location',
-                                              style: TextStyle(
-                                                  fontSize: 14,
-                                                  color: Colors.black54),
-                                            ),
-                                            Text(
-                                              taker.location!,
-                                              style: TextStyle(
-                                                  fontSize: 14,
-                                                  color: Colors.black54,
-                                                  fontWeight: FontWeight.w500),
-                                            ),
-                                            Text(
-                                              'blood-type: ${taker.blood}',
-                                              style: TextStyle(
-                                                  fontSize: 14,
-                                                  color: Colors.black54,
-                                                  fontWeight: FontWeight.w500),
+                                  Expanded(
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 5, vertical: 5),
+                                      decoration: BoxDecoration(
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.grey
+                                                  .withValues(alpha: 0.1),
+                                              spreadRadius: 2,
+                                              blurRadius: 5,
+                                              offset: Offset(0, 3),
                                             ),
                                           ],
-                                        ),
-                                        Spacer(),
-                                        Container(
-                                          margin: EdgeInsets.symmetric(
-                                              horizontal: 10),
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 10, vertical: 5),
-                                          decoration: BoxDecoration(
-                                              color:
-                                                  taker.situation == 'critical'
-                                                      ? Colors.red
-                                                      : Colors.blue,
-                                              borderRadius:
-                                                  BorderRadius.circular(06)),
-                                          child: Text(
-                                            taker.situation!,
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w500),
+                                          borderRadius:
+                                              BorderRadius.circular(06),
+                                          border: Border.all(
+                                              color: Colors.grey.shade300)),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.pin_drop,
+                                            color: Colors.black54,
                                           ),
-                                        ),
-                                      ],
+                                          SizedBox(
+                                            width: 5,
+                                          ),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Location',
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.black54),
+                                              ),
+                                              Text(
+                                                taker.location!,
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.black54,
+                                                    fontWeight:
+                                                        FontWeight.w500),
+                                              ),
+                                              Text(
+                                                'blood-type: ${taker.blood}',
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.black54,
+                                                    fontWeight:
+                                                        FontWeight.w500),
+                                              ),
+                                            ],
+                                          ),
+                                          Spacer(),
+                                          Container(
+                                            margin: EdgeInsets.symmetric(
+                                                horizontal: 10),
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 10, vertical: 5),
+                                            decoration: BoxDecoration(
+                                                color: taker.situation ==
+                                                        'critical'
+                                                    ? Colors.red
+                                                    : Colors.blue,
+                                                borderRadius:
+                                                    BorderRadius.circular(06)),
+                                            child: Text(
+                                              taker.situation!,
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w500),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                   SizedBox(
@@ -419,6 +424,7 @@ class FeedsScreen extends StatelessWidget {
                                                     user.phonenumber,
                                                 'donor_image': user.image,
                                                 'donor_blood': user.bloodgroup,
+                                                'received_status': false,
                                                 'status': false,
                                                 'taker_received_status': false
                                               };

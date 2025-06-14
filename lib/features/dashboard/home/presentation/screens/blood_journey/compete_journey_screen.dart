@@ -389,6 +389,11 @@ class CompeteJourneyScreen extends StatelessWidget {
 
                     bool result = await controller.addDonorHistory(payload);
                     if (result) {
+                      int? count = await controller.getDonorBloodCount();
+                      if (count != null) {
+                        count++;
+                        await controller.updateDonorBloodCount(count);
+                      }
                       controller.updateDonorStatus(
                           donateModel.email, donateModel.donorEmail);
                       controller.addOrUpdateAvailableDonor();

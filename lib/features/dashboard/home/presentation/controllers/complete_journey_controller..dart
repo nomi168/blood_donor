@@ -41,4 +41,21 @@ class CompleteJourneyController extends GetxController {
       Helper.handleError(e, 'Error while updating taker status!');
     }
   }
+
+  Future<int?> getDonorBloodCount() async {
+    try {
+      return await _homeRepository.getDonorBloodCount();
+    } catch (e) {
+      Helper.handleError(e, 'Error while getting donor blood count!');
+      return null;
+    }
+  }
+
+  Future<void> updateDonorBloodCount(int count) async {
+    try {
+      return await _homeRepository.updateDonorBloodCount(count);
+    } catch (e) {
+      Helper.handleError(e, 'Error while udating donor blood count!');
+    }
+  }
 }

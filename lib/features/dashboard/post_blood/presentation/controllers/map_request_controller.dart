@@ -259,11 +259,6 @@ class MapRequestController extends GetxController {
       final extraLocation = payload['location'];
       final takerLocation = (await locationFromAddress(extraLocation)).first;
 
-      // final directory = await getApplicationDocumentsDirectory();
-      // final donorFile = File('${directory.path}/nearby_donors.txt');
-      // if (await donorFile.exists()) await donorFile.delete();
-      // await donorFile.create();
-
       final List<Map<String, dynamic>> donors = donorSnapshot.docs.map((doc) {
         return {
           'location': doc['donor_location'],
@@ -311,7 +306,7 @@ class MapRequestController extends GetxController {
         }
       }).toList();
 
-      await Future.wait(futures);
+      Future.wait(futures);
 
       // Write all nearby donors to file at once
       // await donorFile.writeAsString(nearbyDonorLogLines.join('\n'));
@@ -345,6 +340,76 @@ class MapRequestController extends GetxController {
       await EasyLoading.dismiss();
     }
   }
+
+  // Future<void> getDonorLocation10KM() async {
+  //   try {
+  //     showLoader("please wait...");
+  //     showLoader("please wait...");
+
+  //     // Fetch all donor locations at once
+  //     final donorSnapshot =
+  //         await FirebaseFirestore.instance.collection('donor_location').get();
+
+  //     if (donorSnapshot.docs.isEmpty) {
+  //       logError('No donors found.');
+  //       return;
+  //     }
+
+  //     final List<String> nearbyDonors = [];
+  //     final List<Map<String, double>> receiverLocs = [];
+  //     final List<Future<void>> locationFutures = [];
+
+  //     // Process taker location first
+  //     final takerAddress = payload['location'];
+  //     final takerLocation = (await locationFromAddress(takerAddress)).first;
+  //     final takerLat = takerLocation.latitude;
+  //     final takerLng = takerLocation.longitude;
+
+  //     receiverLocs.add({'latitude': takerLat, 'longitude': takerLng});
+
+  //     // Move map camera to taker
+  //     final controller1 = await controller.future;
+  //     controller1.animateCamera(
+  //         CameraUpdate.newLatLngZoom(LatLng(takerLat, takerLng), 10.0));
+
+  //     // Process donor locations in parallel using Futures
+  //     for (var doc in donorSnapshot.docs) {
+  //       final donorAddress = doc['donor_location'];
+
+  //       locationFutures.add(() async {
+  //         try {
+  //           final donorLocList = await locationFromAddress(donorAddress);
+  //           if (donorLocList.isNotEmpty) {
+  //             final donorLoc = donorLocList.first;
+  //             final distanceInMeters = Geolocator.distanceBetween(
+  //                 takerLat, takerLng, donorLoc.latitude, donorLoc.longitude);
+
+  //             if ((distanceInMeters / 1000) <= 10) {
+  //               receiverLocs.add({
+  //                 'latitude': donorLoc.latitude,
+  //                 'longitude': donorLoc.longitude
+  //               });
+  //               nearbyDonors.add(donorAddress);
+  //             }
+  //           }
+  //         } catch (e) {
+  //           logError("Geocoding failed for: $donorAddress → $e");
+  //         }
+  //       }());
+  //     }
+
+  //     Future.wait(locationFutures); // Wait for all geocoding in parallel
+
+  //     receiverLocations = receiverLocs;
+  //     update();
+
+  //     logSuccess('Nearby donors located and ready.');
+  //     await EasyLoading.dismiss();
+  //     await sendNotificationsToNearbyDonors(nearbyDonors);
+  //   } catch (e) {
+  //     logError('Error: $e');
+  //   } finally {}
+  // }
 
   Future<void> getDonorLocation10KM() async {
     try {
@@ -530,6 +595,98 @@ class MapRequestController extends GetxController {
       await EasyLoading.dismiss();
     }
   }
+  // Future<void> getDonorLocation15KM() async {
+  //   try {
+  //     showLoader("please wait...");
+  //     showLoader("please wait...");
+
+  //     // Fetch all donor locations
+  //     final donorSnapshot =
+  //         await FirebaseFirestore.instance.collection('donor_location').get();
+
+  //     if (donorSnapshot.docs.isEmpty) {
+  //       logError('No donors found.');
+  //       return;
+  //     }
+
+  //     final List<Map<String, double>> receiverLocs = [];
+  //     final Set<Marker> newMarkers = {};
+  //     final List<Future<void>> locationFutures = [];
+
+  //     final String takerAddress = payload['location'];
+  //     final Location takerLoc = (await locationFromAddress(takerAddress)).first;
+
+  //     final double takerLat = takerLoc.latitude;
+  //     final double takerLng = takerLoc.longitude;
+
+  //     receiverLocs.add({'latitude': takerLat, 'longitude': takerLng});
+
+  //     // Add taker marker
+  //     newMarkers.add(Marker(
+  //       markerId: MarkerId('taker_location'),
+  //       position: LatLng(takerLat, takerLng),
+  //       infoWindow: InfoWindow(title: takerAddress),
+  //     ));
+
+  //     // Animate camera to taker location
+  //     final GoogleMapController controller1 = await controller.future;
+  //     controller1.animateCamera(
+  //       CameraUpdate.newLatLngZoom(LatLng(takerLat, takerLng), 10.0),
+  //     );
+
+  //     // Parallel geocode donor locations
+  //     for (var doc in donorSnapshot.docs) {
+  //       final String donorAddress = doc['donor_location'];
+
+  //       locationFutures.add(() async {
+  //         try {
+  //           final donorLocList = await locationFromAddress(donorAddress);
+  //           if (donorLocList.isEmpty) return;
+
+  //           final Location donorLoc = donorLocList.first;
+  //           final double distanceInKm = Geolocator.distanceBetween(
+  //                 takerLat,
+  //                 takerLng,
+  //                 donorLoc.latitude,
+  //                 donorLoc.longitude,
+  //               ) /
+  //               1000;
+
+  //           // Add marker for all donors
+  //           newMarkers.add(Marker(
+  //             markerId: MarkerId(donorAddress),
+  //             position: LatLng(donorLoc.latitude, donorLoc.longitude),
+  //             infoWindow: InfoWindow(title: donorAddress),
+  //           ));
+
+  //           // Save nearby donors
+  //           if (distanceInKm <= 15) {
+  //             receiverLocs.add({
+  //               'latitude': donorLoc.latitude,
+  //               'longitude': donorLoc.longitude
+  //             });
+  //             nearbyDonors.add(donorAddress);
+  //           }
+  //         } catch (e) {
+  //           logError("Failed to geocode $donorAddress: $e");
+  //         }
+  //       }());
+  //     }
+
+  //     Future.wait(locationFutures); // wait for all donors to be processed
+
+  //     // Set values
+  //     receiverLocations = receiverLocs;
+  //     markers = newMarkers;
+  //     update();
+
+  //     logSuccess('Nearby donors saved.');
+  //     await EasyLoading.dismiss();
+  //     await sendNotificationsToNearbyDonors(nearbyDonors);
+  //   } catch (e) {
+  //     logError('Error: $e');
+  //   } finally {}
+  // }
 
   Future<void> getDonorLocation20KM() async {
     try {
@@ -630,13 +787,102 @@ class MapRequestController extends GetxController {
       await EasyLoading.dismiss();
     }
   }
+  // Future<void> getDonorLocation20KM() async {
+  //   try {
+  //     showLoader("please wait...");
+  //     showLoader("please wait...");
+
+  //     // Fetch all donor locations from Firestore
+  //     final donorSnapshot =
+  //         await FirebaseFirestore.instance.collection('donor_location').get();
+  //     if (donorSnapshot.docs.isEmpty) {
+  //       logError('No donors found.');
+  //       return;
+  //     }
+
+  //     final List<Map<String, double>> receiverLocs = [];
+  //     final Set<Marker> newMarkers = {};
+  //     final List<Future<void>> geocodeTasks = [];
+
+  //     // Get taker location from payload
+  //     final String takerAddress = payload['location'];
+  //     final Location takerLocation =
+  //         (await locationFromAddress(takerAddress)).first;
+  //     final double takerLat = takerLocation.latitude;
+  //     final double takerLng = takerLocation.longitude;
+
+  //     // Add taker location to receiverLocs and markers
+  //     receiverLocs.add({'latitude': takerLat, 'longitude': takerLng});
+  //     newMarkers.add(Marker(
+  //       markerId: MarkerId(takerAddress),
+  //       position: LatLng(takerLat, takerLng),
+  //       infoWindow: InfoWindow(title: takerAddress),
+  //     ));
+
+  //     // Animate camera to taker location once
+  //     final GoogleMapController controller1 = await controller.future;
+  //     controller1.animateCamera(CameraUpdate.newLatLngZoom(
+  //       LatLng(takerLat, takerLng),
+  //       10.0,
+  //     ));
+
+  //     // Geocode all donor locations in parallel
+  //     for (var doc in donorSnapshot.docs) {
+  //       final String donorAddress = doc['donor_location'];
+
+  //       geocodeTasks.add(() async {
+  //         try {
+  //           final locs = await locationFromAddress(donorAddress);
+  //           if (locs.isEmpty) return;
+
+  //           final donorLoc = locs.first;
+  //           final double distanceKm = Geolocator.distanceBetween(
+  //                 takerLat,
+  //                 takerLng,
+  //                 donorLoc.latitude,
+  //                 donorLoc.longitude,
+  //               ) /
+  //               1000;
+
+  //           newMarkers.add(Marker(
+  //             markerId: MarkerId(donorAddress),
+  //             position: LatLng(donorLoc.latitude, donorLoc.longitude),
+  //             infoWindow: InfoWindow(title: donorAddress),
+  //           ));
+
+  //           if (distanceKm <= 20) {
+  //             receiverLocs.add({
+  //               'latitude': donorLoc.latitude,
+  //               'longitude': donorLoc.longitude,
+  //             });
+  //             nearbyDonors.add(donorAddress);
+  //           }
+  //         } catch (e) {
+  //           logError('Failed to geocode $donorAddress: $e');
+  //         }
+  //       }());
+  //     }
+
+  //     Future.wait(geocodeTasks);
+
+  //     // Update state
+  //     receiverLocations = receiverLocs;
+  //     markers = newMarkers;
+  //     update();
+
+  //     logSuccess('Nearby donors saved.');
+  //     await EasyLoading.dismiss();
+  //     await sendNotificationsToNearbyDonors(nearbyDonors);
+  //   } catch (e) {
+  //     logError('Error: $e');
+  //   } finally {}
+  // }
 
   Future<void> sendNotificationsToNearbyDonors(
       List<String> nearbyLocations) async {
     try {
-      showLoader("please wait...");
+      // showLoader("please wait...");
       if (nearbyLocations.isEmpty) {
-        EasyLoading.dismiss();
         // Show CupertinoActionSheet if nearbyLocations is empty
         await showCupertinoModalPopup<void>(
           context: navigatorKey.currentContext!,
