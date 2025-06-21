@@ -1,16 +1,25 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:blood_donor/constants.dart';
+import 'package:blood_donor/core/utils/api_response.dart';
 import 'package:blood_donor/core/utils/console_logs.dart';
+import 'package:blood_donor/features/auth/data/models/user_model.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
+import 'package:blood_donor/features/dashboard/post_blood/data/models/user_location_model.dart';
+import 'package:blood_donor/features/dashboard/post_blood/domain/repository_post_request.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 
 class PostRequestController extends GetxController {
   static PostRequestController get to => Get.find();
   final Completer<GoogleMapController> controller =
       Completer<GoogleMapController>();
+  final RepositoryPostRequest _postRequest = RepositoryPostRequest();
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
   TextEditingController hospital = TextEditingController();
@@ -19,17 +28,48 @@ class PostRequestController extends GetxController {
   TextEditingController blood = TextEditingController();
   TextEditingController unit = TextEditingController();
 
-  List<String> bloodType = ['blood', 'platelets','exchange blood'];
+  List<String> bloodType = ['blood', 'platelets', 'exchange blood'];
   String selectedBlood = '';
 
   bool isToggled = false;
   bool isTerm = false;
   String selectedValue = 'normal';
+  File? selectedImage;
+  List<UserModel> userList = [];
+  List<UserLocationModel> userLocationList = [];
+  List<UserLocationModel> filteredList = [];
 
   @override
   void onInit() {
     super.onInit();
     donorOnMap();
+  }
+
+  Future<void> getUserList(String blood) async {
+    userList.clear();
+    userList = await getUserData(blood);
+    update();
+  }
+
+  Future<void> getUserLocationList() async {
+    try {
+      showLoader('please wait...');
+      userLocationList.clear();
+      userLocationList = await getDonorLocations();
+      for (var location in userLocationList) {
+        for (var data in userList) {
+          if (data.id == location.userId) {
+            filteredList.add(location);
+          }
+        }
+      }
+      filteredList;
+    } catch (e) {
+    } finally {
+      await EasyLoading.dismiss();
+    }
+
+    update();
   }
 
   Future<void> selectDate(BuildContext context) async {
@@ -54,6 +94,16 @@ class PostRequestController extends GetxController {
 
     if (picked != null && picked != selectedTime) {
       selectedTime = picked;
+      update();
+    }
+  }
+
+  Future<void> pickImage() async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      selectedImage = File(pickedFile.path);
       update();
     }
   }
@@ -95,6 +145,30 @@ class PostRequestController extends GetxController {
       logSuccess('Nearby donors saved to file.');
     } catch (e) {
       logError(e.toString());
+    }
+  }
+
+  Future<List<UserModel>> getUserData(String blood) async {
+    try {
+      showLoader('please wait...');
+      return await _postRequest.getUserData(blood);
+    } catch (e) {
+      Helper.handleError(e, 'Error while getting user data!');
+      return [];
+    } finally {
+      await EasyLoading.dismiss();
+    }
+  }
+
+  Future<List<UserLocationModel>> getDonorLocations() async {
+    try {
+      showLoader('please wait...');
+      return await _postRequest.getDonorLocations();
+    } catch (e) {
+      Helper.handleError(e, 'Error while getting user data!');
+      return [];
+    } finally {
+      await EasyLoading.dismiss();
     }
   }
 }

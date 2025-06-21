@@ -258,6 +258,79 @@ class PostRequestScreen extends StatelessWidget {
                       height: 10,
                     ),
                     Container(
+                      height: 100,
+                      margin: EdgeInsets.symmetric(horizontal: 10),
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black38),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(06)),
+                              height: 90,
+                              child: controller.selectedImage != null
+                                  ? Image.file(controller.selectedImage!,
+                                      fit: BoxFit.cover)
+                                  : const Center(child: Text('No Image')),
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          InkWell(
+                            splashColor: Colors.transparent,
+                            splashFactory: NoSplash.splashFactory,
+                            onTap: controller.pickImage,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade300,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                'Select Image',
+                                style: TextStyle(
+                                    fontSize: 14, fontWeight: FontWeight.w500),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          // Expanded(
+                          //   child: InkWell(
+                          //     splashColor: Colors.transparent,
+                          //     splashFactory: NoSplash.splashFactory,
+                          //     onTap: () {
+                          //       // Add your AI verification logic here
+                          //     },
+                          //     child: Container(
+                          //       padding: EdgeInsets.symmetric(
+                          //           horizontal: 10, vertical: 10),
+                          //       decoration: BoxDecoration(
+                          //         color: Colors.grey.shade300,
+                          //         borderRadius: BorderRadius.circular(6),
+                          //       ),
+                          //       child: Text(
+                          //         'Verify to AI',
+                          //         style: TextStyle(
+                          //             fontSize: 14,
+                          //             fontWeight: FontWeight.w500),
+                          //         textAlign: TextAlign.center,
+                          //       ),
+                          //     ),
+                          //   ),
+                          // ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Container(
                       margin: EdgeInsets.symmetric(horizontal: 5),
                       child: Material(
                         color: Colors.white,
@@ -427,7 +500,7 @@ class PostRequestScreen extends StatelessWidget {
                     InkWell(
                       splashColor: Colors.transparent,
                       splashFactory: NoSplash.splashFactory,
-                      onTap: () {
+                      onTap: () async {
                         if (controller.hospital.text.isEmpty) {
                           showCustomSnackBar(
                               context, 'must be enter hospital name', false);
@@ -447,6 +520,14 @@ class PostRequestScreen extends StatelessWidget {
 
                           return;
                         }
+                        final image = controller.selectedImage;
+
+                        if (image == null || image.path.isEmpty) {
+                          showCustomSnackBar(
+                              context, 'Please select image', false);
+                          return;
+                        }
+
                         if (controller.unit.text.isEmpty) {
                           showCustomSnackBar(
                               context, 'please enter the unit', false);
@@ -471,6 +552,10 @@ class PostRequestScreen extends StatelessWidget {
 
                           return;
                         }
+                        await controller
+                            .getUserList(controller.blood.text.trim());
+                        await controller.getUserLocationList();
+
                         dynamic payload = {
                           'taker_id': UserController.to.userModel!.id,
                           'email': UserController.to.userModel!.email,
@@ -490,19 +575,22 @@ class PostRequestScreen extends StatelessWidget {
                           'note': controller.note.text.trim(),
                           'blood': controller.blood.text.trim(),
                           'situation': controller.selectedValue,
+                          'blood_image': controller.selectedImage!.path,
                           'rating': '0.0',
                           'status': false,
                         };
                         final mapController = PostRequestController.to;
+
                         Navigator.push(
                           context,
                           PageRouteBuilder(
                             pageBuilder:
                                 (context, animation, secondaryAnimation) {
                               return MapRequestScreen(
-                                payload: payload,
-                                controller: mapController.controller,
-                              );
+                                  payload: payload,
+                                  controller: mapController.controller,
+                                  userList: controller.userList,
+                                  userLocationList: controller.filteredList);
                             },
                             transitionDuration:
                                 const Duration(microseconds: 100),

@@ -413,6 +413,7 @@ class FeedsScreen extends StatelessWidget {
                                                 'location': taker.location,
                                                 'note': taker.note,
                                                 'blood': taker.blood,
+                                                'blood_image': taker.bloodImage,
                                                 'unit': taker.unit,
                                                 'phone_number': taker.number,
                                                 'situation': taker.situation,

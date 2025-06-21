@@ -10,6 +10,7 @@ class DonateAcceptModel {
   final String location;
   final String note;
   final String blood;
+  final String bloodImage;
   final String unit;
   final String phoneNumber;
   final String situation;
@@ -35,6 +36,7 @@ class DonateAcceptModel {
     required this.location,
     required this.note,
     required this.blood,
+    required this.bloodImage,
     required this.unit,
     required this.phoneNumber,
     required this.situation,
@@ -62,6 +64,7 @@ class DonateAcceptModel {
         location: json['location'] ?? '',
         note: json['note'] ?? '',
         blood: json['blood'] ?? '',
+        bloodImage: json['blood_image'],
         unit: json['unit'] ?? '',
         phoneNumber: json['phone_number'] ?? '',
         situation: json['situation'] ?? '',
@@ -89,6 +92,7 @@ class DonateAcceptModel {
       'location': location,
       'note': note,
       'blood': blood,
+      'blood_image':bloodImage,
       'unit': unit,
       'phone_number': phoneNumber,
       'situation': situation,

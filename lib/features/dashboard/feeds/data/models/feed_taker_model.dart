@@ -18,6 +18,7 @@ class FeedTakerModel {
   String? rating;
   bool? status;
   String? createdAt;
+  String? bloodImage;
 
   FeedTakerModel({
     this.takerId,
@@ -37,6 +38,7 @@ class FeedTakerModel {
     this.rating,
     this.status,
     this.createdAt,
+    this.bloodImage
   });
 
   factory FeedTakerModel.fromJson(Map<String, dynamic> json) {
@@ -57,6 +59,7 @@ class FeedTakerModel {
       situation: json['situation'],
       rating: json['rating'],
       status: json['status'],
+      bloodImage: json['blood_image'],
       createdAt: json['createdAt'] != null
           ? (json['createdAt'] as Timestamp).toDate().toIso8601String()
           : null,
@@ -82,6 +85,7 @@ class FeedTakerModel {
       'rating': rating,
       'status': status,
       'createdAt': createdAt,
+      'blood_image':bloodImage
     };
   }
 }

@@ -227,34 +227,40 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         child: ElevatedButton(
                           onPressed: () {
                             String blood = homeController.selectedBloodGroup;
-                            Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                pageBuilder:
-                                    (context, animation, secondaryAnimation) {
-                                  return PostRequestScreen(blood: blood);
-                                },
-                                transitionsBuilder: (context, animation,
-                                    secondaryAnimation, child) {
-                                  const begin = Offset(
-                                      10.0, 0.0); // slide in from the right
-                                  const end = Offset.zero;
-                                  const curve = Curves.easeInOutQuart;
+                            if (userController.userModel!.type == 'taker') {
+                              Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                  pageBuilder:
+                                      (context, animation, secondaryAnimation) {
+                                    return PostRequestScreen(blood: blood);
+                                  },
+                                  transitionsBuilder: (context, animation,
+                                      secondaryAnimation, child) {
+                                    const begin = Offset(
+                                        10.0, 0.0); // slide in from the right
+                                    const end = Offset.zero;
+                                    const curve = Curves.easeInOutQuart;
 
-                                  var tween = Tween(begin: begin, end: end)
-                                      .chain(CurveTween(curve: curve));
-                                  var offsetAnimation = animation.drive(tween);
+                                    var tween = Tween(begin: begin, end: end)
+                                        .chain(CurveTween(curve: curve));
+                                    var offsetAnimation =
+                                        animation.drive(tween);
 
-                                  return SlideTransition(
-                                    position: offsetAnimation,
-                                    child: child,
-                                  );
-                                },
-                              ),
-                            );
+                                    return SlideTransition(
+                                      position: offsetAnimation,
+                                      child: child,
+                                    );
+                                  },
+                                ),
+                              );
+                            } else {
+                              showCustomSnackBar(
+                                  context, 'login must as a taker', false);
+                            }
                           },
                           style: ButtonStyle(
-                            shape:
+                            shape:  
                                 WidgetStateProperty.all<RoundedRectangleBorder>(
                               RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10.0),

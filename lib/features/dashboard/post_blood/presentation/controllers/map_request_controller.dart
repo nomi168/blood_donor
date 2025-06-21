@@ -4,10 +4,11 @@ import 'dart:convert';
 import 'package:blood_donor/constants.dart';
 import 'package:blood_donor/core/utils/api_response.dart';
 import 'package:blood_donor/core/utils/console_logs.dart';
+import 'package:blood_donor/features/auth/data/models/user_model.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/screens/Dashboatd.dart';
+import 'package:blood_donor/features/dashboard/post_blood/data/models/user_location_model.dart';
 import 'package:blood_donor/features/dashboard/post_blood/domain/repository_post_request.dart';
 import 'package:blood_donor/main.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,7 +25,13 @@ class MapRequestController extends GetxController {
   final RepositoryPostRequest _postRequest = RepositoryPostRequest();
   final Map<String, dynamic> payload;
   final Completer<GoogleMapController> controller;
-  MapRequestController({required this.payload, required this.controller});
+  final List<UserModel> userList;
+  final List<UserLocationModel> locationList;
+  MapRequestController(
+      {required this.payload,
+      required this.controller,
+      required this.userList,
+      required this.locationList});
   Completer<GoogleMapController> controller1 = Completer<GoogleMapController>();
   List<Map<String, double>> receiverLocations = [];
   List<String> nearbyDonors = [];
@@ -39,6 +46,18 @@ class MapRequestController extends GetxController {
     }
     donorOnMap();
     super.onInit();
+  }
+
+  Future<void> justPostRequest() async {
+    try {
+      bool result = await postBloodRequest(payload);
+      if (result) {
+        _showDonatePopup();
+      }
+    } catch (e) {
+    } finally {
+      await EasyLoading.dismiss();
+    }
   }
 
   // Future<void> donorOnMap() async {
@@ -249,9 +268,7 @@ class MapRequestController extends GetxController {
     try {
       showLoader('Please wait...');
 
-      final donorSnapshot =
-          await FirebaseFirestore.instance.collection('donor_location').get();
-      if (donorSnapshot.docs.isEmpty) {
+      if (locationList.isEmpty) {
         logError('No donors found.');
         return;
       }
@@ -259,22 +276,24 @@ class MapRequestController extends GetxController {
       final extraLocation = payload['location'];
       final takerLocation = (await locationFromAddress(extraLocation)).first;
 
-      final List<Map<String, dynamic>> donors = donorSnapshot.docs.map((doc) {
-        return {
-          'location': doc['donor_location'],
-          'userId': doc['user_id'],
-        };
-      }).toList();
-
       final Set<Marker> newMarkers = {};
       final List<Map<String, double>> receiverLocs = [];
       final List<String> receiverIds = [];
       final List<String> nearbyDonorLogLines = [];
 
-      final futures = donors.map((donor) async {
+      final futures = locationList.map((donor) async {
         try {
-          final locations = await locationFromAddress(donor['location']);
-          if (locations.isEmpty) return;
+          final address = donor.userLcoation.toString().trim();
+          if (address.isEmpty) {
+            logError('❌ Skipping donor with empty location.');
+            return;
+          }
+
+          final locations = await locationFromAddress(address);
+          if (locations.isEmpty) {
+            logError('❌ No results for location: $address');
+            return;
+          }
 
           final loc = locations.first;
           final distanceInMeters = Geolocator.distanceBetween(
@@ -286,32 +305,28 @@ class MapRequestController extends GetxController {
           final distanceInKm = distanceInMeters / 1000;
 
           newMarkers.add(Marker(
-            markerId: MarkerId(donor['location']),
+            markerId: MarkerId(address),
             position: LatLng(loc.latitude, loc.longitude),
-            infoWindow: InfoWindow(title: donor['location']),
+            infoWindow: InfoWindow(title: address),
           ));
 
           if (distanceInKm <= 5) {
-            receiverIds.add(donor['location']);
+            receiverIds.add(donor.userId); // More meaningful than location
             receiverLocs
                 .add({'latitude': loc.latitude, 'longitude': loc.longitude});
-            nearbyDonors.add(donor['location']);
+            nearbyDonors.add(address);
 
             nearbyDonorLogLines.add(
-              'Donor ID: ${donor['userId']}, Location: ${donor['location']}, Distance: ${distanceInKm.toStringAsFixed(2)} km',
+              'Donor ID: ${donor.userId}, Location: $address, Distance: ${distanceInKm.toStringAsFixed(2)} km',
             );
           }
         } catch (e) {
-          logError('Error processing ${donor['location']}: $e');
+          logError('❌ Error processing ${donor.userId}: $e');
         }
       }).toList();
 
-      Future.wait(futures);
+      await Future.wait(futures);
 
-      // Write all nearby donors to file at once
-      // await donorFile.writeAsString(nearbyDonorLogLines.join('\n'));
-
-      // Add receiver marker
       final receiverLoc =
           LatLng(takerLocation.latitude, takerLocation.longitude);
       newMarkers.add(Marker(
@@ -410,16 +425,12 @@ class MapRequestController extends GetxController {
   //     logError('Error: $e');
   //   } finally {}
   // }
-
-  Future<void> getDonorLocation10KM() async {
+  Future<void> getNearDonoesByLocations(int distance, int number) async {
     try {
       showLoader("please wait...");
       showLoader("please wait...");
-      // Fetch all donor locations from Firestore
-      QuerySnapshot donorSnapshot =
-          await FirebaseFirestore.instance.collection('donor_location').get();
 
-      if (donorSnapshot.docs.isNotEmpty) {
+      if (locationList.isNotEmpty) {
         List<String> receiverIds = [];
         List<Map<String, double>> receiverLocs = [];
         Set<Marker> newMarkers = {};
@@ -430,8 +441,96 @@ class MapRequestController extends GetxController {
             (await locationFromAddress(payload['location'])).first;
 
         // Iterate over each donor document
-        for (var doc in donorSnapshot.docs) {
-          String donorLocation = doc['donor_location'];
+        for (var doc in locationList) {
+          String donorLocation = doc.userLcoation;
+
+          // Convert donorLocation to latitude and longitude
+          List<Location> locations = await locationFromAddress(donorLocation);
+          if (locations.isNotEmpty) {
+            Location loc = locations.first;
+
+            double distanceInMeters = Geolocator.distanceBetween(
+                takerLocation.latitude,
+                takerLocation.longitude,
+                loc.latitude,
+                loc.longitude);
+
+            double distanceInKm = distanceInMeters / 1000;
+
+            // Check if the distance is within 5 km
+            if (distanceInKm <= distance) {
+              receiverIds.add(donorLocation);
+              receiverLocs
+                  .add({'latitude': loc.latitude, 'longitude': loc.longitude});
+
+              // Add to nearby donors list for notification
+              nearbyDonors.add(donorLocation);
+            }
+          }
+        }
+
+        // Process the extra locations (taker location)
+        for (String extraLocation in extraLocations) {
+          List<Location> locations = await locationFromAddress(extraLocation);
+          if (locations.isNotEmpty) {
+            Location loc = locations.first;
+            receiverLocs
+                .add({'latitude': loc.latitude, 'longitude': loc.longitude});
+
+            // Add marker for taker location
+            // newMarkers.add(Marker(
+            //   markerId: MarkerId(extraLocation),
+            //   position: LatLng(loc.latitude, loc.longitude),
+            //   infoWindow: InfoWindow(title: extraLocation),
+            // ));
+
+            // Animate camera to the taker location
+            final GoogleMapController controller1 = await controller.future;
+            controller1.animateCamera(
+              CameraUpdate.newLatLngZoom(
+                LatLng(loc.latitude, loc.longitude),
+                10.0,
+              ),
+            );
+          }
+        }
+
+        receiverIds = receiverIds;
+        receiverLocations = receiverLocs;
+        markers = newMarkers;
+        update();
+
+        logSuccess('Nearby donors saved to file.');
+        await EasyLoading.dismiss();
+        await sendNotificationsToNearbyDonors(nearbyDonors);
+      } else {
+        logError('No donors found.');
+      }
+    } catch (e) {
+      logError('Error: $e');
+    } finally {
+      await EasyLoading.dismiss();
+    }
+  }
+
+  Future<void> getDonorLocation10KM() async {
+    try {
+      showLoader("please wait...");
+      showLoader("please wait...");
+
+      if (locationList.isNotEmpty) {
+        List<String> receiverIds = [];
+        List<Map<String, double>> receiverLocs = [];
+        Set<Marker> newMarkers = {};
+
+        // Get taker location from the widget
+        List<String> extraLocations = [payload['location']];
+        Location takerLocation =
+            (await locationFromAddress(payload['location'])).first;
+
+        // Iterate over each donor document
+        for (var doc in locationList) {
+          String donorLocation = doc.userLcoation;
 
           // Convert donorLocation to latitude and longitude
           List<Location> locations = await locationFromAddress(donorLocation);
@@ -503,12 +602,10 @@ class MapRequestController extends GetxController {
 
   Future<void> getDonorLocation15KM() async {
     try {
-      showLoader("Please Wait!");
-      // Fetch all donor locations from Firestore
-      QuerySnapshot donorSnapshot =
-          await FirebaseFirestore.instance.collection('donor_location').get();
+      showLoader("please wait...");
+      showLoader("please wait...");
 
-      if (donorSnapshot.docs.isNotEmpty) {
+      if (locationList.isNotEmpty) {
         List<String> receiverIds = [];
         List<Map<String, double>> receiverLocs = [];
         Set<Marker> newMarkers = {};
@@ -518,8 +615,8 @@ class MapRequestController extends GetxController {
         Location takerLocation =
             (await locationFromAddress(payload['location'])).first;
 
-        for (var doc in donorSnapshot.docs) {
-          String donorLocation = doc['donor_location'];
+        for (var doc in locationList) {
+          String donorLocation = doc.userLcoation;
 
           // Convert donorLocation to latitude and longitude
           List<Location> locations = await locationFromAddress(donorLocation);
@@ -692,11 +789,8 @@ class MapRequestController extends GetxController {
     try {
       showLoader("Please Wait!");
       showLoader("please wait...");
-      // Fetch all donor locations from Firestore
-      QuerySnapshot donorSnapshot =
-          await FirebaseFirestore.instance.collection('donor_location').get();
 
-      if (donorSnapshot.docs.isNotEmpty) {
+      if (locationList.isNotEmpty) {
         List<String> receiverIds = [];
         List<Map<String, double>> receiverLocs = [];
         Set<Marker> newMarkers = {};
@@ -707,8 +801,8 @@ class MapRequestController extends GetxController {
             (await locationFromAddress(payload['location'])).first;
 
         // Iterate over each donor document
-        for (var doc in donorSnapshot.docs) {
-          String donorLocation = doc['donor_location'];
+        for (var doc in locationList) {
+          String donorLocation = doc.userLcoation;
 
           // Convert donorLocation to latitude and longitude
           List<Location> locations = await locationFromAddress(donorLocation);
@@ -892,10 +986,10 @@ class MapRequestController extends GetxController {
               message: Text('Choose a distance range to search for donors.'),
               actions: <CupertinoActionSheetAction>[
                 CupertinoActionSheetAction(
-                  onPressed: () {
+                  onPressed: () async {
                     // Action for 10km
                     Navigator.pop(context, '10km');
-                    getDonorLocation10KM();
+                    await getNearDonoesByLocations(10, 1);
                     // Call your function to search within 10km
                   },
                   child: Text(
@@ -904,11 +998,9 @@ class MapRequestController extends GetxController {
                   ),
                 ),
                 CupertinoActionSheetAction(
-                  onPressed: () {
-                    // Action for 15km
+                  onPressed: () async {
                     Navigator.pop(context, '15km');
-                    getDonorLocation15KM();
-                    // Call your function to search within 15km
+                    await getNearDonoesByLocations(15, 2);
                   },
                   child: Text(
                     '15km',
@@ -916,14 +1008,38 @@ class MapRequestController extends GetxController {
                   ),
                 ),
                 CupertinoActionSheetAction(
-                  onPressed: () {
+                  onPressed: () async {
                     // Action for 20km
                     Navigator.pop(context, '20km');
-                    getDonorLocation20KM();
+                    await getNearDonoesByLocations(20, 3);
                     // Call your function to search within 20km
                   },
                   child: Text(
                     '20km',
+                    style: TextStyle(color: PRIMARY_COLOR),
+                  ),
+                ),
+                CupertinoActionSheetAction(
+                  onPressed: () {
+                    // Action for 20km
+                    Navigator.pop(context, '30km');
+                    getNearDonoesByLocations(30, 4);
+                    // Call your function to search within 20km
+                  },
+                  child: Text(
+                    '30km',
+                    style: TextStyle(color: PRIMARY_COLOR),
+                  ),
+                ),
+                CupertinoActionSheetAction(
+                  onPressed: () {
+                    // Action for 20km
+                    Navigator.pop(context, '');
+                    justPostRequest();
+                    // Call your function to search within 20km
+                  },
+                  child: Text(
+                    'Just Post',
                     style: TextStyle(color: PRIMARY_COLOR),
                   ),
                 ),
@@ -948,36 +1064,23 @@ class MapRequestController extends GetxController {
 
         List<String> list = [];
         List<String> nonDuplicateList = [];
-        // Iterate over each location in the list
-        for (String location in nearbyLocations) {
-          // Query Firestore to get users in the current location
-          QuerySnapshot userSnapshot = await FirebaseFirestore.instance
-              .collection('donor_location')
-              .where('donor_location', isEqualTo: location)
-              .get();
 
-          // Iterate over each user document in the query result
-          for (QueryDocumentSnapshot userDoc in userSnapshot.docs) {
-            String userId = userDoc['user_id'];
-            list.add(userId);
-            Set<String> uniqueList = list.toSet();
-            nonDuplicateList = uniqueList.toList();
+        for (String location in nearbyLocations) {
+          for (var userDoc in locationList) {
+            if (location == userDoc.userLcoation) {
+              String userId = userDoc.userId;
+              list.add(userId);
+              Set<String> uniqueList = list.toSet();
+              nonDuplicateList = uniqueList.toList();
+            }
           }
         }
         for (String userId in nonDuplicateList) {
-          DocumentSnapshot userDoc = await FirebaseFirestore.instance
-              .collection('users')
-              .doc(userId)
-              .get();
-
-          if (userDoc.exists) {
-            String deviceToken = userDoc['deviceToken'];
-            String bloodType = userDoc['bloodgroup'];
-            String type = userDoc['type'];
-            if (payload['blood'] == bloodType && type == 'donor') {
+          for (var i = 0; i < userList.length; i++) {
+            if (userList[i].id == userId) {
               var data = {
                 'message': {
-                  'token': deviceToken,
+                  'token': userList[i].deviceToken,
                   'notification': {
                     'title': 'New Blood Request',
                     'body':
@@ -1010,10 +1113,10 @@ class MapRequestController extends GetxController {
 
               if (response.statusCode == 200) {
                 logSuccess(
-                    'Notification sent successfully to user: ${userDoc.id}');
+                    'Notification sent successfully to user: ${userList[i].id}');
               } else {
                 logError(
-                    'Failed to send notification to user: ${userDoc.id}. Status code: ${response.statusCode}');
+                    'Failed to send notification to user: ${userList[i].id} Status code: ${response.statusCode}');
                 logError('Response body: ${response.body}');
                 await EasyLoading.dismiss();
               }
@@ -1032,7 +1135,7 @@ class MapRequestController extends GetxController {
     }
   }
 
-  Future<bool> postBloodRequest(dynamic payload) async {
+  Future<bool> postBloodRequest(Map<String, dynamic> payload) async {
     try {
       showLoader('adding request...');
       return await _postRequest.postBloodRequest(payload);

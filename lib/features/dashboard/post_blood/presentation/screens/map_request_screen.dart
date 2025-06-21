@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:blood_donor/features/auth/data/models/user_model.dart';
+import 'package:blood_donor/features/dashboard/post_blood/data/models/user_location_model.dart';
 import 'package:blood_donor/features/dashboard/post_blood/presentation/controllers/map_request_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -8,15 +10,22 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 class MapRequestScreen extends StatelessWidget {
   final Map<String, dynamic> payload;
   final Completer<GoogleMapController> controller;
+  final List<UserModel> userList;
+  final List<UserLocationModel> userLocationList;
   const MapRequestScreen(
-      {super.key, required this.payload, required this.controller});
+      {super.key,
+      required this.payload,
+      required this.controller,
+      required this.userList,
+      required this.userLocationList});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: SafeArea(
       child: GetBuilder<MapRequestController>(
-        init: MapRequestController(payload: payload, controller: controller),
+        init: MapRequestController(
+            payload: payload, controller: controller, userList: userList,locationList: userLocationList),
         builder: (mapController) {
           return Stack(children: [
             GoogleMap(
