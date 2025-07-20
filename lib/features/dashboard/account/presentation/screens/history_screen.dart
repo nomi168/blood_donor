@@ -23,7 +23,7 @@ class HistoryScreen extends StatelessWidget {
           init: HistoryController(),
           builder: (controller) {
             return Column(
-                // crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 // mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Row(
@@ -85,9 +85,18 @@ class HistoryScreen extends StatelessWidget {
                         )
                       : controller.historyList.isEmpty &&
                               controller.isLoading == true
-                          ? CircularProgressIndicator(
-                              color: PRIMARY_COLOR,
-                              strokeWidth: 3,
+                          ? Column(
+                              // crossAxisAlignment: CrossAxisAlignment.center,
+                              // mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  height: 40.h,
+                                ),
+                                CircularProgressIndicator(
+                                  color: PRIMARY_COLOR,
+                                  strokeWidth: 3,
+                                ),
+                              ],
                             )
                           : Expanded(
                               child: Padding(
@@ -98,6 +107,7 @@ class HistoryScreen extends StatelessWidget {
                                     BloodHistoryModel his =
                                         controller.historyList[index];
                                     return Container(
+                                      margin: EdgeInsets.symmetric(vertical: 5),
                                       padding: EdgeInsets.symmetric(
                                           horizontal: 10, vertical: 10),
                                       decoration: BoxDecoration(

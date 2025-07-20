@@ -230,10 +230,20 @@ class _CardScanningScreenState extends State<CardScanningScreen> {
                                             );
                                           }
                                         } else {
-                                          showCustomSnackBar(
-                                              context,
-                                              'Card number already matched! please try another cnic card number',
-                                              false);
+                                          Get.snackbar(
+                                            "Error",
+                                            "Card number already matched! please try another cnic card number",
+                                            snackPosition: SnackPosition.TOP,
+                                            snackStyle: SnackStyle.FLOATING,
+                                            backgroundColor: Colors.red
+                                                .withValues(alpha: 0.9),
+                                            colorText: Colors.white,
+                                            margin: EdgeInsets.all(10),
+                                            duration: Duration(seconds: 3),
+                                            borderRadius: 8,
+                                            icon: Icon(Icons.error,
+                                                color: Colors.white),
+                                          );
                                         }
                                       },
                                       child: Container(
@@ -354,8 +364,18 @@ class _CardScanningScreenState extends State<CardScanningScreen> {
               return CustomDialogBox(onCameraBTNPressed: () {
                 controller.scanCnic(ImageSource.camera);
               }, onGalleryBTNPressed: () {
-                showCustomSnackBar(context,
-                    'You are not allow to scan Cnic from gallary', false);
+                Get.snackbar(
+                  "Error",
+                  "You are not allow to scan Cnic from gallary",
+                  snackPosition: SnackPosition.TOP,
+                  snackStyle: SnackStyle.FLOATING,
+                  backgroundColor: Colors.red.withValues(alpha: 0.9),
+                  colorText: Colors.white,
+                  margin: EdgeInsets.all(10),
+                  duration: Duration(seconds: 3),
+                  borderRadius: 8,
+                  icon: Icon(Icons.error, color: Colors.white),
+                );
 
                 // scanCnic(ImageSource.gallery);
               });

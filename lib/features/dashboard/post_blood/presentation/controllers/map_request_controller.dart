@@ -36,6 +36,7 @@ class MapRequestController extends GetxController {
   List<Map<String, double>> receiverLocations = [];
   List<String> nearbyDonors = [];
   Set<Marker> markers = {};
+  bool isUrdu = false;
 
   @override
   void onInit() {
@@ -1086,6 +1087,13 @@ class MapRequestController extends GetxController {
                     'body':
                         'You have a new blood request from ${payload['name']} for blood ${payload['blood']}.'
                   },
+                  'apns': {
+                    'payload': {
+                      'aps': {
+                        'sound': 'custom_sound.wav',
+                      }
+                    }
+                  },
                   'data': {'type': 'request_notification', 'id': 'Nomi12345'}
                 }
               };
@@ -1151,62 +1159,105 @@ class MapRequestController extends GetxController {
     showDialog(
       context: navigatorKey.currentContext!,
       builder: (BuildContext context) {
-        return AlertDialog(
-          contentPadding: const EdgeInsets.all(16.0),
-          backgroundColor: Colors.white,
-          title: Center(
-            child: Column(
+        return GetBuilder<MapRequestController>(builder: (homeController) {
+          return AlertDialog(
+            contentPadding: const EdgeInsets.all(16.0),
+            backgroundColor: Colors.white,
+            title: Center(
+              child: Column(
+                children: [
+                  InkWell(
+                    splashColor: Colors.transparent,
+                    splashFactory: NoSplash.splashFactory,
+                    onTap: () {
+                      isUrdu = !isUrdu;
+                      update();
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: PRIMARY_COLOR,
+                        border: Border.all(color: PRIMARY_COLOR),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      child: Text(
+                        isUrdu ? 'Switch to English' : 'Switch to Urdu',
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                  ),
+                  Image.asset(
+                    'images/svg1.png',
+                    height: 30.h,
+                    width: 30.w,
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Donate',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                // Your image goes here
-                Image.asset(
-                  'images/svg1.png',
-                  height: 40.h,
-                  width: 40.w,
+                Text(
+                  'Blood is Successfully Requested',
+                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 10),
-                const Text(
-                  'Donate',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                isUrdu
+                    ? Text(
+                        'نوٹ: ڈونر کسی بھی قسم کی رقم لینے یا مانگنے کا ذمہ دار نہیں ہے۔\n'
+                        'جب ڈونر کامیابی سے خون عطیہ کر دیتا ہے، تو ایڈمن کی جانب سے آنے والے دنوں میں شکریہ کے طور پر ایک واؤچر جاری کیا جائے گا۔\n'
+                        'یہ واؤچر منتخب شدہ ریسٹورنٹس، کپڑوں کی دکانوں اور دیگر پارٹنر آؤٹ لیٹس پر استعمال کیا جا سکتا ہے۔',
+                        textAlign: TextAlign.right,
+                        textDirection: TextDirection.rtl,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.black87,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      )
+                    : Text(
+                        'Note: The donor is not responsible for requesting or accepting any kind of money from the recipient. '
+                        'Once the donor has successfully donated blood, a voucher will be issued by the admin in the coming days as a token of appreciation. '
+                        'This voucher may be used at selected restaurants, clothing stores, and other partnered outlets.',
+                        textAlign: TextAlign.justify,
+                        style: TextStyle(fontSize: 12, color: Colors.black),
+                      ),
               ],
             ),
-          ),
-          content: const Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Your donation popup content goes here
-              Text(
-                'Blood is Successfully Requested',
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-          actions: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(15.w, 5.h, 15.w, 0),
-              child: Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    Get.offAll(() => Dashboard());
-                  },
-                  style: ElevatedButton.styleFrom(
-                      shape: const CircleBorder(),
-                      elevation: 8,
-                      padding: EdgeInsets.all(4.0.w),
-                      backgroundColor: const Color(0xFFDE0A1E)),
-                  child: const Icon(
-                    Icons.arrow_forward,
-                    size: 32,
-                    color: Colors.white,
+            actions: [
+              Padding(
+                padding: EdgeInsets.fromLTRB(15.w, 5.h, 15.w, 0),
+                child: Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Get.offAll(() => Dashboard());
+                    },
+                    style: ElevatedButton.styleFrom(
+                        shape: const CircleBorder(),
+                        elevation: 8,
+                        padding: EdgeInsets.all(4.0.w),
+                        backgroundColor: const Color(0xFFDE0A1E)),
+                    child: const Icon(
+                      Icons.arrow_forward,
+                      size: 32,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
-        );
+            ],
+          );
+        });
       },
     );
   }

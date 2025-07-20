@@ -30,6 +30,8 @@ class SignupController extends GetxController {
   late final phone;
   bool obscureText = false;
   bool obscureText1 = false;
+  final hasNumber = RegExp(r'[0-9]');
+  final hasSpecialChar = RegExp(r'[!@#\$&*~%^()_+\-=\[\]{};:\\|,.<>\/?]');
 
   File? image;
 

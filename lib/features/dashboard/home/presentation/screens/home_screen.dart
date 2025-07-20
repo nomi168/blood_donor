@@ -222,10 +222,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       SizedBox(
                         height: 10,
                       ),
-                      Container(
-                        margin: EdgeInsets.symmetric(horizontal: 20),
-                        child: ElevatedButton(
-                          onPressed: () {
+
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        splashFactory: NoSplash.splashFactory,
+                        onTap: () async {
+                          Map<String, dynamic> payload = {
+                            'email': userController.userModel!.email
+                          };
+                          bool result = await homeController
+                              .checkTakerBloodRequest(payload);
+                          if (result) {
                             String blood = homeController.selectedBloodGroup;
                             if (userController.userModel!.type == 'taker') {
                               Navigator.push(
@@ -255,42 +262,60 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                 ),
                               );
                             } else {
-                              showCustomSnackBar(
-                                  context, 'login must as a taker', false);
+                              Get.snackbar(
+                                "Error",
+                                "Please login using a taker account",
+                                snackPosition: SnackPosition.TOP,
+                                snackStyle: SnackStyle.FLOATING,
+                                backgroundColor:
+                                    Colors.red.withValues(alpha: 0.9),
+                                colorText: Colors.white,
+                                margin: EdgeInsets.all(10),
+                                duration: Duration(seconds: 3),
+                                borderRadius: 8,
+                                icon: Icon(Icons.error, color: Colors.white),
+                              );
                             }
-                          },
-                          style: ButtonStyle(
-                            shape:  
-                                WidgetStateProperty.all<RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
+                          } else {
+                            Get.snackbar(
+                              "Error",
+                              "Blood request is already posted",
+                              snackPosition: SnackPosition.TOP,
+                              snackStyle: SnackStyle.FLOATING,
+                              backgroundColor:
+                                  Colors.red.withValues(alpha: 0.9),
+                              colorText: Colors.white,
+                              margin: EdgeInsets.all(10),
+                              duration: Duration(seconds: 3),
+                              borderRadius: 8,
+                              icon: Icon(Icons.error, color: Colors.white),
+                            );
+                          }
+                        },
+                        child: Container(
+                            alignment: Alignment.center,
+                            height: 50,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: PRIMARY_COLOR,
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            padding:
-                                WidgetStateProperty.all<EdgeInsetsGeometry>(
-                              // ignore: prefer_const_constructors
-                              EdgeInsets.symmetric(
-                                  vertical: 13.5, horizontal: 32.w),
-                            ),
-                            backgroundColor: WidgetStateProperty.all<Color>(
-                                const Color(0xFFDE0A1E)),
-                          ),
-                          child: Text(
-                            'Send Request',
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
+                            margin: EdgeInsets.symmetric(horizontal: 20),
+                            child: Text(
+                              textAlign: TextAlign.center,
+                              'Send Request',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            )),
                       ),
                       SizedBox(
                         height: 2.h,
                       ),
                       CarouselSlider(
-                        items: homeController.imagesBannerList.map((url) {
-                          return Image.asset(url, fit: BoxFit.contain);
+                        items: homeController.bannerList.map((url) {
+                          return Image.network(url.path, fit: BoxFit.contain);
                         }).toList(),
                         options: CarouselOptions(
                           autoPlay: true,
@@ -306,9 +331,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: homeController.imagesBannerList.map((url) {
-                          int index =
-                              homeController.imagesBannerList.indexOf(url);
+                        children: homeController.bannerList.map((url) {
+                          int index = homeController.bannerList.indexOf(url);
                           return Container(
                             margin: const EdgeInsets.symmetric(
                                 vertical: 10.0, horizontal: 2.0),
@@ -423,41 +447,86 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                           ),
                                         ))
                                     : GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            PageRouteBuilder(
-                                              pageBuilder: (context, animation,
-                                                  secondaryAnimation) {
-                                                return const PostRequestScreen();
-                                              },
-                                              transitionDuration:
-                                                  const Duration(
-                                                      microseconds: 100),
-                                              transitionsBuilder: (context,
-                                                  animation,
-                                                  secondaryAnimation,
-                                                  child) {
-                                                const begin = Offset(10.0,
-                                                    0.0); // slide in from the right
-                                                const end = Offset.zero;
-                                                const curve =
-                                                    Curves.easeInOutQuart;
+                                        onTap: () async {
+                                          Map<String, dynamic> payload = {
+                                            'email':
+                                                userController.userModel!.email
+                                          };
+                                          bool result = await homeController
+                                              .checkTakerBloodRequest(payload);
+                                          if (result) {
+                                            String blood = homeController
+                                                .selectedBloodGroup;
+                                            if (userController
+                                                    .userModel!.type ==
+                                                'taker') {
+                                              Navigator.push(
+                                                context,
+                                                PageRouteBuilder(
+                                                  pageBuilder: (context,
+                                                      animation,
+                                                      secondaryAnimation) {
+                                                    return PostRequestScreen(
+                                                        blood: blood);
+                                                  },
+                                                  transitionsBuilder: (context,
+                                                      animation,
+                                                      secondaryAnimation,
+                                                      child) {
+                                                    const begin = Offset(10.0,
+                                                        0.0); // slide in from the right
+                                                    const end = Offset.zero;
+                                                    const curve =
+                                                        Curves.easeInOutQuart;
 
-                                                var tween = Tween(
-                                                        begin: begin, end: end)
-                                                    .chain(CurveTween(
-                                                        curve: curve));
-                                                var offsetAnimation =
-                                                    animation.drive(tween);
+                                                    var tween = Tween(
+                                                            begin: begin,
+                                                            end: end)
+                                                        .chain(CurveTween(
+                                                            curve: curve));
+                                                    var offsetAnimation =
+                                                        animation.drive(tween);
 
-                                                return SlideTransition(
-                                                  position: offsetAnimation,
-                                                  child: child,
-                                                );
-                                              },
-                                            ),
-                                          );
+                                                    return SlideTransition(
+                                                      position: offsetAnimation,
+                                                      child: child,
+                                                    );
+                                                  },
+                                                ),
+                                              );
+                                            } else {
+                                              Get.snackbar(
+                                                "Error",
+                                                "Please login using a taker account",
+                                                snackPosition:
+                                                    SnackPosition.TOP,
+                                                snackStyle: SnackStyle.FLOATING,
+                                                backgroundColor: Colors.red
+                                                    .withValues(alpha: 0.9),
+                                                colorText: Colors.white,
+                                                margin: EdgeInsets.all(10),
+                                                duration: Duration(seconds: 3),
+                                                borderRadius: 8,
+                                                icon: Icon(Icons.error,
+                                                    color: Colors.white),
+                                              );
+                                            }
+                                          } else {
+                                            Get.snackbar(
+                                              "Error",
+                                              "Blood request is already posted",
+                                              snackPosition: SnackPosition.TOP,
+                                              snackStyle: SnackStyle.FLOATING,
+                                              backgroundColor: Colors.red
+                                                  .withValues(alpha: 0.9),
+                                              colorText: Colors.white,
+                                              margin: EdgeInsets.all(10),
+                                              duration: Duration(seconds: 3),
+                                              borderRadius: 8,
+                                              icon: Icon(Icons.error,
+                                                  color: Colors.white),
+                                            );
+                                          }
                                         },
                                         child: Container(
                                           height: 120,

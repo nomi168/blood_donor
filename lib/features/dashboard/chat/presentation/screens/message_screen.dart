@@ -297,86 +297,164 @@ class _MessageScreenState extends State<MessageScreen>
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Align(
+        alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
         child: Row(
           mainAxisAlignment:
               isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            SizedBox(width: 10),
-            isMe == false
-                ? UserController.to.userModel!.type == 'taker'
-                    ? Material(
-                        color: Colors.transparent,
-                        child: CircleAvatar(
-                          backgroundImage:
-                              NetworkImage(widget.chatModel.takerImage),
-                          radius: 20,
-                        ))
-                    : Material(
-                        color: Colors.transparent,
-                        child: CircleAvatar(
-                          backgroundImage:
-                              NetworkImage(widget.chatModel.donorImage),
-                          radius: 20,
-                        ))
-                : SizedBox(),
-            SizedBox(width: 5),
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-              decoration: BoxDecoration(
-                color: isMe ? Colors.red : Colors.grey[200],
-                borderRadius: BorderRadius.circular(10),
+            if (!isMe)
+              CircleAvatar(
+                backgroundImage: NetworkImage(
+                  UserController.to.userModel!.type == 'taker'
+                      ? widget.chatModel.donorImage
+                      : widget.chatModel.takerImage,
+                ),
+                radius: 20,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        data['content'],
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: isMe ? Colors.white : Colors.black),
+            SizedBox(width: 5),
+            Flexible(
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    topRight: Radius.circular(12),
+                    bottomLeft: isMe ? Radius.circular(12) : Radius.circular(0),
+                    bottomRight:
+                        isMe ? Radius.circular(0) : Radius.circular(12),
+                  ),
+
+                  color: isMe ? Colors.red : Colors.grey[200],
+                  // borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      data['content'],
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: isMe ? Colors.white : Colors.black,
                       ),
-                      SizedBox(
-                        width: 30,
-                      ),
-                      Text(
-                        data['time'] != null
-                            ? (data['time'])
-                            : 'Time not available',
+                    ),
+                    SizedBox(height: 5),
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: Text(
+                        data['time'] ?? 'Time not available',
                         style: TextStyle(
                           fontSize: 10,
-                          color: isMe ? Colors.white : Colors.black,
+                          color: isMe ? Colors.white70 : Colors.black54,
                         ),
                       ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
             ),
-            SizedBox(
-              width: 5,
-            ),
-            isMe == true
-                ? UserController.to.userModel!.type == 'donor'
-                    ? Material(
-                        color: Colors.transparent,
-                        child: CircleAvatar(
-                          backgroundImage:
-                              NetworkImage(widget.chatModel.takerImage),
-                          radius: 20,
-                        ))
-                    : Material(
-                        color: Colors.transparent,
-                        child: CircleAvatar(
-                          backgroundImage:
-                              NetworkImage(widget.chatModel.donorImage),
-                          radius: 20,
-                        ))
-                : SizedBox()
+            SizedBox(width: 5),
+            if (isMe)
+              CircleAvatar(
+                backgroundImage: NetworkImage(
+                  UserController.to.userModel!.type == 'donor'
+                      ? widget.chatModel.donorImage
+                      : widget.chatModel.takerImage,
+                ),
+                radius: 20,
+              ),
           ],
         ),
       ),
     );
   }
+
+  // Widget buildMessage(Map<String, dynamic> data) {
+  //   bool isMe = data['receiver_email'] == UserController.to.userModel!.email;
+
+  //   return Padding(
+  //     padding: const EdgeInsets.all(8.0),
+  //     child: Align(
+  //       child: Row(
+  //         mainAxisAlignment:
+  //             isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+  //         children: [
+  //           SizedBox(width: 10),
+  //           isMe == false
+  //               ? UserController.to.userModel!.type == 'taker'
+  //                   ? Material(
+  //                       color: Colors.transparent,
+  //                       child: CircleAvatar(
+  //                         backgroundImage:
+  //                             NetworkImage(widget.chatModel.takerImage),
+  //                         radius: 20,
+  //                       ))
+  //                   : Material(
+  //                       color: Colors.transparent,
+  //                       child: CircleAvatar(
+  //                         backgroundImage:
+  //                             NetworkImage(widget.chatModel.donorImage),
+  //                         radius: 20,
+  //                       ))
+  //               : SizedBox(),
+  //           SizedBox(width: 5),
+  //           Container(
+  //             padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+  //             decoration: BoxDecoration(
+  //               color: isMe ? Colors.red : Colors.grey[200],
+  //               borderRadius: BorderRadius.circular(10),
+  //             ),
+  //             child: Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 Row(
+  //                   children: [
+  //                     Text(
+  //                       data['content'],
+  //                       style: TextStyle(
+  //                           fontSize: 16,
+  //                           color: isMe ? Colors.white : Colors.black),
+  //                     ),
+  //                     SizedBox(
+  //                       width: 30,
+  //                     ),
+  //                     Text(
+  //                       data['time'] != null
+  //                           ? (data['time'])
+  //                           : 'Time not available',
+  //                       style: TextStyle(
+  //                         fontSize: 10,
+  //                         color: isMe ? Colors.white : Colors.black,
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //           SizedBox(
+  //             width: 5,
+  //           ),
+  //           isMe == true
+  //               ? UserController.to.userModel!.type == 'donor'
+  //                   ? Material(
+  //                       color: Colors.transparent,
+  //                       child: CircleAvatar(
+  //                         backgroundImage:
+  //                             NetworkImage(widget.chatModel.donorImage),
+  //                         radius: 20,
+  //                       ))
+  //                   : Material(
+  //                       color: Colors.transparent,
+  //                       child: CircleAvatar(
+  //                         backgroundImage:
+  //                             NetworkImage(widget.chatModel.takerImage),
+  //                         radius: 20,
+  //                       ))
+  //               : SizedBox()
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 }

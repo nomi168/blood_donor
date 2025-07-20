@@ -21,7 +21,7 @@ class LoginScreen extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Center(child: SvgPicture.asset('images/Banners/Login.svg')),
+              Center(child: SvgPicture.asset('images/svg/Login.svg')),
               GetBuilder<LoginController>(
                   init: LoginController(),
                   builder: (controller) {
@@ -166,23 +166,75 @@ class LoginScreen extends StatelessWidget {
                           splashColor: Colors.transparent,
                           splashFactory: NoSplash.splashFactory,
                           onTap: () async {
-                            if (controller.email.text.isEmpty ||
-                                !controller.email.text.contains('@')) {
-                              showCustomSnackBar(
-                                  context, 'email is invalid', false);
+                            if (controller.email.text.isEmpty) {
+                              Get.snackbar(
+                                "Error",
+                                "Email is required",
+                                snackPosition: SnackPosition.TOP,
+                                snackStyle: SnackStyle.FLOATING,
+                                backgroundColor:
+                                    Colors.red.withValues(alpha: 0.9),
+                                colorText: Colors.white,
+                                margin: EdgeInsets.all(10),
+                                duration: Duration(seconds: 3),
+                                borderRadius: 8,
+                                icon: Icon(Icons.error, color: Colors.white),
+                              );
+
+                              return;
+                            }
+                            if (!controller.email.text.contains('@')) {
+                              Get.snackbar(
+                                "Error",
+                                "Email is invalid",
+                                snackPosition: SnackPosition.TOP,
+                                snackStyle: SnackStyle.FLOATING,
+                                backgroundColor:
+                                    Colors.red.withValues(alpha: 0.9),
+                                colorText: Colors.white,
+                                margin: EdgeInsets.all(10),
+                                duration: Duration(seconds: 3),
+                                borderRadius: 8,
+                                icon: Icon(Icons.error, color: Colors.white),
+                              );
+
                               return;
                             }
                             if (controller.password.text.isEmpty) {
-                              showCustomSnackBar(
-                                  context, 'enter the password', false);
+                              Get.snackbar(
+                                "Error",
+                                "Password is required",
+                                snackPosition: SnackPosition.TOP,
+                                snackStyle: SnackStyle.FLOATING,
+                                backgroundColor:
+                                    Colors.red.withValues(alpha: 0.9),
+                                colorText: Colors.white,
+                                margin: EdgeInsets.all(10),
+                                duration: Duration(seconds: 3),
+                                borderRadius: 8,
+                                icon: Icon(Icons.error, color: Colors.white),
+                              );
+
                               return;
                             }
                             bool? result = await controller.loginToFirebase(
                                 controller.email.text.trim(),
                                 controller.password.text.trim());
                             if (result) {
-                              showCustomSnackBar(
-                                  context, 'login successfully', true);
+                              Get.snackbar(
+                                "Success",
+                                "login successfully",
+                                snackPosition: SnackPosition.TOP,
+                                snackStyle: SnackStyle.FLOATING,
+                                backgroundColor:
+                                    Colors.green.withValues(alpha: 0.9),
+                                colorText: Colors.white,
+                                margin: EdgeInsets.all(10),
+                                duration: Duration(seconds: 3),
+                                borderRadius: 8,
+                                icon: Icon(Icons.check_circle,
+                                    color: Colors.white),
+                              );
 
                               Get.offAll(() => Dashboard());
                             }

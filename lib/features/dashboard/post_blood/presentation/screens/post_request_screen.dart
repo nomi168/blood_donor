@@ -630,6 +630,7 @@ class PostRequestScreen extends StatelessWidget {
                         ),
                       ),
                     ),
+                    SizedBox(height: 10,),
                   ],
                 ),
               );

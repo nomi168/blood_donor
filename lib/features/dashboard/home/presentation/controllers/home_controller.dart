@@ -1,15 +1,18 @@
 import 'dart:async';
 
+import 'package:blood_donor/constants.dart';
 import 'package:blood_donor/core/utils/api_response.dart';
 import 'package:blood_donor/core/utils/console_logs.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:blood_donor/features/dashboard/feeds/presentation/screens/notification.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/active_user_model.dart';
+import 'package:blood_donor/features/dashboard/home/data/models/banner_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/donor_accept_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/taker_model.dart';
 import 'package:blood_donor/features/dashboard/home/domain/home_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -28,6 +31,7 @@ class HomeController extends GetxController {
   List<DonateAcceptModel> donorList = [];
   List<DonateAcceptModel> seeList = [];
   List<ActiveUserModel> activeUserModel = [];
+  List<BannerModel> bannerList = [];
 
   List<String> bloodGroups = [
     'A+',
@@ -39,24 +43,17 @@ class HomeController extends GetxController {
     'O-',
     'AB-',
   ];
-  final List<String> imagesBannerList = [
-    'images/Banners/2.jpeg',
-    'images/Banners/3.jpeg',
-    'images/Banners/4.jpg',
-    'images/Banners/5.jpg',
-    'images/Banners/banner_app.jpg'
-  ];
+
 
   String selectedBloodGroup = '';
   int currentIndex = 0;
   bool isLoading = false;
   bool? isAvailability;
-
-  @override
+  bool isUrdu = false;
   @override
   void onInit() {
     super.onInit();
-
+    getBannersList();
     Future.microtask(() async {
       final user = UserController.to.userModel;
 
@@ -84,6 +81,13 @@ class HomeController extends GetxController {
     while (UserController.to.userModel == null) {
       await Future.delayed(Duration(milliseconds: 100));
     }
+  }
+
+  Future<void> getBannersList() async {
+    bannerList.clear();
+    bannerList = await getBanners();
+
+    update();
   }
 
   Future<void> getTodayActiveUsersList() async {
@@ -316,6 +320,27 @@ class HomeController extends GetxController {
       return await _homeRepository.addTodateActiveUser(payload);
     } catch (e) {
       Helper.handleError(e, 'Error while getting user data!');
+    }
+  }
+
+  Future<bool> checkTakerBloodRequest(Map<String, dynamic> payload) async {
+    try {
+      showLoader('checking request');
+      return await _homeRepository.checkTakerBloodRequest(payload);
+    } catch (e) {
+      Helper.handleError(e, 'Error while checking taler blood request!');
+      return false;
+    } finally {
+      await EasyLoading.dismiss();
+    }
+  }
+
+  Future<List<BannerModel>> getBanners() async {
+    try {
+      return await _homeRepository.getBanners();
+    } catch (e) {
+      Helper.handleError(e, 'Error while getting banners data!');
+      return [];
     }
   }
 }

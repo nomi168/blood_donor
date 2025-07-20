@@ -17,11 +17,13 @@ class HistoryController extends GetxController {
 
   Future<void> getHistoryData() async {
     isLoading = true;
-    update();
+
     historyList = await getHistoryList(
       UserController.to.userModel!.email,
       UserController.to.userModel!.type,
     );
+    isLoading = false;
+
     update();
   }
 

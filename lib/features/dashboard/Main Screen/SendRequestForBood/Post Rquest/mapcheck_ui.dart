@@ -1202,6 +1202,13 @@ class _MapCheckScreenState extends State<MapCheckScreen> {
                     'body':
                         'You have a new blood request from ${widget.fullname} for blood ${widget.blood}.'
                   },
+                  'apns': {
+                    'payload': {
+                      'aps': {
+                        'sound': 'custom_sound.wav',
+                      }
+                    }
+                  },
                   'data': {'type': 'request_notification', 'id': 'Nomi12345'}
                 }
               };
@@ -1351,6 +1358,13 @@ class _MapCheckScreenState extends State<MapCheckScreen> {
                     'title': 'New Blood Request',
                     'body':
                         'You have a new blood request from ${widget.fullname} for blood ${widget.blood}.'
+                  },
+                  'apns': {
+                    'payload': {
+                      'aps': {
+                        'sound': 'custom_sound.wav',
+                      }
+                    }
                   },
                   'data': {'type': 'request_notification', 'id': 'Nomi12345'}
                 }

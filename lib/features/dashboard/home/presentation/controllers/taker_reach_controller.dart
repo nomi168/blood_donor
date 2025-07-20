@@ -299,6 +299,13 @@ class TakerReachController extends GetxController {
               'body':
                   'Hello $name I am on my way and will arrive in ${hours > 0 ? "$hours hours, " : ""}${minutes > 0 ? "$minutes minutes, " : ""}${seconds > 0 ? "$seconds seconds" : ""}.',
             },
+            'apns': {
+              'payload': {
+                'aps': {
+                  'sound': 'custom_sound.wav',
+                }
+              }
+            },
             'data': {'type': 'request_notification', 'id': 'Nomi12345'}
           }
         };
@@ -373,6 +380,13 @@ class TakerReachController extends GetxController {
             'notification': {
               'title': 'Blood Request',
               'body': 'Hello $name I am reached on your location.',
+            },
+            'apns': {
+              'payload': {
+                'aps': {
+                  'sound': 'custom_sound.wav',
+                }
+              }
             },
             'data': {'type': 'request_notification', 'id': 'Nomi12345'}
           }

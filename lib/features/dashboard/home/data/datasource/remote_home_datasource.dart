@@ -2,6 +2,7 @@ import 'package:blood_donor/common/widgets/custon_snakbar.dart';
 import 'package:blood_donor/core/utils/console_logs.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/active_user_model.dart';
+import 'package:blood_donor/features/dashboard/home/data/models/banner_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/donor_accept_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/taker_model.dart';
 import 'package:blood_donor/main.dart';
@@ -646,6 +647,46 @@ class RemoteHomeDatasource {
             .doc(documentId)
             .update({'blood_count': count});
       }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> checkTakerBloodRequest(Map<String, dynamic> payload) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('taker')
+          .where('status', isEqualTo: false)
+          .where('email', isEqualTo: payload['email'])
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<BannerModel>> getBanners() async {
+    try {
+      List<BannerModel> bannerList = [];
+      QuerySnapshot chatQuerySnapshot = await FirebaseFirestore.instance
+          .collection('banners')
+          .orderBy('id', descending: false)
+          .get();
+
+      if (chatQuerySnapshot.docs.isNotEmpty) {
+        for (var doc in chatQuerySnapshot.docs) {
+          bannerList
+              .add(BannerModel.fromJson((doc.data() as Map<String, dynamic>)));
+        }
+      } else {
+        logError('data not found!');
+      }
+      return bannerList;
     } catch (e) {
       rethrow;
     }

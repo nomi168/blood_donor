@@ -1,5 +1,6 @@
 import 'package:blood_donor/features/dashboard/home/data/datasource/remote_home_datasource.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/active_user_model.dart';
+import 'package:blood_donor/features/dashboard/home/data/models/banner_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/donor_accept_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/taker_model.dart';
 
@@ -227,6 +228,22 @@ class HomeRepository {
   Future<void> updateDonorBloodCount(int count) async {
     try {
       return await _datasource.updateDonorBloodCount(count);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> checkTakerBloodRequest(Map<String, dynamic> payload) async {
+    try {
+      return await _datasource.checkTakerBloodRequest(payload);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<BannerModel>> getBanners() async {
+    try {
+      return await _datasource.getBanners();
     } catch (e) {
       rethrow;
     }

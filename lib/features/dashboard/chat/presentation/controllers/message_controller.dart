@@ -65,10 +65,20 @@ class MessageController extends GetxController {
         'message': {
           'token': deviceToken,
           'notification': {
-            'title': 'new message',
+            'title': 'New message',
             'body': 'You have a new message from $name',
           },
-          'data': {'type': 'chat', 'id': 'Nomi12345'}
+          'apns': {
+            'payload': {
+              'aps': {
+                'sound': 'custom_sound.wav',
+              }
+            }
+          },
+          'data': {
+            'type': 'chat',
+            'id': 'Nomi12345',
+          }
         }
       };
 

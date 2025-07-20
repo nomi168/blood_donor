@@ -97,6 +97,7 @@ class NotificationServices {
             importance: Importance.high,
             priority: Priority.high,
             ticker: 'ticker',
+            sound: RawResourceAndroidNotificationSound('custom_sound'),
             icon: '@mipmap/ic_launcher');
 
     const DarwinNotificationDetails darwinNotificationDetails =

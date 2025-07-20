@@ -21,7 +21,7 @@ class RemotePostRequestDatasource {
 
       if (payload['image'] != null && payload['image'].isNotEmpty) {
         // Assuming picture is a path from a file picker
-        final file2 = File(payload['image']);
+        // final file2 = File(payload['image']);
         final file1 = File(payload['blood_image']);
         logSuccess("File is $file1");
 
@@ -41,7 +41,7 @@ class RemotePostRequestDatasource {
           await uploadTask.whenComplete(() => null);
 
           // Upload the file to Firebase Storage
-          await storageRef.putFile(file2);
+          await storageRef.putFile(file1);
 
           final imageUrl = await storageReference.getDownloadURL();
 

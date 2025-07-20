@@ -206,6 +206,22 @@ class _OTPForgetScreenState extends State<OTPForgetScreen> {
                             EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                         child: ElevatedButton(
                           onPressed: () async {
+                            if (controller.email.text.isEmpty) {
+                              Get.snackbar(
+                                "Error",
+                                "Email is required",
+                                snackPosition: SnackPosition.TOP,
+                                snackStyle: SnackStyle.FLOATING,
+                                backgroundColor:
+                                    Colors.red.withValues(alpha: 0.9),
+                                colorText: Colors.white,
+                                margin: EdgeInsets.all(10),
+                                duration: Duration(seconds: 3),
+                                borderRadius: 8,
+                                icon: Icon(Icons.error, color: Colors.white),
+                              );
+                              return;
+                            }
                             bool? result = await controller
                                 .checkEmail(controller.email.text.trim());
                             if (!result) {
@@ -387,19 +403,52 @@ class _OTPForgetScreenState extends State<OTPForgetScreen> {
                       splashFactory: NoSplash.splashFactory,
                       onTap: () async {
                         if (controller.pass.text.isEmpty) {
-                          showCustomSnackBar(
-                              context, 'enter new password!', false);
+                          Get.snackbar(
+                            "Error",
+                            "New password is required",
+                            snackPosition: SnackPosition.TOP,
+                            snackStyle: SnackStyle.FLOATING,
+                            backgroundColor: Colors.red.withValues(alpha: 0.9),
+                            colorText: Colors.white,
+                            margin: EdgeInsets.all(10),
+                            duration: Duration(seconds: 3),
+                            borderRadius: 8,
+                            icon: Icon(Icons.error, color: Colors.white),
+                          );
+
                           return;
                         }
                         if (controller.cpass.text.isEmpty) {
-                          showCustomSnackBar(
-                              context, 'enter confirm password!', false);
+                          Get.snackbar(
+                            "Error",
+                            "Confirm password is required",
+                            snackPosition: SnackPosition.TOP,
+                            snackStyle: SnackStyle.FLOATING,
+                            backgroundColor: Colors.red.withValues(alpha: 0.9),
+                            colorText: Colors.white,
+                            margin: EdgeInsets.all(10),
+                            duration: Duration(seconds: 3),
+                            borderRadius: 8,
+                            icon: Icon(Icons.error, color: Colors.white),
+                          );
+
                           return;
                         }
                         if (controller.pass.text.trim() !=
                             controller.cpass.text.trim()) {
-                          showCustomSnackBar(
-                              context, 'must be enter same password!', false);
+                          Get.snackbar(
+                            "Error",
+                            "Entered must be same password!",
+                            snackPosition: SnackPosition.TOP,
+                            snackStyle: SnackStyle.FLOATING,
+                            backgroundColor: Colors.red.withValues(alpha: 0.9),
+                            colorText: Colors.white,
+                            margin: EdgeInsets.all(10),
+                            duration: Duration(seconds: 3),
+                            borderRadius: 8,
+                            icon: Icon(Icons.error, color: Colors.white),
+                          );
+
                           return;
                         }
                         dynamic payload = {
@@ -408,6 +457,19 @@ class _OTPForgetScreenState extends State<OTPForgetScreen> {
                         };
                         bool result = await controller.forgotPassword(payload);
                         if (result) {
+                          Get.snackbar(
+                            "Success",
+                            "Changed password successfully",
+                            snackPosition: SnackPosition.TOP,
+                            snackStyle: SnackStyle.FLOATING,
+                            backgroundColor:
+                                Colors.green.withValues(alpha: 0.9),
+                            colorText: Colors.white,
+                            margin: EdgeInsets.all(10),
+                            duration: Duration(seconds: 3),
+                            borderRadius: 8,
+                            icon: Icon(Icons.check_circle, color: Colors.white),
+                          );
                           Get.offAll(() => Dashboard());
                         }
                       },

@@ -1,4 +1,4 @@
-import 'package:blood_donor/constants.dart';
+
 import 'package:blood_donor/features/auth/presentation/controllers/otp_controller.dart';
 import 'package:blood_donor/features/auth/presentation/screens/card_scanning_screen.dart';
 import 'package:email_otp/email_otp.dart';
@@ -108,16 +108,35 @@ class OtpScreen extends StatelessWidget {
                     if (await EmailOTP.sendOTP(
                             email: otpController.email.text.trim()) ==
                         true) {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text("OTP has been sent"),
-                      ));
+                      Get.snackbar(
+                        "Success",
+                        "OTP has been sent",
+                        snackPosition: SnackPosition.TOP,
+                        snackStyle: SnackStyle.FLOATING,
+                        backgroundColor: Colors.green.withValues(alpha: 0.9),
+                        colorText: Colors.white,
+                        margin: EdgeInsets.all(10),
+                        duration: Duration(seconds: 3),
+                        borderRadius: 8,
+                        icon: Icon(Icons.check_circle, color: Colors.white),
+                      );
+
                       // setState(() {
                       //   otpsend = true;
                       // });
                     } else {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text("Oops, OTP send failed"),
-                      ));
+                      Get.snackbar(
+                        "Error",
+                        "Oops, OTP send failed",
+                        snackPosition: SnackPosition.TOP,
+                        snackStyle: SnackStyle.FLOATING,
+                        backgroundColor: Colors.red.withValues(alpha: 0.9),
+                        colorText: Colors.white,
+                        margin: EdgeInsets.all(10),
+                        duration: Duration(seconds: 3),
+                        borderRadius: 8,
+                        icon: Icon(Icons.error, color: Colors.white),
+                      );
                     }
                   },
                 ),
@@ -197,13 +216,31 @@ class OtpScreen extends StatelessWidget {
                   if (await EmailOTP.sendOTP(
                           email: otpController.email.text.trim()) ==
                       true) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text("OTP has been sent"),
-                    ));
+                    Get.snackbar(
+                      "Success",
+                      "OTP has been sent",
+                      snackPosition: SnackPosition.TOP,
+                      snackStyle: SnackStyle.FLOATING,
+                      backgroundColor: Colors.green.withValues(alpha: 0.9),
+                      colorText: Colors.white,
+                      margin: EdgeInsets.all(10),
+                      duration: Duration(seconds: 3),
+                      borderRadius: 8,
+                      icon: Icon(Icons.check_circle, color: Colors.white),
+                    );
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text("Oops, OTP send failed"),
-                    ));
+                    Get.snackbar(
+                      "Error",
+                      "Oops, OTP send failed",
+                      snackPosition: SnackPosition.TOP,
+                      snackStyle: SnackStyle.FLOATING,
+                      backgroundColor: Colors.red.withValues(alpha: 0.9),
+                      colorText: Colors.white,
+                      margin: EdgeInsets.all(10),
+                      duration: Duration(seconds: 3),
+                      borderRadius: 8,
+                      icon: Icon(Icons.error, color: Colors.white),
+                    );
                   }
                 },
               )
@@ -216,13 +253,37 @@ class OtpScreen extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () async {
                     if (otpController.otp.text.isEmpty) {
-                      showCustomSnackBar(context, 'enter otp', false);
+                      Get.snackbar(
+                        "Error",
+                        "enter otp",
+                        snackPosition: SnackPosition.TOP,
+                        snackStyle: SnackStyle.FLOATING,
+                        backgroundColor: Colors.red.withValues(alpha: 0.9),
+                        colorText: Colors.white,
+                        margin: EdgeInsets.all(10),
+                        duration: Duration(seconds: 3),
+                        borderRadius: 8,
+                        icon: Icon(Icons.error, color: Colors.white),
+                      );
+
                       return;
                     }
                     if (await EmailOTP.verifyOTP(
                             otp: otpController.otp.text.trim()) ==
                         true) {
-                      showCustomSnackBar(context, 'OTP is verified', true);
+                      Get.snackbar(
+                        "Success",
+                        "OTP is verified",
+                        snackPosition: SnackPosition.TOP,
+                        snackStyle: SnackStyle.FLOATING,
+                        backgroundColor: Colors.green.withValues(alpha: 0.9),
+                        colorText: Colors.white,
+                        margin: EdgeInsets.all(10),
+                        duration: Duration(seconds: 3),
+                        borderRadius: 8,
+                        icon: Icon(Icons.check_circle, color: Colors.white),
+                      );
+
                       // setState(() {
                       //   otpresult = true;
                       // });
@@ -247,7 +308,7 @@ class OtpScreen extends StatelessWidget {
                               payload: payload,
                             );
                           },
-                          transitionDuration: const Duration(microseconds: 300),
+                          transitionDuration: const Duration(microseconds: 100),
                           transitionsBuilder:
                               (context, animation, secondaryAnimation, child) {
                             const begin =
@@ -267,7 +328,18 @@ class OtpScreen extends StatelessWidget {
                         ),
                       );
                     } else {
-                      showCustomSnackBar(context, 'OTP is not verify', false);
+                      Get.snackbar(
+                        "Error",
+                        "OTP is not verify",
+                        snackPosition: SnackPosition.TOP,
+                        snackStyle: SnackStyle.FLOATING,
+                        backgroundColor: Colors.red.withValues(alpha: 0.9),
+                        colorText: Colors.white,
+                        margin: EdgeInsets.all(10),
+                        duration: Duration(seconds: 3),
+                        borderRadius: 8,
+                        icon: Icon(Icons.error, color: Colors.white),
+                      );
                     }
                   },
                   style: ButtonStyle(

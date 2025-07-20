@@ -38,8 +38,8 @@ class RemoteFeedDatasource {
           }
         }
       } else {
-        showCustomSnackBar(navigatorKey.currentContext!,
-            message: 'No data found!');
+        // showCustomSnackBar(navigatorKey.currentContext!,
+        //     message: 'No data found!');
       }
 
       return takerList;
@@ -92,6 +92,13 @@ class RemoteFeedDatasource {
             "notification": {
               'title': 'New Blood Request',
               'body': 'You have a new request from $name',
+            },
+            'apns': {
+              'payload': {
+                'aps': {
+                  'sound': 'custom_sound.wav',
+                }
+              }
             },
             // "data": {'type': 'request_notification', 'id': 'Nomi12345'}
           }
@@ -366,6 +373,13 @@ class RemoteFeedDatasource {
               'title': 'Request Accept',
               'body': 'You have in Chat.',
             },
+            'apns': {
+              'payload': {
+                'aps': {
+                  'sound': 'custom_sound.wav',
+                }
+              }
+            },
             'data': {'type': 'request_notification', 'id': 'Nomi12345'}
           }
         };
@@ -405,7 +419,7 @@ class RemoteFeedDatasource {
 
   Future<void> deleteExpiredRequests() async {
     try {
-        dynamic payload = {'status': true};
+      dynamic payload = {'status': true};
       final firestore = FirebaseFirestore.instance;
       // Calculate the timestamp for 24 hours ago
       DateTime twentyFourHoursAgo =

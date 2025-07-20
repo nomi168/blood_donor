@@ -383,16 +383,34 @@ class QuestionsScreen extends StatelessWidget {
                                   }
                                 }
                               } else {
-                                showCustomSnackBar(
-                                    context,
-                                    'You must check the questionnaires.',
-                                    false);
+                                Get.snackbar(
+                                  "Error",
+                                  "You must check the questionnaires.",
+                                  snackPosition: SnackPosition.TOP,
+                                  snackStyle: SnackStyle.FLOATING,
+                                  backgroundColor:
+                                      Colors.red.withValues(alpha: 0.9),
+                                  colorText: Colors.white,
+                                  margin: EdgeInsets.all(10),
+                                  duration: Duration(seconds: 3),
+                                  borderRadius: 8,
+                                  icon: Icon(Icons.error, color: Colors.white),
+                                );
                               }
                             } else {
-                              showCustomSnackBar(
-                                  context,
-                                  'Please must be check Terms and Conditions.',
-                                  false);
+                              Get.snackbar(
+                                "Error",
+                                "Please must be check Terms and Conditions.",
+                                snackPosition: SnackPosition.TOP,
+                                snackStyle: SnackStyle.FLOATING,
+                                backgroundColor:
+                                    Colors.red.withValues(alpha: 0.9),
+                                colorText: Colors.white,
+                                margin: EdgeInsets.all(10),
+                                duration: Duration(seconds: 3),
+                                borderRadius: 8,
+                                icon: Icon(Icons.error, color: Colors.white),
+                              );
                             }
                           },
                           style: ButtonStyle(
