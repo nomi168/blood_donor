@@ -110,8 +110,20 @@ class _ManageAddressScreenState extends State<ManageAddressScreen> {
                           child: ElevatedButton(
                             onPressed: () async {
                               if (controller.home.text.isEmpty) {
-                                showCustomSnackBar(
-                                    context, 'please enter address', false);
+                                Get.snackbar(
+                                  "Error",
+                                  "please enter address",
+                                  snackPosition: SnackPosition.TOP,
+                                  snackStyle: SnackStyle.FLOATING,
+                                  backgroundColor:
+                                      Colors.red.withValues(alpha: 0.9),
+                                  colorText: Colors.white,
+                                  margin: EdgeInsets.all(10),
+                                  duration: Duration(seconds: 3),
+                                  borderRadius: 8,
+                                  icon: Icon(Icons.error, color: Colors.white),
+                                );
+
                                 return;
                               }
                               dynamic payload = {
@@ -122,8 +134,20 @@ class _ManageAddressScreenState extends State<ManageAddressScreen> {
                               bool result =
                                   await controller.addHomeAddress(payload);
                               if (result) {
-                                showCustomSnackBar(context,
-                                    'Home address added successfully', true);
+                                Get.snackbar(
+                                  "Success",
+                                  "Home address added successfully",
+                                  snackPosition: SnackPosition.TOP,
+                                  snackStyle: SnackStyle.FLOATING,
+                                  backgroundColor:
+                                      Colors.green.withValues(alpha: 0.9),
+                                  colorText: Colors.white,
+                                  margin: EdgeInsets.all(10),
+                                  duration: Duration(seconds: 3),
+                                  borderRadius: 8,
+                                  icon: Icon(Icons.check_circle,
+                                      color: Colors.white),
+                                );
                               }
                             },
                             style: ElevatedButton.styleFrom(
@@ -181,8 +205,20 @@ class _ManageAddressScreenState extends State<ManageAddressScreen> {
                           child: ElevatedButton(
                             onPressed: () async {
                               if (controller.work.text.isEmpty) {
-                                showCustomSnackBar(
-                                    context, 'please enter address', false);
+                                Get.snackbar(
+                                  "Error",
+                                  "please enter address",
+                                  snackPosition: SnackPosition.TOP,
+                                  snackStyle: SnackStyle.FLOATING,
+                                  backgroundColor:
+                                      Colors.red.withValues(alpha: 0.9),
+                                  colorText: Colors.white,
+                                  margin: EdgeInsets.all(10),
+                                  duration: Duration(seconds: 3),
+                                  borderRadius: 8,
+                                  icon: Icon(Icons.error, color: Colors.white),
+                                );
+
                                 return;
                               }
                               dynamic payload = {
@@ -193,8 +229,20 @@ class _ManageAddressScreenState extends State<ManageAddressScreen> {
                               bool result =
                                   await controller.addWorkAddress(payload);
                               if (result) {
-                                showCustomSnackBar(context,
-                                    'Work address added successfully', true);
+                                Get.snackbar(
+                                  "Success",
+                                  "Work address added successfully",
+                                  snackPosition: SnackPosition.TOP,
+                                  snackStyle: SnackStyle.FLOATING,
+                                  backgroundColor:
+                                      Colors.green.withValues(alpha: 0.9),
+                                  colorText: Colors.white,
+                                  margin: EdgeInsets.all(10),
+                                  duration: Duration(seconds: 3),
+                                  borderRadius: 8,
+                                  icon: Icon(Icons.check_circle,
+                                      color: Colors.white),
+                                );
                               }
                             },
                             style: ElevatedButton.styleFrom(
@@ -287,8 +335,21 @@ class _ManageAddressScreenState extends State<ManageAddressScreen> {
                               child: ElevatedButton(
                                 onPressed: () async {
                                   if (controller.travel.text.isEmpty) {
-                                    showCustomSnackBar(
-                                        context, 'please enter address', false);
+                                    Get.snackbar(
+                                      "Error",
+                                      "please enter address",
+                                      snackPosition: SnackPosition.TOP,
+                                      snackStyle: SnackStyle.FLOATING,
+                                      backgroundColor:
+                                          Colors.red.withValues(alpha: 0.9),
+                                      colorText: Colors.white,
+                                      margin: EdgeInsets.all(10),
+                                      duration: Duration(seconds: 3),
+                                      borderRadius: 8,
+                                      icon: Icon(Icons.error,
+                                          color: Colors.white),
+                                    );
+
                                     return;
                                   }
                                   dynamic payload = {
@@ -299,10 +360,20 @@ class _ManageAddressScreenState extends State<ManageAddressScreen> {
                                   bool result = await controller
                                       .addTravelAddress(payload);
                                   if (result) {
-                                    showCustomSnackBar(
-                                        context,
-                                        'Travel address added successfully',
-                                        true);
+                                    Get.snackbar(
+                                      "Success",
+                                      "Travel address added successfully",
+                                      snackPosition: SnackPosition.TOP,
+                                      snackStyle: SnackStyle.FLOATING,
+                                      backgroundColor:
+                                          Colors.green.withValues(alpha: 0.9),
+                                      colorText: Colors.white,
+                                      margin: EdgeInsets.all(10),
+                                      duration: Duration(seconds: 3),
+                                      borderRadius: 8,
+                                      icon: Icon(Icons.check_circle,
+                                          color: Colors.white),
+                                    );
                                   }
                                 },
                                 style: ElevatedButton.styleFrom(

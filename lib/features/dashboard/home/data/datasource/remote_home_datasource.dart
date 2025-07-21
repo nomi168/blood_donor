@@ -1,12 +1,14 @@
-import 'package:blood_donor/common/widgets/custon_snakbar.dart';
+
 import 'package:blood_donor/core/utils/console_logs.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/active_user_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/banner_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/donor_accept_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/taker_model.dart';
-import 'package:blood_donor/main.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class RemoteHomeDatasource {
   RemoteHomeDatasource._privateController();
@@ -194,8 +196,8 @@ class RemoteHomeDatasource {
               DonateAcceptModel.fromJson(doc.data() as Map<String, dynamic>));
         }
       } else {
-        showCustomSnackBar(navigatorKey.currentContext!,
-            message: 'No data found!');
+        // showCustomSnackBar(navigatorKey.currentContext!,
+        //     message: 'No data found!');
       }
       return seeList;
     } catch (e) {
@@ -246,8 +248,19 @@ class RemoteHomeDatasource {
             .delete();
         return true;
       } else {
-        showCustomSnackBar(navigatorKey.currentContext!,
-            message: 'No Cancel Request Accepted');
+        Get.snackbar(
+          "Error",
+          "No Cancel Request Accepted",
+          snackPosition: SnackPosition.TOP,
+          snackStyle: SnackStyle.FLOATING,
+          backgroundColor: Colors.red.withValues(alpha: 0.9),
+          colorText: Colors.white,
+          margin: EdgeInsets.all(10),
+          duration: Duration(seconds: 3),
+          borderRadius: 8,
+          icon: Icon(Icons.error, color: Colors.white),
+        );
+
         return false;
       }
     } catch (e) {
@@ -569,10 +582,10 @@ class RemoteHomeDatasource {
           querySnapshot.docs.first.data() as Map<String, dynamic>,
         );
       } else {
-        showCustomSnackBar(
-          navigatorKey.currentContext!,
-          message: 'No data found!',
-        );
+        // showCustomSnackBar(
+        //   navigatorKey.currentContext!,
+        //   message: 'No data found!',
+        // );
         return null;
       }
     } catch (e) {

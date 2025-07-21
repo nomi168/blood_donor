@@ -1,4 +1,3 @@
-import 'package:blood_donor/constants.dart';
 import 'package:blood_donor/core/validate_test_field.dart';
 import 'package:blood_donor/features/auth/data/models/user_model.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
@@ -241,27 +240,70 @@ class EditProfileScreen extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () async {
                         if (controller.fname.text.isEmpty) {
-                          showCustomSnackBar(
-                              context, 'please enter first name', false);
+                          Get.snackbar(
+                            "Error",
+                            "please enter first name",
+                            snackPosition: SnackPosition.TOP,
+                            snackStyle: SnackStyle.FLOATING,
+                            backgroundColor: Colors.red.withValues(alpha: 0.9),
+                            colorText: Colors.white,
+                            margin: EdgeInsets.all(10),
+                            duration: Duration(seconds: 3),
+                            borderRadius: 8,
+                            icon: Icon(Icons.error, color: Colors.white),
+                          );
+
                           return;
                         }
                         if (controller.lname.text.isEmpty) {
-                          showCustomSnackBar(
-                              context, 'please enter last name', false);
+                          Get.snackbar(
+                            "Error",
+                            "please enter last name",
+                            snackPosition: SnackPosition.TOP,
+                            snackStyle: SnackStyle.FLOATING,
+                            backgroundColor: Colors.red.withValues(alpha: 0.9),
+                            colorText: Colors.white,
+                            margin: EdgeInsets.all(10),
+                            duration: Duration(seconds: 3),
+                            borderRadius: 8,
+                            icon: Icon(Icons.error, color: Colors.white),
+                          );
+
                           return;
                         }
                         if (controller.location.text.isEmpty) {
-                          showCustomSnackBar(
-                              context, 'please enter location', false);
-                          return;
-                        }
-                        if (controller.selectedBloodGroup == null ||
-                            controller.selectedBloodGroup.trim().isEmpty) {
-                          showCustomSnackBar(
-                              context, 'Please select a blood group.', false);
-                          return;
-                        }
+                          Get.snackbar(
+                            "Error",
+                            "please enter location",
+                            snackPosition: SnackPosition.TOP,
+                            snackStyle: SnackStyle.FLOATING,
+                            backgroundColor: Colors.red.withValues(alpha: 0.9),
+                            colorText: Colors.white,
+                            margin: EdgeInsets.all(10),
+                            duration: Duration(seconds: 3),
+                            borderRadius: 8,
+                            icon: Icon(Icons.error, color: Colors.white),
+                          );
 
+                          return;
+                        }
+                        if (controller.selectedBloodGroup == "" ||
+                            controller.selectedBloodGroup.trim().isEmpty) {
+                          Get.snackbar(
+                            "Error",
+                            "Please select a blood group.",
+                            snackPosition: SnackPosition.TOP,
+                            snackStyle: SnackStyle.FLOATING,
+                            backgroundColor: Colors.red.withValues(alpha: 0.9),
+                            colorText: Colors.white,
+                            margin: EdgeInsets.all(10),
+                            duration: Duration(seconds: 3),
+                            borderRadius: 8,
+                            icon: Icon(Icons.error, color: Colors.white),
+                          );
+
+                          return;
+                        }
 
                         Map<String, dynamic> payload = {
                           'firstname': controller.fname.text.trim(),
@@ -276,8 +318,19 @@ class EditProfileScreen extends StatelessWidget {
 
                         bool result = await controller.updateProfile(payload);
                         if (result) {
-                          showCustomSnackBar(
-                              context, 'update profile successfully', true);
+                          Get.snackbar(
+                            "Success",
+                            "update profile successfully",
+                            snackPosition: SnackPosition.TOP,
+                            snackStyle: SnackStyle.FLOATING,
+                            backgroundColor:
+                                Colors.green.withValues(alpha: 0.9),
+                            colorText: Colors.white,
+                            margin: EdgeInsets.all(10),
+                            duration: Duration(seconds: 3),
+                            borderRadius: 8,
+                            icon: Icon(Icons.check_circle, color: Colors.white),
+                          );
 
                           UserController.to.userModel == null;
                           UserController.to.update();

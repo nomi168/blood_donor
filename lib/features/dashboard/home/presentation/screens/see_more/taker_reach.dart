@@ -195,16 +195,37 @@ class TakerReachScreen extends StatelessWidget {
                                   controller.minutes,
                                   controller.seconds);
                           if (response) {
-                            showCustomSnackBar(context,
-                                'notification successfully sending', true);
+                            Get.snackbar(
+                              "Success",
+                              "notification successfully sending",
+                              snackPosition: SnackPosition.TOP,
+                              snackStyle: SnackStyle.FLOATING,
+                              backgroundColor:
+                                  Colors.green.withValues(alpha: 0.9),
+                              colorText: Colors.white,
+                              margin: EdgeInsets.all(10),
+                              duration: Duration(seconds: 3),
+                              borderRadius: 8,
+                              icon:
+                                  Icon(Icons.check_circle, color: Colors.white),
+                            );
+
                             controller.isReceived = true;
                             controller.update();
                           }
                         } else {
-                          showCustomSnackBar(
-                              context,
-                              'you are already notify to ${acceptModel.donorName}',
-                              false);
+                          Get.snackbar(
+                            "Error",
+                            "you are already notify to ${acceptModel.donorName}",
+                            snackPosition: SnackPosition.TOP,
+                            snackStyle: SnackStyle.FLOATING,
+                            backgroundColor: Colors.red.withValues(alpha: 0.9),
+                            colorText: Colors.white,
+                            margin: EdgeInsets.all(10),
+                            duration: Duration(seconds: 3),
+                            borderRadius: 8,
+                            icon: Icon(Icons.error, color: Colors.white),
+                          );
                         }
                       },
                       child: Container(
@@ -236,8 +257,19 @@ class TakerReachScreen extends StatelessWidget {
                             await controller.sendNotificationToDonorReached(
                                 acceptModel.donorEmail);
                         if (result) {
-                          showCustomSnackBar(context,
-                              'notification successfully sending', true);
+                          Get.snackbar(
+                            "Success",
+                            "notification successfully sending",
+                            snackPosition: SnackPosition.TOP,
+                            snackStyle: SnackStyle.FLOATING,
+                            backgroundColor:
+                                Colors.green.withValues(alpha: 0.9),
+                            colorText: Colors.white,
+                            margin: EdgeInsets.all(10),
+                            duration: Duration(seconds: 3),
+                            borderRadius: 8,
+                            icon: Icon(Icons.check_circle, color: Colors.white),
+                          );
                         }
                       },
                       child: Container(
@@ -298,9 +330,19 @@ class TakerReachScreen extends StatelessWidget {
                               },
                             ),
                           );
-                        }
-                        else {
-                          showCustomSnackBar(context, 'Please wait, the donor is on the way to your location.', false);
+                        } else {
+                          Get.snackbar(
+                            "Error",
+                            "Please wait, the donor is on the way to your location.",
+                            snackPosition: SnackPosition.TOP,
+                            snackStyle: SnackStyle.FLOATING,
+                            backgroundColor: Colors.red.withValues(alpha: 0.9),
+                            colorText: Colors.white,
+                            margin: EdgeInsets.all(10),
+                            duration: Duration(seconds: 3),
+                            borderRadius: 8,
+                            icon: Icon(Icons.error, color: Colors.white),
+                          );
                         }
                       },
                       child: Container(

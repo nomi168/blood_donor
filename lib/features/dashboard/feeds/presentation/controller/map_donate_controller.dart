@@ -6,7 +6,6 @@ import 'package:blood_donor/constants.dart';
 import 'package:blood_donor/core/utils/api_response.dart';
 import 'package:blood_donor/core/utils/console_logs.dart';
 import 'package:blood_donor/features/dashboard/feeds/domain/feed_repository.dart';
-import 'package:blood_donor/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:geocoding/geocoding.dart';
@@ -174,8 +173,18 @@ class MapDonateController extends GetxController {
             double distanceInKm = distance / 1000;
             shortdistance = distanceInKm;
 
-            showCustomSnackBar(navigatorKey.currentContext!,
-                'Distance: ${distanceInKm.toStringAsFixed(2)} km', true);
+            Get.snackbar(
+              "Success",
+              "Distance: ${distanceInKm.toStringAsFixed(2)} km",
+              snackPosition: SnackPosition.TOP,
+              snackStyle: SnackStyle.FLOATING,
+              backgroundColor: Colors.green.withValues(alpha: 0.9),
+              colorText: Colors.white,
+              margin: EdgeInsets.all(10),
+              duration: Duration(seconds: 3),
+              borderRadius: 8,
+              icon: Icon(Icons.check_circle, color: Colors.white),
+            );
           } else {
             logError('No route found');
           }

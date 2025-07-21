@@ -1480,10 +1480,36 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                                                   if (homeController
                                                                           .isAvailability ==
                                                                       true) {
-                                                                    showCustomSnackBar(
-                                                                        context,
-                                                                        'You have already donated blood. If you want to donate again, please wait for 90 days.',
-                                                                        false);
+                                                                    Get.snackbar(
+                                                                      "Error",
+                                                                      "You have already donated blood. If you want to donate again, please wait for 90 days.",
+                                                                      snackPosition:
+                                                                          SnackPosition
+                                                                              .TOP,
+                                                                      snackStyle:
+                                                                          SnackStyle
+                                                                              .FLOATING,
+                                                                      backgroundColor: Colors
+                                                                          .red
+                                                                          .withValues(
+                                                                              alpha: 0.9),
+                                                                      colorText:
+                                                                          Colors
+                                                                              .white,
+                                                                      margin: EdgeInsets
+                                                                          .all(
+                                                                              10),
+                                                                      duration: Duration(
+                                                                          seconds:
+                                                                              3),
+                                                                      borderRadius:
+                                                                          8,
+                                                                      icon: Icon(
+                                                                          Icons
+                                                                              .error,
+                                                                          color:
+                                                                              Colors.white),
+                                                                    );
                                                                   } else {
                                                                     Navigator
                                                                         .push(

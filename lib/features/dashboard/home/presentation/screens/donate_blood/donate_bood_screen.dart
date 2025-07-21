@@ -1,8 +1,6 @@
 // ignore_for_file: file_names
 
 import 'dart:async';
-
-import 'package:blood_donor/constants.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/donor_accept_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/taker_model.dart';
@@ -241,8 +239,19 @@ class DonateBoodScreen extends StatelessWidget {
                         await controller.aceeptDonationRequest(payload1);
 
                     if (result) {
-                      showCustomSnackBar(
-                          context, 'accepting request successfully', true);
+                      Get.snackbar(
+                        "Success",
+                        "accepting request successfully",
+                        snackPosition: SnackPosition.TOP,
+                        snackStyle: SnackStyle.FLOATING,
+                        backgroundColor: Colors.green.withValues(alpha: 0.9),
+                        colorText: Colors.white,
+                        margin: EdgeInsets.all(10),
+                        duration: Duration(seconds: 3),
+                        borderRadius: 8,
+                        icon: Icon(Icons.check_circle, color: Colors.white),
+                      );
+
                       DonateAcceptModel? model =
                           await controller.getSingleDonorAcceptance(
                               payload.email!,
@@ -252,8 +261,19 @@ class DonateBoodScreen extends StatelessWidget {
                             context, controller.mapController, model);
                       }
                     } else {
-                      showCustomSnackBar(
-                          context, 'This taker is in donation mood', false);
+                      Get.snackbar(
+                        "Error",
+                        "This taker is in donation mood",
+                        snackPosition: SnackPosition.TOP,
+                        snackStyle: SnackStyle.FLOATING,
+                        backgroundColor: Colors.red.withValues(alpha: 0.9),
+                        colorText: Colors.white,
+                        margin: EdgeInsets.all(10),
+                        duration: Duration(seconds: 3),
+                        borderRadius: 8,
+                        icon: Icon(Icons.error, color: Colors.white),
+                      );
+
                       Get.offAll(() => Dashboard());
                     }
                   },

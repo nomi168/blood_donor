@@ -1,12 +1,10 @@
-import 'package:blood_donor/common/widgets/custon_snakbar.dart';
-import 'package:blood_donor/core/theme/app_colors.dart';
 import 'package:blood_donor/core/utils/console_logs.dart';
 import 'package:blood_donor/features/auth/data/models/user_model.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
-import 'package:blood_donor/main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -196,9 +194,18 @@ class RemoteAuthDataSource {
           await users.where('email', isEqualTo: paylaod['email']).get();
 
       if (existingUsers.docs.isNotEmpty) {
-        showCustomSnackBar(navigatorKey.currentContext!,
-            message: "email is already exist, please try another email!",
-            color: backgroundColorError);
+        Get.snackbar(
+          "Error",
+          "email is already exist, please try another email!",
+          snackPosition: SnackPosition.TOP,
+          snackStyle: SnackStyle.FLOATING,
+          backgroundColor: Colors.red.withValues(alpha: 0.9),
+          colorText: Colors.white,
+          margin: EdgeInsets.all(10),
+          duration: Duration(seconds: 3),
+          borderRadius: 8,
+          icon: Icon(Icons.error, color: Colors.white),
+        );
 
         return false;
       } else {
@@ -229,9 +236,19 @@ class RemoteAuthDataSource {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('user_uid', result.user?.uid ?? '');
         prefs.setString('user_email', paylaod['email']);
+        Get.snackbar(
+          "Success",
+          "add user successfully!",
+          snackPosition: SnackPosition.TOP,
+          snackStyle: SnackStyle.FLOATING,
+          backgroundColor: Colors.green.withValues(alpha: 0.9),
+          colorText: Colors.white,
+          margin: EdgeInsets.all(10),
+          duration: Duration(seconds: 3),
+          borderRadius: 8,
+          icon: Icon(Icons.check_circle, color: Colors.white),
+        );
 
-        showCustomSnackBar(navigatorKey.currentContext!,
-            message: "add user successfully!", color: backgroundColorSuccess);
         Get.put(UserController(), permanent: true);
 
         return true;
@@ -288,11 +305,19 @@ class RemoteAuthDataSource {
 
         return true;
       } else {
-        showCustomSnackBar(
-          navigatorKey.currentContext!,
-          message: "Email or password is incorrect!",
-          color: backgroundColorError,
+        Get.snackbar(
+          "Error",
+          "Email or password is incorrect!",
+          snackPosition: SnackPosition.TOP,
+          snackStyle: SnackStyle.FLOATING,
+          backgroundColor: Colors.red.withValues(alpha: 0.9),
+          colorText: Colors.white,
+          margin: EdgeInsets.all(10),
+          duration: Duration(seconds: 3),
+          borderRadius: 8,
+          icon: Icon(Icons.error, color: Colors.white),
         );
+
         return false;
       }
     } catch (e) {
@@ -367,8 +392,19 @@ class RemoteAuthDataSource {
       final userEmail = prefs.getString('user_email');
 
       if (userEmail == null || userEmail.isEmpty) {
-        showCustomSnackBar(navigatorKey.currentContext!,
-            message: 'User email not found in local storage.');
+        Get.snackbar(
+          "Error",
+          "User email not found in local storage.",
+          snackPosition: SnackPosition.TOP,
+          snackStyle: SnackStyle.FLOATING,
+          backgroundColor: Colors.red.withValues(alpha: 0.9),
+          colorText: Colors.white,
+          margin: EdgeInsets.all(10),
+          duration: Duration(seconds: 3),
+          borderRadius: 8,
+          icon: Icon(Icons.error, color: Colors.white),
+        );
+
         return null;
       }
 
@@ -378,8 +414,19 @@ class RemoteAuthDataSource {
           .get();
 
       if (querySnapshot.docs.isEmpty) {
-        showCustomSnackBar(navigatorKey.currentContext!,
-            message: 'User not found!');
+        Get.snackbar(
+          "Error",
+          "User not found!",
+          snackPosition: SnackPosition.TOP,
+          snackStyle: SnackStyle.FLOATING,
+          backgroundColor: Colors.red.withValues(alpha: 0.9),
+          colorText: Colors.white,
+          margin: EdgeInsets.all(10),
+          duration: Duration(seconds: 3),
+          borderRadius: 8,
+          icon: Icon(Icons.error, color: Colors.white),
+        );
+
         return null;
       }
 

@@ -348,12 +348,34 @@ class _MapOnDonatorState extends State<MapOnDonator> {
                     bool result =
                         await controller.aceeptDonationRequest(widget.payload);
                     if (result) {
-                      showCustomSnackBar(
-                          context, 'accepting request successfully', true);
+                      Get.snackbar(
+                        "Success",
+                        "accepting request successfully",
+                        snackPosition: SnackPosition.TOP,
+                        snackStyle: SnackStyle.FLOATING,
+                        backgroundColor: Colors.green.withValues(alpha: 0.9),
+                        colorText: Colors.white,
+                        margin: EdgeInsets.all(10),
+                        duration: Duration(seconds: 3),
+                        borderRadius: 8,
+                        icon: Icon(Icons.check_circle, color: Colors.white),
+                      );
+
                       _showDonatePopup();
                     } else {
-                      showCustomSnackBar(
-                          context, 'This taker is in donation mood', false);
+                      Get.snackbar(
+                        "Error",
+                        "This taker is in donation mood.",
+                        snackPosition: SnackPosition.TOP,
+                        snackStyle: SnackStyle.FLOATING,
+                        backgroundColor: Colors.red.withValues(alpha: 0.9),
+                        colorText: Colors.white,
+                        margin: EdgeInsets.all(10),
+                        duration: Duration(seconds: 3),
+                        borderRadius: 8,
+                        icon: Icon(Icons.error, color: Colors.white),
+                      );
+
                       Get.offAll(() => Dashboard());
                     }
                     // _acceptRequest();

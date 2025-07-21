@@ -363,22 +363,25 @@ class _CardScanningScreenState extends State<CardScanningScreen> {
             builder: (BuildContext context) {
               return CustomDialogBox(onCameraBTNPressed: () {
                 controller.scanCnic(ImageSource.camera);
-              }, onGalleryBTNPressed: () {
-                Get.snackbar(
-                  "Error",
-                  "You are not allow to scan Cnic from gallary",
-                  snackPosition: SnackPosition.TOP,
-                  snackStyle: SnackStyle.FLOATING,
-                  backgroundColor: Colors.red.withValues(alpha: 0.9),
-                  colorText: Colors.white,
-                  margin: EdgeInsets.all(10),
-                  duration: Duration(seconds: 3),
-                  borderRadius: 8,
-                  icon: Icon(Icons.error, color: Colors.white),
-                );
+              }, 
+              onGalleryBTNPressed: () {
+                controller.scanCnic(ImageSource.camera);
+                // Get.snackbar(
+                //   "Error",
+                //   "You are not allow to scan Cnic from gallary",
+                //   snackPosition: SnackPosition.TOP,
+                //   snackStyle: SnackStyle.FLOATING,
+                //   backgroundColor: Colors.red.withValues(alpha: 0.9),
+                //   colorText: Colors.white,
+                //   margin: EdgeInsets.all(10),
+                //   duration: Duration(seconds: 3),
+                //   borderRadius: 8,
+                //   icon: Icon(Icons.error, color: Colors.white),
+                // );
 
                 // scanCnic(ImageSource.gallery);
-              });
+              }
+              );
             });
       },
       // textColor: Colors.white,

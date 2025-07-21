@@ -140,15 +140,15 @@ class _CustomDialogBoxState extends State<CustomDialogBox> {
                         'CAMERA',
                         style: TextStyle(fontSize: 18, color: PRIMARY_COLOR),
                       )),
-                  TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        widget.onGalleryBTNPressed();
-                      },
-                      child: Text(
-                        'GALLERY',
-                        style: TextStyle(fontSize: 18, color: PRIMARY_COLOR),
-                      )),
+                  // TextButton(
+                  //     onPressed: () {
+                  //       Navigator.pop(context);
+                  //       widget.onGalleryBTNPressed();
+                  //     },
+                  //     child: Text(
+                  //       'GALLERY',
+                  //       style: TextStyle(fontSize: 18, color: PRIMARY_COLOR),
+                  //     )),
                 ],
               ),
             ],

@@ -301,16 +301,34 @@ class _AccountScreenState extends State<AccountScreen>
                               if (result == true) {
                                 SystemNavigator.pop();
                               } else {
-                                showCustomSnackBar(
-                                    context,
-                                    'Could not update user. Please try again.',
-                                    false);
+                                Get.snackbar(
+                                  "Error",
+                                  "Could not update user. Please try again.",
+                                  snackPosition: SnackPosition.TOP,
+                                  snackStyle: SnackStyle.FLOATING,
+                                  backgroundColor:
+                                      Colors.red.withValues(alpha: 0.9),
+                                  colorText: Colors.white,
+                                  margin: EdgeInsets.all(10),
+                                  duration: Duration(seconds: 3),
+                                  borderRadius: 8,
+                                  icon: Icon(Icons.error, color: Colors.white),
+                                );
                               }
                             } else {
-                              showCustomSnackBar(
-                                  context,
-                                  'Failed to create donor switcher. Please check your details and try again.',
-                                  false);
+                              Get.snackbar(
+                                "Error",
+                                "Failed to create donor switcher. Please check your details and try again.'",
+                                snackPosition: SnackPosition.TOP,
+                                snackStyle: SnackStyle.FLOATING,
+                                backgroundColor:
+                                    Colors.red.withValues(alpha: 0.9),
+                                colorText: Colors.white,
+                                margin: EdgeInsets.all(10),
+                                duration: Duration(seconds: 3),
+                                borderRadius: 8,
+                                icon: Icon(Icons.error, color: Colors.white),
+                              );
                             }
                           },
                           child: Container(
@@ -347,10 +365,19 @@ class _AccountScreenState extends State<AccountScreen>
                             if (result == true) {
                               SystemNavigator.pop();
                             } else {
-                              showCustomSnackBar(
-                                  context,
-                                  'Could not update user. Please try again.',
-                                  false);
+                              Get.snackbar(
+                                "Error",
+                                "Could not update user. Please try again.",
+                                snackPosition: SnackPosition.TOP,
+                                snackStyle: SnackStyle.FLOATING,
+                                backgroundColor:
+                                    Colors.red.withValues(alpha: 0.9),
+                                colorText: Colors.white,
+                                margin: EdgeInsets.all(10),
+                                duration: Duration(seconds: 3),
+                                borderRadius: 8,
+                                icon: Icon(Icons.error, color: Colors.white),
+                              );
                             }
                           },
                           child: Container(

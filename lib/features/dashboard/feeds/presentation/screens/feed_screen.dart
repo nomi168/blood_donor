@@ -352,10 +352,20 @@ class FeedsScreen extends StatelessWidget {
                                                   payload['recipientEmail']);
                                             }
                                           } else {
-                                            showCustomSnackBar(
-                                                context,
-                                                'only donors are allowed to send chat requests!',
-                                                false);
+                                            Get.snackbar(
+                                              "Error",
+                                              "only donors are allowed to send chat requests.",
+                                              snackPosition: SnackPosition.TOP,
+                                              snackStyle: SnackStyle.FLOATING,
+                                              backgroundColor: Colors.red
+                                                  .withValues(alpha: 0.9),
+                                              colorText: Colors.white,
+                                              margin: EdgeInsets.all(10),
+                                              duration: Duration(seconds: 3),
+                                              borderRadius: 8,
+                                              icon: Icon(Icons.error,
+                                                  color: Colors.white),
+                                            );
                                           }
                                         },
                                         child: Container(
@@ -389,10 +399,21 @@ class FeedsScreen extends StatelessWidget {
                                               'donor') {
                                             if (controller.isAvailability ==
                                                 true) {
-                                              showCustomSnackBar(
-                                                  context,
-                                                  'You have already donated blood. Please wait 90 days before donating again.',
-                                                  false);
+                                              Get.snackbar(
+                                                "Error",
+                                                "You have already donated blood. Please wait 90 days before donating again.",
+                                                snackPosition:
+                                                    SnackPosition.TOP,
+                                                snackStyle: SnackStyle.FLOATING,
+                                                backgroundColor: Colors.red
+                                                    .withValues(alpha: 0.9),
+                                                colorText: Colors.white,
+                                                margin: EdgeInsets.all(10),
+                                                duration: Duration(seconds: 3),
+                                                borderRadius: 8,
+                                                icon: Icon(Icons.error,
+                                                    color: Colors.white),
+                                              );
                                             } else {
                                               final user =
                                                   UserController.to.userModel!;
@@ -474,10 +495,20 @@ class FeedsScreen extends StatelessWidget {
                                               // );
                                             }
                                           } else {
-                                            showCustomSnackBar(
-                                                context,
-                                                'Takers are not blood donors.',
-                                                false);
+                                            Get.snackbar(
+                                              "Error",
+                                              "Takers are not blood donors.",
+                                              snackPosition: SnackPosition.TOP,
+                                              snackStyle: SnackStyle.FLOATING,
+                                              backgroundColor: Colors.red
+                                                  .withValues(alpha: 0.9),
+                                              colorText: Colors.white,
+                                              margin: EdgeInsets.all(10),
+                                              duration: Duration(seconds: 3),
+                                              borderRadius: 8,
+                                              icon: Icon(Icons.error,
+                                                  color: Colors.white),
+                                            );
                                           }
                                         },
                                         child: Container(

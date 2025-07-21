@@ -7,7 +7,9 @@ import 'package:blood_donor/features/dashboard/feeds/data/models/chat_request_mo
 import 'package:blood_donor/features/dashboard/feeds/data/models/feed_taker_model.dart';
 import 'package:blood_donor/main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:googleapis_auth/auth_io.dart' as auth;
 import 'package:http/http.dart' as http;
 
@@ -59,15 +61,36 @@ class RemoteFeedDatasource {
           .get();
 
       if (senderSnapshot.docs.isNotEmpty) {
-        showCustomSnackBar(navigatorKey.currentContext!,
-            message:
-                'Already Send Chat Request to ${payload['recipientEmail']}');
+        Get.snackbar(
+          "Error",
+          "Already Send Chat Request to ${payload['recipientEmail']}",
+          snackPosition: SnackPosition.TOP,
+          snackStyle: SnackStyle.FLOATING,
+          backgroundColor: Colors.red.withValues(alpha: 0.9),
+          colorText: Colors.white,
+          margin: EdgeInsets.all(10),
+          duration: Duration(seconds: 3),
+          borderRadius: 8,
+          icon: Icon(Icons.error, color: Colors.white),
+        );
+
         return false;
       }
 
       await _firestore.collection('chat_request').add(payload);
-      showCustomSnackBar(navigatorKey.currentContext!,
-          message: 'sending chat request is successfully');
+      Get.snackbar(
+        "Success",
+        "sending chat request is successfully",
+        snackPosition: SnackPosition.TOP,
+        snackStyle: SnackStyle.FLOATING,
+        backgroundColor: Colors.green.withValues(alpha: 0.9),
+        colorText: Colors.white,
+        margin: EdgeInsets.all(10),
+        duration: Duration(seconds: 3),
+        borderRadius: 8,
+        icon: Icon(Icons.check_circle, color: Colors.white),
+      );
+
       return true;
     } catch (error) {
       rethrow;
@@ -190,8 +213,8 @@ class RemoteFeedDatasource {
           );
         }).toList();
       } else {
-        showCustomSnackBar(navigatorKey.currentContext!,
-            message: 'No pending chat requests found');
+        // showCustomSnackBar(navigatorKey.currentContext!,
+        //     message: 'No pending chat requests found');
       }
 
       return chatList;
@@ -213,8 +236,8 @@ class RemoteFeedDatasource {
               whereIn: [userEmail, email]).get();
 
       if (snapshot.docs.isEmpty) {
-        showCustomSnackBar(navigatorKey.currentContext!,
-            message: 'No pending requests found!');
+        // showCustomSnackBar(navigatorKey.currentContext!,
+        //     message: 'No pending requests found!');
 
         return;
       }
@@ -296,12 +319,33 @@ class RemoteFeedDatasource {
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        showCustomSnackBar(navigatorKey.currentContext!,
-            message: 'This person is already in chat');
+        Get.snackbar(
+          "Error",
+          "This person is already in chat",
+          snackPosition: SnackPosition.TOP,
+          snackStyle: SnackStyle.FLOATING,
+          backgroundColor: Colors.red.withValues(alpha: 0.9),
+          colorText: Colors.white,
+          margin: EdgeInsets.all(10),
+          duration: Duration(seconds: 3),
+          borderRadius: 8,
+          icon: Icon(Icons.error, color: Colors.white),
+        );
+
         return false;
       } else if (querySnapshot1.docs.isNotEmpty) {
-        showCustomSnackBar(navigatorKey.currentContext!,
-            message: 'This person is already in chat');
+        Get.snackbar(
+          "Error",
+          "This person is already in chat",
+          snackPosition: SnackPosition.TOP,
+          snackStyle: SnackStyle.FLOATING,
+          backgroundColor: Colors.red.withValues(alpha: 0.9),
+          colorText: Colors.white,
+          margin: EdgeInsets.all(10),
+          duration: Duration(seconds: 3),
+          borderRadius: 8,
+          icon: Icon(Icons.error, color: Colors.white),
+        );
         return false;
       } else {
         // If senderEmail does not exist, send chat request

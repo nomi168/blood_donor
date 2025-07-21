@@ -502,53 +502,135 @@ class PostRequestScreen extends StatelessWidget {
                       splashFactory: NoSplash.splashFactory,
                       onTap: () async {
                         if (controller.hospital.text.isEmpty) {
-                          showCustomSnackBar(
-                              context, 'must be enter hospital name', false);
+                          Get.snackbar(
+                            "Error",
+                            "must be enter hospital name",
+                            snackPosition: SnackPosition.TOP,
+                            snackStyle: SnackStyle.FLOATING,
+                            backgroundColor: Colors.red.withValues(alpha: 0.9),
+                            colorText: Colors.white,
+                            margin: EdgeInsets.all(10),
+                            duration: Duration(seconds: 3),
+                            borderRadius: 8,
+                            icon: Icon(Icons.error, color: Colors.white),
+                          );
 
                           return;
                         }
                         logSuccess(controller.selectedBlood);
                         if (controller.selectedBlood.toString().isEmpty) {
-                          showCustomSnackBar(
-                              context, 'please select the blood type', false);
+                          Get.snackbar(
+                            "Error",
+                            "please select the blood type",
+                            snackPosition: SnackPosition.TOP,
+                            snackStyle: SnackStyle.FLOATING,
+                            backgroundColor: Colors.red.withValues(alpha: 0.9),
+                            colorText: Colors.white,
+                            margin: EdgeInsets.all(10),
+                            duration: Duration(seconds: 3),
+                            borderRadius: 8,
+                            icon: Icon(Icons.error, color: Colors.white),
+                          );
 
                           return;
                         }
                         if (controller.location.text.isEmpty) {
-                          showCustomSnackBar(
-                              context, 'please enter the address', false);
+                          Get.snackbar(
+                            "Error",
+                            "please enter the address",
+                            snackPosition: SnackPosition.TOP,
+                            snackStyle: SnackStyle.FLOATING,
+                            backgroundColor: Colors.red.withValues(alpha: 0.9),
+                            colorText: Colors.white,
+                            margin: EdgeInsets.all(10),
+                            duration: Duration(seconds: 3),
+                            borderRadius: 8,
+                            icon: Icon(Icons.error, color: Colors.white),
+                          );
 
                           return;
                         }
                         final image = controller.selectedImage;
 
                         if (image == null || image.path.isEmpty) {
-                          showCustomSnackBar(
-                              context, 'Please select image', false);
+                          Get.snackbar(
+                            "Error",
+                            "Please select image",
+                            snackPosition: SnackPosition.TOP,
+                            snackStyle: SnackStyle.FLOATING,
+                            backgroundColor: Colors.red.withValues(alpha: 0.9),
+                            colorText: Colors.white,
+                            margin: EdgeInsets.all(10),
+                            duration: Duration(seconds: 3),
+                            borderRadius: 8,
+                            icon: Icon(Icons.error, color: Colors.white),
+                          );
+
                           return;
                         }
 
                         if (controller.unit.text.isEmpty) {
-                          showCustomSnackBar(
-                              context, 'please enter the unit', false);
+                          Get.snackbar(
+                            "Error",
+                            "please enter the unit",
+                            snackPosition: SnackPosition.TOP,
+                            snackStyle: SnackStyle.FLOATING,
+                            backgroundColor: Colors.red.withValues(alpha: 0.9),
+                            colorText: Colors.white,
+                            margin: EdgeInsets.all(10),
+                            duration: Duration(seconds: 3),
+                            borderRadius: 8,
+                            icon: Icon(Icons.error, color: Colors.white),
+                          );
 
                           return;
                         }
                         if (controller.note.text.isEmpty) {
-                          showCustomSnackBar(
-                              context, 'please enter the notes', false);
+                          Get.snackbar(
+                            "Error",
+                            "please enter the notes",
+                            snackPosition: SnackPosition.TOP,
+                            snackStyle: SnackStyle.FLOATING,
+                            backgroundColor: Colors.red.withValues(alpha: 0.9),
+                            colorText: Colors.white,
+                            margin: EdgeInsets.all(10),
+                            duration: Duration(seconds: 3),
+                            borderRadius: 8,
+                            icon: Icon(Icons.error, color: Colors.white),
+                          );
 
                           return;
                         }
                         if (controller.blood.text.isEmpty) {
-                          showCustomSnackBar(
-                              context, 'please enter the blood group', false);
+                          Get.snackbar(
+                            "Error",
+                            "please enter the blood group",
+                            snackPosition: SnackPosition.TOP,
+                            snackStyle: SnackStyle.FLOATING,
+                            backgroundColor: Colors.red.withValues(alpha: 0.9),
+                            colorText: Colors.white,
+                            margin: EdgeInsets.all(10),
+                            duration: Duration(seconds: 3),
+                            borderRadius: 8,
+                            icon: Icon(Icons.error, color: Colors.white),
+                          );
+                          ;
 
                           return;
                         }
                         if (!controller.isTerm) {
-                          showCustomSnackBar(context,
-                              'please check the Terms and Conditions', false);
+                          Get.snackbar(
+                            "Error",
+                            "please check the Terms and Conditions",
+                            snackPosition: SnackPosition.TOP,
+                            snackStyle: SnackStyle.FLOATING,
+                            backgroundColor: Colors.red.withValues(alpha: 0.9),
+                            colorText: Colors.white,
+                            margin: EdgeInsets.all(10),
+                            duration: Duration(seconds: 3),
+                            borderRadius: 8,
+                            icon: Icon(Icons.error, color: Colors.white),
+                          );
 
                           return;
                         }
@@ -630,7 +712,9 @@ class PostRequestScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    SizedBox(height: 10,),
+                    SizedBox(
+                      height: 10,
+                    ),
                   ],
                 ),
               );

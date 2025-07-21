@@ -326,7 +326,7 @@ class BloodJourneyScreen extends StatelessWidget {
                     Expanded(
                       child: InkWell(
                         onTap: () async {
-                          Map<String,dynamic> payload = {
+                          Map<String, dynamic> payload = {
                             'donor_email': donateModel.donorEmail,
                             'email': donateModel.email
                           };
@@ -336,10 +336,19 @@ class BloodJourneyScreen extends StatelessWidget {
                             _showConfirmationDialog(
                                 context, payload, bloodController, donateModel);
                           } else {
-                            showCustomSnackBar(
-                                context,
-                                'The taker has not received it at your location yet',
-                                false);
+                            Get.snackbar(
+                              "Error",
+                              "The taker has not received it at your location yet",
+                              snackPosition: SnackPosition.TOP,
+                              snackStyle: SnackStyle.FLOATING,
+                              backgroundColor:
+                                  Colors.red.withValues(alpha: 0.9),
+                              colorText: Colors.white,
+                              margin: EdgeInsets.all(10),
+                              duration: Duration(seconds: 3),
+                              borderRadius: 8,
+                              icon: Icon(Icons.error, color: Colors.white),
+                            );
                           }
                         },
                         child: Container(

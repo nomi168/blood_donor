@@ -420,6 +420,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ],
                   ),
+                  SizedBox(height: 5 ,),
+                  Container(
+                      margin: EdgeInsets.symmetric(horizontal: 10),
+                      alignment: Alignment.centerLeft,
+                      child: Text('Special Characters: @ ! , . # & % ^ *')),
                   SizedBox(
                     height: 10.h,
                   ),

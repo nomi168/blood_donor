@@ -1,31 +1,79 @@
 import 'dart:async';
-
-import 'package:blood_donor/common/widgets/custon_snakbar.dart';
-import 'package:blood_donor/core/theme/app_colors.dart';
 import 'package:blood_donor/core/utils/console_logs.dart';
-import 'package:blood_donor/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class Helper {
   static void handleError(dynamic e, String errorMessage) {
     if (e is TypeError) {
-      showCustomSnackBar(navigatorKey.currentContext!,
-          message: errorMessage, color: backgroundColorError);
+      Get.snackbar(
+        "Error",
+        "$errorMessage",
+        snackPosition: SnackPosition.TOP,
+        snackStyle: SnackStyle.FLOATING,
+        backgroundColor: Colors.red.withValues(alpha: 0.9),
+        colorText: Colors.white,
+        margin: EdgeInsets.all(10),
+        duration: Duration(seconds: 3),
+        borderRadius: 8,
+        icon: Icon(Icons.error, color: Colors.white),
+      );
     } else if (e is FirebaseAuthException) {
-      showCustomSnackBar(navigatorKey.currentContext!,
-          message: "${e.message ?? errorMessage}!",
-          color: backgroundColorError);
+      Get.snackbar(
+        "Error",
+        "${e.message ?? errorMessage}!",
+        snackPosition: SnackPosition.TOP,
+        snackStyle: SnackStyle.FLOATING,
+        backgroundColor: Colors.red.withValues(alpha: 0.9),
+        colorText: Colors.white,
+        margin: EdgeInsets.all(10),
+        duration: Duration(seconds: 3),
+        borderRadius: 8,
+        icon: Icon(Icons.error, color: Colors.white),
+      );
     } else if (e is FirebaseException) {
-      showCustomSnackBar(navigatorKey.currentContext!,
-          message: "${e.message ?? errorMessage}!",
-          color: backgroundColorError);
+       Get.snackbar(
+        "Error",
+        "${e.message ?? errorMessage}!",
+        snackPosition: SnackPosition.TOP,
+        snackStyle: SnackStyle.FLOATING,
+        backgroundColor: Colors.red.withValues(alpha: 0.9),
+        colorText: Colors.white,
+        margin: EdgeInsets.all(10),
+        duration: Duration(seconds: 3),
+        borderRadius: 8,
+        icon: Icon(Icons.error, color: Colors.white),
+      );
+     
     } else if (e is TimeoutException) {
-      showCustomSnackBar(navigatorKey.currentContext!,
-          message: "Request timeout, please try again in few seconds!",
-          color: backgroundColorError);
+       Get.snackbar(
+        "Error",
+        "Request timeout, please try again in few seconds!",
+        snackPosition: SnackPosition.TOP,
+        snackStyle: SnackStyle.FLOATING,
+        backgroundColor: Colors.red.withValues(alpha: 0.9),
+        colorText: Colors.white,
+        margin: EdgeInsets.all(10),
+        duration: Duration(seconds: 3),
+        borderRadius: 8,
+        icon: Icon(Icons.error, color: Colors.white),
+      );
+      
     } else {
-      showCustomSnackBar(navigatorKey.currentContext!,
-          message: "$e!", color: backgroundColorError);
+       Get.snackbar(
+        "Error",
+        "$e!",
+        snackPosition: SnackPosition.TOP,
+        snackStyle: SnackStyle.FLOATING,
+        backgroundColor: Colors.red.withValues(alpha: 0.9),
+        colorText: Colors.white,
+        margin: EdgeInsets.all(10),
+        duration: Duration(seconds: 3),
+        borderRadius: 8,
+        icon: Icon(Icons.error, color: Colors.white),
+      );
+      
     }
 
     logError(e.toString());
