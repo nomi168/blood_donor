@@ -1,4 +1,3 @@
-
 import 'package:blood_donor/core/utils/console_logs.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/active_user_model.dart';
@@ -700,6 +699,26 @@ class RemoteHomeDatasource {
         logError('data not found!');
       }
       return bannerList;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<FeedTakerModel?> checkTakerCondition() async {
+    try {
+      String email = UserController.to.userModel!.email;
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('taker')
+          .where('status', isEqualTo: false)
+          .where('email', isEqualTo: email)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        return FeedTakerModel.fromJson(
+            querySnapshot.docs.first.data() as Map<String, dynamic>);
+      } else {
+        return null;
+      }
     } catch (e) {
       rethrow;
     }

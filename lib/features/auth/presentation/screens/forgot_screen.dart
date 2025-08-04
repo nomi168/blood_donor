@@ -227,6 +227,20 @@ class _OTPForgetScreenState extends State<OTPForgetScreen> {
                             if (!result) {
                               controller.isCheck = true;
                               controller.update();
+                            } else {
+                              Get.snackbar(
+                                "Error",
+                                "Email not found",
+                                snackPosition: SnackPosition.TOP,
+                                snackStyle: SnackStyle.FLOATING,
+                                backgroundColor:
+                                    Colors.red.withValues(alpha: 0.9),
+                                colorText: Colors.white,
+                                margin: EdgeInsets.all(10),
+                                duration: Duration(seconds: 3),
+                                borderRadius: 8,
+                                icon: Icon(Icons.error, color: Colors.white),
+                              );
                             }
                             // if (await myauth.verifyOTP(otp: otp.text) == true) {
                             //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(

@@ -13,6 +13,7 @@ import 'package:blood_donor/features/dashboard/home/data/models/taker_model.dart
 import 'package:blood_donor/features/dashboard/home/presentation/controllers/home_controller.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/screens/blood_journey/blood_journey_screen.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/screens/donate_blood/donate_bood_screen.dart';
+import 'package:blood_donor/features/dashboard/home/presentation/screens/emergency_help/emergency_taker_screen.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/screens/see_more/taker_reach.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -26,7 +27,7 @@ import 'package:sizer/sizer.dart';
 
 import '../../../post_blood/presentation/screens/post_request_screen.dart';
 import 'Blood Bank/Blood_ank.dart';
-import 'Emergency Donor/Emergency_Blood.dart';
+import 'emergency_help/emergency_donor_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -646,35 +647,73 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                 )),
                             GestureDetector(
                                 onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    PageRouteBuilder(
-                                      pageBuilder: (context, animation,
-                                          secondaryAnimation) {
-                                        return const Emerency_Blood();
-                                      },
-                                      transitionDuration:
-                                          const Duration(microseconds: 100),
-                                      transitionsBuilder: (context, animation,
-                                          secondaryAnimation, child) {
-                                        const begin = Offset(10.0,
-                                            0.0); // slide in from the right
-                                        const end = Offset.zero;
-                                        const curve = Curves.easeInOutQuart;
+                                  userController.userModel!.type == 'donor'
+                                      ? Navigator.push(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation,
+                                                secondaryAnimation) {
+                                              return const EmergencyDonorScreen();
+                                            },
+                                            transitionDuration: const Duration(
+                                                microseconds: 100),
+                                            transitionsBuilder: (context,
+                                                animation,
+                                                secondaryAnimation,
+                                                child) {
+                                              const begin = Offset(10.0,
+                                                  0.0); // slide in from the right
+                                              const end = Offset.zero;
+                                              const curve =
+                                                  Curves.easeInOutQuart;
 
-                                        var tween = Tween(
-                                                begin: begin, end: end)
-                                            .chain(CurveTween(curve: curve));
-                                        var offsetAnimation =
-                                            animation.drive(tween);
+                                              var tween = Tween(
+                                                      begin: begin, end: end)
+                                                  .chain(
+                                                      CurveTween(curve: curve));
+                                              var offsetAnimation =
+                                                  animation.drive(tween);
 
-                                        return SlideTransition(
-                                          position: offsetAnimation,
-                                          child: child,
+                                              return SlideTransition(
+                                                position: offsetAnimation,
+                                                child: child,
+                                              );
+                                            },
+                                          ),
+                                        )
+                                      : Navigator.push(
+                                          context,
+                                          PageRouteBuilder(
+                                            pageBuilder: (context, animation,
+                                                secondaryAnimation) {
+                                              return const EmergencyTakerScreen();
+                                            },
+                                            transitionDuration: const Duration(
+                                                microseconds: 100),
+                                            transitionsBuilder: (context,
+                                                animation,
+                                                secondaryAnimation,
+                                                child) {
+                                              const begin = Offset(10.0,
+                                                  0.0); // slide in from the right
+                                              const end = Offset.zero;
+                                              const curve =
+                                                  Curves.easeInOutQuart;
+
+                                              var tween = Tween(
+                                                      begin: begin, end: end)
+                                                  .chain(
+                                                      CurveTween(curve: curve));
+                                              var offsetAnimation =
+                                                  animation.drive(tween);
+
+                                              return SlideTransition(
+                                                position: offsetAnimation,
+                                                child: child,
+                                              );
+                                            },
+                                          ),
                                         );
-                                      },
-                                    ),
-                                  );
                                 },
                                 child: Container(
                                   height: 120,
@@ -707,7 +746,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                           padding: EdgeInsets.fromLTRB(
                                               3.w, 0.h, 2.w, 0),
                                           child: Text(
-                                            'Donors',
+                                            'Help',
                                             style: TextStyle(
                                                 fontSize: 16.sp,
                                                 fontWeight: FontWeight.bold,

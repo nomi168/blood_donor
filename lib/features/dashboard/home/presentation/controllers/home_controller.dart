@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:blood_donor/constants.dart';
 import 'package:blood_donor/core/utils/api_response.dart';
@@ -18,6 +19,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeController extends GetxController {
   final HomeRepository _homeRepository = HomeRepository();
@@ -43,7 +45,6 @@ class HomeController extends GetxController {
     'O-',
     'AB-',
   ];
-
 
   String selectedBloodGroup = '';
   int currentIndex = 0;
@@ -83,9 +84,26 @@ class HomeController extends GetxController {
     }
   }
 
+  // Future<void> getBannersList() async {
+  //   bannerList.clear();
+  //   bannerList = await getBanners();
+
+  //   update();
+  // }
+
   Future<void> getBannersList() async {
-    bannerList.clear();
-    bannerList = await getBanners();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    String? cachedData = prefs.getString('banners');
+    if (cachedData != null) {
+      List<dynamic> cachedList = jsonDecode(cachedData);
+      bannerList = cachedList.map((e) => BannerModel.fromJson(e)).toList();
+    }
+
+    List<BannerModel> freshList = await getBanners();
+    bannerList = freshList;
+    prefs.setString(
+        'banners', jsonEncode(bannerList.map((e) => e.toJson()).toList()));
 
     update();
   }

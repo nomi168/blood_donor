@@ -1,5 +1,9 @@
 import 'package:blood_donor/main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'dart:math' as math;
+
+import 'package:sizer/sizer.dart';
 
 void showCustomSnackBar(
   BuildContext context, {
@@ -124,4 +128,74 @@ class _SlideTransitionSnackBarState extends State<SlideTransitionSnackBar>
       ),
     );
   }
+}
+
+class CustomEasypaisaLoader extends StatefulWidget {
+  @override
+  _CustomEasypaisaLoaderState createState() => _CustomEasypaisaLoaderState();
+}
+
+class _CustomEasypaisaLoaderState extends State<CustomEasypaisaLoader>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        AnimationController(duration: const Duration(seconds: 2), vsync: this)
+          ..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        // Dimmed background
+        Opacity(
+          opacity: 0.5,
+          child: const ModalBarrier(dismissible: false, color: Colors.black),
+        ),
+        Center(
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (_, child) {
+              return Transform.rotate(
+                angle: _controller.value * 2 * math.pi,
+                child: child,
+              );
+            },
+            child: Container(
+                width: 100,
+                height: 100,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [BoxShadow(blurRadius: 10, color: Colors.black26)],
+                ),
+                child: SvgPicture.asset(
+                  'images/svg/Logo.svg',
+                  height: 5.h,
+                  width: 5.w,
+                )),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+void showCustomLoader(BuildContext context) {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => CustomEasypaisaLoader(),
+  );
 }

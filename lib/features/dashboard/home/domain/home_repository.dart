@@ -248,4 +248,12 @@ class HomeRepository {
       rethrow;
     }
   }
+
+  Future<FeedTakerModel?> checkTakerCondition() async {
+    try {
+      return await _datasource.checkTakerCondition();
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

@@ -19,51 +19,52 @@ class FeedTakerModel {
   bool? status;
   String? createdAt;
   String? bloodImage;
+  bool? isEmergencyHelp;
 
-  FeedTakerModel({
-    this.takerId,
-    this.email,
-    this.name,
-    this.number,
-    this.image,
-    this.hospitalName,
-    this.bloodType,
-    this.date,
-    this.time,
-    this.location,
-    this.unit,
-    this.note,
-    this.blood,
-    this.situation,
-    this.rating,
-    this.status,
-    this.createdAt,
-    this.bloodImage
-  });
+  FeedTakerModel(
+      {this.takerId,
+      this.email,
+      this.name,
+      this.number,
+      this.image,
+      this.hospitalName,
+      this.bloodType,
+      this.date,
+      this.time,
+      this.location,
+      this.unit,
+      this.note,
+      this.blood,
+      this.situation,
+      this.rating,
+      this.status,
+      this.createdAt,
+      this.bloodImage,
+      this.isEmergencyHelp});
 
   factory FeedTakerModel.fromJson(Map<String, dynamic> json) {
     return FeedTakerModel(
-      takerId: json['taker_id'],
-      email: json['email'],
-      name: json['name'],
-      number: json['number'],
-      image: json['image'],
-      hospitalName: json['hospitalname'],
-      bloodType: json['blood_type'],
-      date: json['date'],
-      time: json['time'],
-      location: json['location'],
-      unit: json['unit'],
-      note: json['note'],
-      blood: json['blood'],
-      situation: json['situation'],
-      rating: json['rating'],
-      status: json['status'],
-      bloodImage: json['blood_image'],
-      createdAt: json['createdAt'] != null
-          ? (json['createdAt'] as Timestamp).toDate().toIso8601String()
-          : null,
-    );
+        takerId: json['taker_id'],
+        email: json['email'],
+        name: json['name'],
+        number: json['number'],
+        image: json['image'],
+        hospitalName: json['hospitalname'],
+        bloodType: json['blood_type'],
+        date: json['date'],
+        time: json['time'],
+        location: json['location'],
+        unit: json['unit'],
+        note: json['note'],
+        blood: json['blood'],
+        situation: json['situation'],
+        rating: json['rating'],
+        status: json['status'],
+        bloodImage: json['blood_image'],
+        createdAt: json['createdAt'] != null
+            ? (json['createdAt'] as Timestamp).toDate().toIso8601String()
+            : null,
+        isEmergencyHelp: json['emergency_help']);
   }
 
   Map<String, dynamic> toJson() {
@@ -85,7 +86,8 @@ class FeedTakerModel {
       'rating': rating,
       'status': status,
       'createdAt': createdAt,
-      'blood_image':bloodImage
+      'blood_image': bloodImage,
+      'emergency_help': isEmergencyHelp
     };
   }
 }

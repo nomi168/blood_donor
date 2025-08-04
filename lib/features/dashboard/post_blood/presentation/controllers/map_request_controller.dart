@@ -1060,6 +1060,7 @@ class MapRequestController extends GetxController {
           },
         );
       } else {
+        showLoader('sending notification...');
         // If nearbyLocations is not empty, proceed with sending notifications
         String projectId = 'blood-app-8f4c2';
 
@@ -1120,6 +1121,7 @@ class MapRequestController extends GetxController {
               );
 
               if (response.statusCode == 200) {
+                EasyLoading.dismiss();
                 logSuccess(
                     'Notification sent successfully to user: ${userList[i].id}');
               } else {
@@ -1131,6 +1133,7 @@ class MapRequestController extends GetxController {
             }
           }
         }
+
         bool result = await postBloodRequest(payload);
         if (result) {
           _showDonatePopup();

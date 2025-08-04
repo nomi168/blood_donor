@@ -19,11 +19,8 @@ class PostRequestScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         body: SafeArea(
           child: GetBuilder<PostRequestController>(
-            init: PostRequestController(),
+            init: PostRequestController(bloodgroup: blood!),
             builder: (controller) {
-              if (blood != null) {
-                controller.blood.text = blood!;
-              }
               return SingleChildScrollView(
                 child: Column(
                   children: [
@@ -292,9 +289,9 @@ class PostRequestScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
-                                'Select Image',
+                                'Select Doctor slip',
                                 style: TextStyle(
-                                    fontSize: 14, fontWeight: FontWeight.w500),
+                                    fontSize: 12, fontWeight: FontWeight.w500),
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -338,6 +335,7 @@ class PostRequestScreen extends StatelessWidget {
                         borderRadius:
                             BorderRadius.circular(10.0), // Add border radius
                         child: TextFormField(
+                          keyboardType: TextInputType.number,
                           controller: controller.unit,
                           decoration: InputDecoration(
                             label: const Text('Units'),
@@ -464,11 +462,38 @@ class PostRequestScreen extends StatelessWidget {
                               if (value) {
                                 controller.selectedValue = 'critical';
                               }
+                              else {
+                                controller.selectedValue = 'normal';
+                              }
                               controller.update();
                             },
                           ),
                         ],
                       ),
+                    ),
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: controller.isEmergencyHelp,
+                          checkColor: Colors.white,
+                          focusColor: Colors.red,
+                          activeColor: Colors.red,
+
+                          // Check if ttype is 'donor'
+                          onChanged: (bool? value) {
+                            controller.isEmergencyHelp = value!;
+
+                            controller.update();
+                          },
+                        ),
+                        Expanded(
+                          child: Text(
+                            'By clicking, you are allowing access to Emergency Help.',
+                            style: TextStyle(
+                                fontSize: 15.sp, fontWeight: FontWeight.bold),
+                          ),
+                        )
+                      ],
                     ),
                     // SizedBox(
                     //   height: 10,
@@ -659,6 +684,7 @@ class PostRequestScreen extends StatelessWidget {
                           'situation': controller.selectedValue,
                           'blood_image': controller.selectedImage!.path,
                           'rating': '0.0',
+                          'emergency_help': controller.isEmergencyHelp,
                           'status': false,
                         };
                         final mapController = PostRequestController.to;

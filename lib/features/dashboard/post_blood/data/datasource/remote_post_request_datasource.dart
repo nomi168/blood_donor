@@ -5,7 +5,6 @@ import 'package:blood_donor/features/auth/data/models/user_model.dart';
 import 'package:blood_donor/features/dashboard/post_blood/data/models/user_location_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:intl/intl.dart';
 
 class RemotePostRequestDatasource {
   RemotePostRequestDatasource._privateController();
@@ -19,29 +18,18 @@ class RemotePostRequestDatasource {
     try {
       final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-      if (payload['image'] != null && payload['image'].isNotEmpty) {
-        // Assuming picture is a path from a file picker
-        // final file2 = File(payload['image']);
+      if (payload['blood_image'] != null && payload['blood_image'].isNotEmpty) {
         final file1 = File(payload['blood_image']);
         logSuccess("File is $file1");
 
         if (await file1.exists()) {
-          String fileName =
-              DateFormat('yyyyMMdd_HHmmss').format(DateTime.now()) + '.jpg';
-          final storageRef =
-              FirebaseStorage.instance.ref().child('profile_images/$fileName');
-          String bloodName =
-              DateFormat('yyyyMMdd_HHmmss').format(DateTime.now()) + '.jpg';
+          String bloodName = payload['name'] + '.jpg';
 
-          final Reference storageReference = FirebaseStorage.instance
-              .ref()
-              .child('blood_images/$bloodName.jpg');
-          final file = File(payload['blood_image']);
-          final uploadTask = storageReference.putFile(file);
+          final Reference storageReference =
+              FirebaseStorage.instance.ref().child('blood_images/$bloodName');
+
+          final uploadTask = storageReference.putFile(file1);
           await uploadTask.whenComplete(() => null);
-
-          // Upload the file to Firebase Storage
-          await storageRef.putFile(file1);
 
           final imageUrl = await storageReference.getDownloadURL();
 
@@ -55,7 +43,7 @@ class RemotePostRequestDatasource {
         logError("Error: Picture path is null or empty.");
       }
       payload['createdAt'] = FieldValue.serverTimestamp();
-      payload;
+
       DocumentReference docRef =
           await _firestore.collection('taker').add(payload);
       String documentId = docRef.id;

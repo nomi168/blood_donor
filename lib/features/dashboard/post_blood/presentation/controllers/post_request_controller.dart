@@ -16,6 +16,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 
 class PostRequestController extends GetxController {
+  final String bloodgroup;
+  PostRequestController({required this.bloodgroup});
   static PostRequestController get to => Get.find();
   final Completer<GoogleMapController> controller =
       Completer<GoogleMapController>();
@@ -34,6 +36,7 @@ class PostRequestController extends GetxController {
   bool isToggled = false;
   bool isTerm = false;
   String selectedValue = 'normal';
+  bool isEmergencyHelp=false;
   File? selectedImage;
   List<UserModel> userList = [];
   List<UserLocationModel> userLocationList = [];
@@ -41,6 +44,9 @@ class PostRequestController extends GetxController {
 
   @override
   void onInit() {
+    if (bloodgroup.isNotEmpty) {
+      blood.text = bloodgroup;
+    }
     super.onInit();
     donorOnMap();
   }

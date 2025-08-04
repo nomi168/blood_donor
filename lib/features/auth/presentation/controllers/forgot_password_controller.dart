@@ -1,3 +1,4 @@
+
 import 'package:blood_donor/constants.dart';
 import 'package:blood_donor/core/utils/api_response.dart';
 import 'package:blood_donor/features/auth/domain/auth_repository.dart';
@@ -20,12 +21,14 @@ class ForgotPasswordController extends GetxController {
 
   Future<bool> checkEmail(String email) async {
     try {
-      showLoader('checking email');
+      showLoader('please wait...');
+      // showCustomLoader(navigatorKey.currentContext!);
       return await _authRepository.checkEmail(email);
     } catch (e) {
       Helper.handleError(e, "Error while checking email!");
       return false;
     } finally {
+      
       await EasyLoading.dismiss();
     }
   }
