@@ -53,16 +53,16 @@ class _MapOnDonatorState extends State<MapOnDonator> {
                     ),
                   )),
               // Switch for light/dark mode
-              Switch(
-                activeColor: PRIMARY_COLOR,
-                value: controller.isLightMode,
-                onChanged: (value) {
-                  controller.isLightMode = value;
-                  controller.update();
+              // Switch(
+              //   activeColor: PRIMARY_COLOR,
+              //   value: controller.isLightMode,
+              //   onChanged: (value) {
+              //     controller.isLightMode = value;
+              //     controller.update();
 
-                  controller.toggleMapMode();
-                },
-              ),
+              //     controller.toggleMapMode();
+              //   },
+              // ),
             ],
           ),
           body: Column(
@@ -71,7 +71,7 @@ class _MapOnDonatorState extends State<MapOnDonator> {
                 height: 41.h,
                 child: GoogleMap(
                   mapType:
-                      controller.isLightMode ? MapType.normal : MapType.hybrid,
+                       MapType.normal, 
                   initialCameraPosition: controller.kGooglePlex,
                   polylines: Set<Polyline>.of(controller.polylines),
                   circles: Set<Circle>.of(controller.circles),

@@ -273,11 +273,15 @@ class FeedsScreen extends StatelessWidget {
                                                     color: Colors.black54),
                                               ),
                                               Text(
-                                                taker.location != null &&
-                                                        taker.location!.length >
+                                                taker.location != null
+                                                    ? (taker
+                                                                .location!
+                                                                .characters
+                                                                .length >
                                                             20
-                                                    ? '${taker.location!.substring(0, 23)}...'
-                                                    : taker.location ?? '',
+                                                        ? '${taker.location!.characters.take(20)}...'
+                                                        : taker.location!)
+                                                    : '',
                                                 style: TextStyle(
                                                   fontSize: 14,
                                                   color: Colors.black54,
@@ -378,11 +382,11 @@ class FeedsScreen extends StatelessWidget {
                                           width: 140,
                                           alignment: Alignment.center,
                                           decoration: BoxDecoration(
-                                            color: PRIMARY_COLOR,
+                                            color: Colors.blue,
                                             borderRadius:
                                                 BorderRadius.circular(5),
                                             border: Border.all(
-                                              color: Colors.red,
+                                              color: Colors.transparent,
                                               width: 1.0,
                                             ),
                                           ),
@@ -631,7 +635,7 @@ class FeedsScreen extends StatelessWidget {
                                           width: 140,
                                           alignment: Alignment.center,
                                           decoration: BoxDecoration(
-                                            color: PRIMARY_COLOR,
+                                            color: Colors.green,
                                             borderRadius:
                                                 BorderRadius.circular(5),
                                             border: Border.all(

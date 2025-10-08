@@ -45,15 +45,15 @@ class FeedbackDonorScreen extends StatelessWidget {
                     ),
                   )),
               // Switch for light/dark mode
-              Switch(
-                value: controller.isLightMode,
-                onChanged: (value) {
-                  controller.isLightMode = value;
-                  controller.update();
+              // Switch(
+              //   value: controller.isLightMode,
+              //   onChanged: (value) {
+              //     controller.isLightMode = value;
+              //     controller.update();
 
-                  controller.toggleMapMode();
-                },
-              ),
+              //     controller.toggleMapMode();
+              //   },
+              // ),
             ],
           ),
           backgroundColor: Colors.white,
@@ -64,9 +64,7 @@ class FeedbackDonorScreen extends StatelessWidget {
                 height: 27.h,
                 width: double.infinity,
                 child: GoogleMap(
-                    mapType: controller.isLightMode
-                        ? MapType.normal
-                        : MapType.hybrid,
+                    mapType: MapType.normal,
                     initialCameraPosition: controller.kGooglePlex,
                     polylines: Set<Polyline>.of(controller.polylines),
                     circles: Set<Circle>.of(controller.circles),

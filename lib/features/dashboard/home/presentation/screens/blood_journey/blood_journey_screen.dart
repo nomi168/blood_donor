@@ -47,15 +47,15 @@ class BloodJourneyScreen extends StatelessWidget {
                       ),
                     )),
                 // Switch for light/dark mode
-                Switch(
-                  value: bloodController.isLightMode,
-                  onChanged: (value) {
-                    bloodController.isLightMode = value;
-                    bloodController.update();
+                // Switch(
+                //   value: bloodController.isLightMode,
+                //   onChanged: (value) {
+                //     bloodController.isLightMode = value;
+                //     bloodController.update();
 
-                    bloodController.toggleMapMode();
-                  },
-                ),
+                //     bloodController.toggleMapMode();
+                //   },
+                // ),
               ],
             ),
             backgroundColor: Colors.white,
@@ -65,9 +65,7 @@ class BloodJourneyScreen extends StatelessWidget {
                 height: 30.h,
                 width: double.infinity,
                 child: GoogleMap(
-                  mapType: bloodController.isLightMode
-                      ? MapType.normal
-                      : MapType.hybrid,
+                  mapType: MapType.normal,
                   initialCameraPosition: bloodController.kGooglePlex,
                   polylines: Set<Polyline>.of(bloodController.polylines),
                   circles: Set<Circle>.of(bloodController.circles),
@@ -372,55 +370,6 @@ class BloodJourneyScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              // Padding(
-              //     padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0.h),
-              //     child: SizedBox(
-              //       height: 6.h,
-              //       width: 100.w,
-              //       child: Material(
-              //           borderRadius: BorderRadius.circular(10.0),
-              //           elevation: 5.0,
-              //           color: const Color(0xFFDE0A1E),
-              //           child: Row(
-              //             children: [
-              //               Padding(
-              //                   padding: EdgeInsets.fromLTRB(5.w, 0, 0, 0),
-              //                   child: TextButton(
-              //                     child: Text(
-              //                       'Cancel Request',
-              //                       style: TextStyle(
-              //                           fontSize: 12.sp,
-              //                           fontWeight: FontWeight.bold,
-              //                           color: Colors.white70),
-              //                     ),
-              //                     onPressed: () async {
-              //                       await deleteAcceptRequest();
-              //                     },
-              //                   )),
-              //               Padding(
-              //                 padding: EdgeInsets.fromLTRB(4.w, 0, 0, 0),
-              //                 child: const VerticalDivider(
-              //                   color: Colors.white, // Adjust the color as needed
-              //                   thickness: 2.0, // Adjust the thickness as needed
-              //                 ),
-              //               ),
-              //               Padding(
-              //                   padding: EdgeInsets.fromLTRB(10.w, 0, 0, 0),
-              //                   child: TextButton(
-              //                     child: Text(
-              //                       'Donated',
-              //                       style: TextStyle(
-              //                           fontSize: 12.sp,
-              //                           fontWeight: FontWeight.bold,
-              //                           color: Colors.white),
-              //                     ),
-              //                     onPressed: () {
-              //                       _showConfirmationDialog(context);
-              //                     },
-              //                   ))
-              //             ],
-              //           )),
-              //     ))
             ]),
           );
         });
@@ -468,27 +417,6 @@ class BloodJourneyScreen extends StatelessWidget {
                       controller.updateTakerReceivedStatue(
                           payload['email'], payload['donor_email']);
 
-                      // String name = widget.name;
-                      // String image = widget.image;
-                      // String blood = widget.blood;
-                      // String hospital = widget.hospital;
-                      // String location = widget.location;
-                      // String date = widget.date;
-                      // String time = widget.time;
-                      // String rating = widget.rating;
-                      // String note = widget.note;
-                      // String review1 = review.text;
-                      // String id = widget.id; String name = widget.name;
-                      // String image = widget.image;
-                      // String blood = widget.blood;
-                      // String hospital = widget.hospital;
-                      // String location = widget.location;
-                      // String date = widget.date;
-                      // String time = widget.time;
-                      // String rating = widget.rating;
-                      // String note = widget.note;
-                      // String review1 = review.text;
-                      // String id = widget.id;
                       Navigator.push(
                         context,
                         PageRouteBuilder(
