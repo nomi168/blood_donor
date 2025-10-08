@@ -186,7 +186,7 @@ class RemoteAuthDataSource {
     }
   }
 
-  Future<bool> addUser(dynamic paylaod, {bool flag = false}) async {
+  Future<bool> addUser(Map<String,dynamic> paylaod, {bool flag = false}) async {
     try {
       CollectionReference users =
           FirebaseFirestore.instance.collection('users');

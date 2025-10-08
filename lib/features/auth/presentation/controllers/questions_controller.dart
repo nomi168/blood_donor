@@ -37,7 +37,7 @@ class QuestionsController extends GetxController {
     update();
   }
 
-  Future<bool> addUser(dynamic payload, {bool flag = false}) async {
+  Future<bool> addUser(Map<String,dynamic> payload, {bool flag = false}) async {
     try {
       showLoader('adding user...');
       return await _authRepository.addUser(payload);

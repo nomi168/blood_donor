@@ -449,7 +449,7 @@ class HomeController extends GetxController {
     try {
       return await _homeRepository.checkUserCnicVerification();
     } catch (e) {
-      Helper.handleError(e, 'Error while checking CNIC verification!');
+      // Helper.handleError(e, 'Error while checking CNIC verification!');
       return false;
     }
   }

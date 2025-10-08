@@ -6,6 +6,7 @@ import 'package:blood_donor/core/utils/console_logs.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:blood_donor/features/dashboard/feeds/data/models/feed_taker_model.dart';
 import 'package:blood_donor/features/dashboard/feeds/domain/feed_repository.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -13,10 +14,12 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class FeedController extends GetxController {
   final FeedRepository _feedRepository = FeedRepository();
+  TextEditingController searchController = TextEditingController();
   final Completer<GoogleMapController> controllers =
       Completer<GoogleMapController>();
   static FeedController get to => Get.find();
   List<FeedTakerModel> takerList = [];
+  List<FeedTakerModel> filterList = [];
   bool isLoading = false;
   bool? isAvailability;
 
@@ -41,6 +44,20 @@ class FeedController extends GetxController {
     });
     isLoading = false;
 
+    update();
+  }
+
+  void filterUsers(String? query) {
+    if (query == null || query.trim().isEmpty) {
+      filterList = List.from(takerList);
+    } else {
+      final lowerQuery = query.toLowerCase();
+      filterList = takerList.where((user) {
+        final name = user.name?.toLowerCase() ?? '';
+        final blood = user.blood?.toLowerCase() ?? '';
+        return name.contains(lowerQuery) || blood.contains(lowerQuery);
+      }).toList();
+    }
     update();
   }
 

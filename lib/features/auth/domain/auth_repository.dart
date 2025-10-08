@@ -33,7 +33,7 @@ class AuthRepository {
     }
   }
 
-  Future<bool> addUser(dynamic payload, {bool flag = false}) async {
+  Future<bool> addUser(Map<String,dynamic> payload, {bool flag = false}) async {
     try {
       return await _authDataSource.addUser(payload, flag: flag);
     } catch (e) {

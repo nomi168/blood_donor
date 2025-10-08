@@ -62,31 +62,32 @@ class _StartWithSplashScreenState extends State<StartWithSplashScreen> {
           Center(
             child: ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) {
-                      return const SplashMiddleScreen();
-                    },
-                    transitionDuration: const Duration(microseconds: 100),
-                    transitionsBuilder:
-                        (context, animation, secondaryAnimation, child) {
-                      const begin =
-                          Offset(10.0, 0.0); // slide in from the right
-                      const end = Offset.zero;
-                      const curve = Curves.easeInOutQuart;
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>SplashMiddleScreen()));
+                // Navigator.push(
+                //   context,
+                //   PageRouteBuilder(
+                //     pageBuilder: (context, animation, secondaryAnimation) {
+                //       return const SplashMiddleScreen();
+                //     },
+                //     transitionDuration: const Duration(microseconds: 100),
+                //     transitionsBuilder:
+                //         (context, animation, secondaryAnimation, child) {
+                //       const begin =
+                //           Offset(10.0, 0.0); // slide in from the right
+                //       const end = Offset.zero;
+                //       const curve = Curves.easeInOutQuart;
 
-                      var tween = Tween(begin: begin, end: end)
-                          .chain(CurveTween(curve: curve));
-                      var offsetAnimation = animation.drive(tween);
+                //       var tween = Tween(begin: begin, end: end)
+                //           .chain(CurveTween(curve: curve));
+                //       var offsetAnimation = animation.drive(tween);
 
-                      return SlideTransition(
-                        position: offsetAnimation,
-                        child: child,
-                      );
-                    },
-                  ),
-                );
+                //       return SlideTransition(
+                //         position: offsetAnimation,
+                //         child: child,
+                //       );
+                //     },
+                //   ),
+                // );
               },
               style: ElevatedButton.styleFrom(
                   shape: const CircleBorder(),
@@ -121,33 +122,10 @@ class _StartWithSplashScreenState extends State<StartWithSplashScreen> {
               splashColor: Colors.transparent,
               splashFactory: NoSplash.splashFactory,
               onTap: () async {
-                print("Nomi");
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>SignUpScreen()));
 
-                Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) {
-                      return const SignUpScreen();
-                    },
-                    transitionDuration:
-                        Duration(microseconds: 300), // Faster transition
-                    transitionsBuilder:
-                        (context, animation, secondaryAnimation, child) {
-                      const begin = Offset(1.0, 0.0); // slide in from the right
-                      const end = Offset.zero;
-                      const curve = Curves.easeInOutQuart;
-
-                      var tween = Tween(begin: begin, end: end)
-                          .chain(CurveTween(curve: curve));
-                      var offsetAnimation = animation.drive(tween);
-
-                      return SlideTransition(
-                        position: offsetAnimation,
-                        child: child,
-                      );
-                    },
-                  ),
-                );
+                // 
+                
               },
               child: Text(
                 'Skip',

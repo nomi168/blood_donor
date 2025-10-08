@@ -626,7 +626,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               );
                             },
                             transitionDuration:
-                                const Duration(microseconds: 300),
+                                const Duration(microseconds: 100),
                             transitionsBuilder: (context, animation,
                                 secondaryAnimation, child) {
                               const begin =
