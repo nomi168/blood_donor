@@ -1,14 +1,19 @@
+import 'dart:convert';
+
 import 'package:blood_donor/core/utils/console_logs.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/active_user_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/banner_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/blood_bank_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/donor_accept_model.dart';
+import 'package:blood_donor/features/dashboard/home/data/models/donor_update_location_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/taker_model.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
+import 'package:googleapis_auth/auth_io.dart' as auth;
+import 'package:http/http.dart' as http;
 
 class RemoteHomeDatasource {
   RemoteHomeDatasource._privateController();
@@ -20,11 +25,9 @@ class RemoteHomeDatasource {
 
   Future<List<FeedTakerModel>> getTakersList() async {
     try {
-      String blood = UserController.to.userModel!.bloodgroup;
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('taker')
           .where('status', isEqualTo: false)
-          .where('blood', isEqualTo: blood)
           .get();
 
       List<FeedTakerModel> takerList = [];
@@ -134,25 +137,24 @@ class RemoteHomeDatasource {
     }
   }
 
-  Future<List<DonateAcceptModel>> getAcceptanceDonor() async {
+  Future<DonateAcceptModel?> getAcceptanceDonor() async {
     try {
-      List<DonateAcceptModel> donorList = [];
       String userEmail = UserController.to.userModel!.email;
+
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('acceptdonation')
           .where('donor_email', isEqualTo: userEmail)
-          .where('status', isEqualTo: false)
+          .where('is_delete', isEqualTo: false)
+          .where('taker_received_status', isEqualTo: false)
           .get();
+
       if (querySnapshot.docs.isNotEmpty) {
-        for (var doc in querySnapshot.docs) {
-          donorList.add(
-              DonateAcceptModel.fromJson(doc.data() as Map<String, dynamic>));
-        }
+        final data = querySnapshot.docs.first.data() as Map<String, dynamic>;
+        return DonateAcceptModel.fromJson(data);
       } else {
-        // showCustomSnackBar(navigatorKey.currentContext!,
-        //     message: 'No data found!');
+        // No document found
+        return null;
       }
-      return donorList;
     } catch (e) {
       rethrow;
     }
@@ -197,39 +199,36 @@ class RemoteHomeDatasource {
     }
   }
 
-  Future<List<DonateAcceptModel>> seeTakerAcceptanceData() async {
+  Future<DonateAcceptModel?> seeTakerAcceptanceData() async {
     try {
-      List<DonateAcceptModel> seeList = [];
       String userEmail = UserController.to.userModel!.email;
 
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('acceptdonation')
           .where('email', isEqualTo: userEmail)
-          .where('status', isEqualTo: false)
+          .where('is_delete', isEqualTo: false)
+          .where('received_status', isEqualTo: false)
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        for (var doc in querySnapshot.docs) {
-          seeList.add(
-              DonateAcceptModel.fromJson(doc.data() as Map<String, dynamic>));
-        }
+        final data = querySnapshot.docs.first.data() as Map<String, dynamic>;
+        return DonateAcceptModel.fromJson(data);
       } else {
-        // showCustomSnackBar(navigatorKey.currentContext!,
-        //     message: 'No data found!');
+        return null; // No record found
       }
-      return seeList;
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<bool> aceeptDonationRequest(dynamic payload) async {
+  Future<bool> aceeptDonationRequest(Map<String, dynamic> payload) async {
     try {
       final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('acceptdonation')
-          .where('takerid', isEqualTo: payload['takerid'])
+          .where('donor_email', isEqualTo: payload['donor_email'])
+          .where('is_delete', isEqualTo: false)
           .get();
 
       if (querySnapshot.docs.isEmpty) {
@@ -249,12 +248,13 @@ class RemoteHomeDatasource {
     }
   }
 
-  Future<bool> deleteAcceptedRequest(dynamic payload) async {
+  Future<bool> deleteAcceptedRequest(Map<String, dynamic> payload) async {
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('acceptdonation')
           .where('donor_email', isEqualTo: payload['donor_email'])
           .where('email', isEqualTo: payload['email'])
+          .where('is_delete', isEqualTo: false)
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
@@ -263,21 +263,21 @@ class RemoteHomeDatasource {
         await FirebaseFirestore.instance
             .collection('acceptdonation')
             .doc(userDoc.id)
-            .delete();
+            .update(payload);
         return true;
       } else {
-        Get.snackbar(
-          "Error",
-          "No Cancel Request Accepted",
-          snackPosition: SnackPosition.TOP,
-          snackStyle: SnackStyle.FLOATING,
-          backgroundColor: Colors.red.withValues(alpha: 0.9),
-          colorText: Colors.white,
-          margin: EdgeInsets.all(10),
-          duration: Duration(seconds: 3),
-          borderRadius: 8,
-          icon: Icon(Icons.error, color: Colors.white),
-        );
+        // Get.snackbar(
+        //   "Error",
+        //   "No Cancel Request Accepted",
+        //   snackPosition: SnackPosition.TOP,
+        //   snackStyle: SnackStyle.FLOATING,
+        //   backgroundColor: Colors.red.withValues(alpha: 0.9),
+        //   colorText: Colors.white,
+        //   margin: EdgeInsets.all(10),
+        //   duration: Duration(seconds: 3),
+        //   borderRadius: 8,
+        //   icon: Icon(Icons.error, color: Colors.white),
+        // );
 
         return false;
       }
@@ -367,13 +367,11 @@ class RemoteHomeDatasource {
     }
   }
 
-  Future<void> updateReceivedStatue(
-      String takerEmail, String donorEmail) async {
+  Future<bool> updateReceivedStatue(String id) async {
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('acceptdonation')
-          .where('email', isEqualTo: takerEmail)
-          .where('donor_email', isEqualTo: donorEmail)
+          .where('id', isEqualTo: id)
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
@@ -385,7 +383,10 @@ class RemoteHomeDatasource {
         await FirebaseFirestore.instance
             .collection('acceptdonation')
             .doc(documentId)
-            .update({'received_status': true});
+            .update({'status': true});
+        return true;
+      } else {
+        return false;
       }
     } catch (e) {
       rethrow;
@@ -485,12 +486,11 @@ class RemoteHomeDatasource {
     }
   }
 
-  Future<void> updateDonorStatus(String takerID, String donorID) async {
+  Future<void> updateDonorStatus(String id) async {
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('acceptdonation')
-          .where('email', isEqualTo: takerID)
-          .where('donor_email', isEqualTo: donorID)
+          .where('id', isEqualTo: id)
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
@@ -502,7 +502,7 @@ class RemoteHomeDatasource {
         await FirebaseFirestore.instance
             .collection('acceptdonation')
             .doc(documentId)
-            .update({'status': true});
+            .update({'is_delete': true});
       }
     } catch (e) {
       rethrow;
@@ -789,6 +789,286 @@ class RemoteHomeDatasource {
         return true;
       } else {
         return false;
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> sendLocationToApi(Map<String, dynamic> payload) async {
+    try {
+      final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+      // Check if the email already exists
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('acceptdonation_location')
+          .where('id', isEqualTo: payload['id'])
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Email exists, update the document
+        DocumentSnapshot docSnapshot = querySnapshot.docs.first;
+
+        await _firestore
+            .collection('acceptdonation_location')
+            .doc(docSnapshot.id)
+            .update({
+          'latitude': payload['latitude'],
+          'longitude': payload['longitude']
+        });
+
+        logSuccess('Donor status updated');
+      } else {
+        // Email does not exist, create a new document
+        await _firestore.collection('acceptdonation_location').add(payload);
+      }
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  Stream<LocationUpdateModel?> streamDonorUpdateLocation(String id) {
+    try {
+      return FirebaseFirestore.instance
+          .collection('acceptdonation_location')
+          .where('id', isEqualTo: id)
+          .snapshots()
+          .map((snapshot) {
+        if (snapshot.docs.isNotEmpty) {
+          final docData = snapshot.docs.first.data();
+          return LocationUpdateModel.fromJson(docData);
+        } else {
+          return null;
+        }
+      });
+    } catch (e) {
+      logError('Error streaming donor location: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> expiredAcceptedRequests() async {
+    try {
+      final firestore = FirebaseFirestore.instance;
+      final userEmail = UserController.to.userModel!.email;
+
+      // Get current time and calculate 24 hours ago
+      final now = DateTime.now();
+      final twentyFourHoursAgo = now.subtract(const Duration(hours: 24));
+
+      // Fetch accepted requests for this donor
+      final querySnapshot = await firestore
+          .collection('acceptdonation')
+          .where('donor_email', isEqualTo: userEmail)
+          .where('is_delete', isEqualTo: false)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) return;
+
+      for (var doc in querySnapshot.docs) {
+        final data = doc.data();
+        DateTime? requestDateTime;
+
+        if (data['accept_date'] != null && data['accept_time'] != null) {
+          try {
+            final String dateStr = data['accept_date']; // e.g. 2025-06-12
+            final String timeStr = data['accept_time']; // e.g. 07:22 PM
+
+            // Combine and parse AM/PM time correctly
+            final String combined = "$dateStr $timeStr";
+            final DateFormat formatter = DateFormat("yyyy-MM-dd hh:mm a");
+            requestDateTime = formatter.parse(combined);
+          } catch (e) {
+            logError("⚠️ Date parsing error for doc ${doc.id}: $e");
+          }
+        }
+
+        if (requestDateTime == null) continue;
+
+        // ✅ Compare if request older than 24 hours
+        if (requestDateTime.isBefore(twentyFourHoursAgo)) {
+          await firestore
+              .collection('acceptdonation')
+              .doc(doc.id)
+              .update({'is_delete': true});
+          logSuccess("🗑 Deleted expired request: ${doc.id}");
+        }
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> checkIsNextProcess(String id) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('acceptdonation')
+          .where('id', isEqualTo: id)
+          .where('status', isEqualTo: true)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Stream<bool> checkIsNextProcessRealTime(String id) {
+    try {
+      return FirebaseFirestore.instance
+          .collection('acceptdonation')
+          .where('id', isEqualTo: id)
+          .snapshots()
+          .map((snapshot) {
+        // When any doc changes in real time, this is re-triggered
+        if (snapshot.docs.isNotEmpty) {
+          final doc = snapshot.docs.first;
+          return doc['status'] == true;
+        }
+        return false;
+      });
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> updateAcceptanceData(String id) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('acceptdonation')
+          .where('id', isEqualTo: id)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Get the document reference
+        DocumentSnapshot documentSnapshot = querySnapshot.docs.first;
+        String documentId = documentSnapshot.id;
+        if (UserController.to.userModel!.type == 'taker') {
+          await FirebaseFirestore.instance
+              .collection('acceptdonation')
+              .doc(documentId)
+              .update({'is_delete': true, 'received_status': true});
+        } else {
+          await FirebaseFirestore.instance
+              .collection('acceptdonation')
+              .doc(documentId)
+              .update({'is_delete': true, 'taker_received_status': true});
+        }
+
+        // Update the data in the document
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<String?> getCurrentDonorLocation(String id) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: id)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        var data = querySnapshot.docs.first.data() as Map<String, dynamic>;
+        String userId = data['id']!.toString();
+        if (userId.isNotEmpty) {
+          QuerySnapshot querySnapshot1 = await FirebaseFirestore.instance
+              .collection('donor_location')
+              .where('user_id', isEqualTo: userId)
+              .get();
+          var data = querySnapshot1.docs.first.data() as Map<String, dynamic>;
+          return data['donor_location']?.toString();
+        } else {
+          return null;
+        }
+      } else {
+        return null;
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> sendNotification(String email) async {
+    try {
+      String projectId = 'blood-app-8f4c2';
+
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .get();
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot userDoc = querySnapshot.docs.first;
+        String deviceToken = userDoc['deviceToken'];
+
+        var data = {
+          'message': {
+            'token': deviceToken,
+            'notification': {
+              'title': 'Blood Request Accepted',
+              'body':
+                  'Good news! ${UserController.to.userModel!.firstname} ${UserController.to.userModel!.lastname} has accepted your blood request.',
+            },
+            'android': {
+              'priority': 'HIGH', // ✅ Correct place for priority
+              'notification': {
+                'sound': 'custom_sound', // ✅ Do NOT include .wav extension
+                'default_vibrate_timings': true,
+                'icon': 'ic_blood_request', // Optional custom icon name
+                'color': '#DE0A1E',
+              },
+            },
+            'apns': {
+              'payload': {
+                'aps': {
+                  'sound': 'custom_sound.wav',
+                  'alert': {
+                    'title': 'Blood Request Accepted',
+                    'body':
+                        'Good news! ${UserController.to.userModel!.firstname} ${UserController.to.userModel!.lastname} has accepted your blood request.',
+                  },
+                },
+              },
+            },
+            'data': {
+              'type': 'blood_accept_notification',
+              'id': 'Nomi12345',
+            },
+          },
+        };
+
+        // Generate OAuth2 token using service account
+        var jsonString = await rootBundle.loadString('images/json/key1.json');
+        var clientCredentials =
+            auth.ServiceAccountCredentials.fromJson(jsonString);
+        // var clientCredentials = auth.ServiceAccountCredentials.fromJson(
+        //     await File('images/json/key.json').readAsString());
+        var scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
+        var client =
+            await auth.clientViaServiceAccount(clientCredentials, scopes);
+
+        var response = await http.post(
+          Uri.parse(
+              'https://fcm.googleapis.com/v1/projects/$projectId/messages:send'),
+          headers: {
+            'Authorization': 'Bearer ${client.credentials.accessToken.data}',
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode(data),
+        );
+
+        if (response.statusCode == 200) {
+          logSuccess('Notification sent successfully to user: ${userDoc.id}');
+        } else {
+          logError(
+              'Failed to send notification to user: ${userDoc.id}. Status code: ${response.statusCode}');
+          logError('Response body: ${response.body}');
+        }
       }
     } catch (e) {
       rethrow;

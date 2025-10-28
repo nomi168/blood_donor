@@ -23,33 +23,36 @@ class DonateAcceptModel {
   final bool status;
   final bool receivedStatus;
   final bool takerReceivedStatus;
+  final bool isDelete;
+  final bool isStatusAccepted;
 
-  DonateAcceptModel({
-    required this.id,
-    required this.takerId,
-    required this.fullname,
-    required this.image,
-    required this.email,
-    required this.hospitalName,
-    required this.date,
-    required this.time,
-    required this.location,
-    required this.note,
-    required this.blood,
-    required this.bloodImage,
-    required this.unit,
-    required this.phoneNumber,
-    required this.situation,
-    required this.bloodType,
-    required this.donorName,
-    required this.donorEmail,
-    required this.donorNumber,
-    required this.donorImage,
-    required this.donorBlood,
-    required this.status,
-    required this.receivedStatus,
-    required this.takerReceivedStatus,
-  });
+  DonateAcceptModel(
+      {required this.id,
+      required this.takerId,
+      required this.fullname,
+      required this.image,
+      required this.email,
+      required this.hospitalName,
+      required this.date,
+      required this.time,
+      required this.location,
+      required this.note,
+      required this.blood,
+      required this.bloodImage,
+      required this.unit,
+      required this.phoneNumber,
+      required this.situation,
+      required this.bloodType,
+      required this.donorName,
+      required this.donorEmail,
+      required this.donorNumber,
+      required this.donorImage,
+      required this.donorBlood,
+      required this.status,
+      required this.receivedStatus,
+      required this.takerReceivedStatus,
+      required this.isDelete,
+      required this.isStatusAccepted});
 
   factory DonateAcceptModel.fromJson(Map<String, dynamic> json) {
     return DonateAcceptModel(
@@ -64,7 +67,7 @@ class DonateAcceptModel {
         location: json['location'] ?? '',
         note: json['note'] ?? '',
         blood: json['blood'] ?? '',
-        bloodImage: json['blood_image']?? '',
+        bloodImage: json['blood_image'] ?? '',
         unit: json['unit'] ?? '',
         phoneNumber: json['phone_number'] ?? '',
         situation: json['situation'] ?? '',
@@ -76,7 +79,9 @@ class DonateAcceptModel {
         donorBlood: json['donor_blood'] ?? '',
         status: json['status'] ?? false,
         receivedStatus: json['received_status'] ?? false,
-        takerReceivedStatus: json['taker_received_status'] ?? false);
+        takerReceivedStatus: json['taker_received_status'] ?? false,
+        isDelete: json['is_delete'] ?? false,
+        isStatusAccepted: json['is_status_accepted_request'] ?? false);
   }
 
   Map<String, dynamic> toJson() {
@@ -92,7 +97,7 @@ class DonateAcceptModel {
       'location': location,
       'note': note,
       'blood': blood,
-      'blood_image':bloodImage,
+      'blood_image': bloodImage,
       'unit': unit,
       'phone_number': phoneNumber,
       'situation': situation,
@@ -104,7 +109,9 @@ class DonateAcceptModel {
       'donor_blood': donorBlood,
       'status': status,
       'received_status': receivedStatus,
-      'taker_received_status': takerReceivedStatus
+      'taker_received_status': takerReceivedStatus,
+      'is_delete': isDelete,
+      'is_status_accepted_request':isStatusAccepted
     };
   }
 }

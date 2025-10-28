@@ -1,6 +1,7 @@
 
 import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/core/utils/api_response.dart';
+import 'package:blood_donor/features/auth/data/models/user_model.dart';
 import 'package:blood_donor/features/auth/domain/auth_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -33,13 +34,13 @@ class ForgotPasswordController extends GetxController {
     }
   }
 
-  Future<bool> forgotPassword(dynamic payload) async {
+  Future<UserModel?> forgotPassword(Map<String,dynamic> payload) async {
     try {
       showLoader('updating password...');
       return await _authRepository.forgotPassword(payload);
     } catch (e) {
       Helper.handleError(e, 'Error while updating password!');
-      return false;
+      return null;
     } finally {
       await EasyLoading.dismiss();
     }

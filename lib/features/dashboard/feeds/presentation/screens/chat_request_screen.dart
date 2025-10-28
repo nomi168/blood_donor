@@ -59,188 +59,193 @@ class ChatRequestScreen extends StatelessWidget {
                           } else {
                             ChatRequestModel chat =
                                 controller.chatRequestList[index];
-                            return CouponCard(
-                              curveAxis: Axis.vertical,
-                              firstChild: Container(
-                                // alignment: Alignment.topLeft,
-                                decoration: BoxDecoration(color: Colors.grey),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Container(
-                                    child: CachedNetworkImage(
-                                      fit: BoxFit.cover,
-                                      imageUrl: chat.image!.isNotEmpty
-                                          ? chat.image!
-                                          : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
-                                      placeholder: (context, url) =>
-                                          const CupertinoActivityIndicator(
-                                        color: Colors.white,
-                                      ),
-                                      errorWidget: (context, url, error) =>
-                                          Icon(Icons.error),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              secondChild: Container(
-                                decoration: const BoxDecoration(
-                                  color: Colors.black26,
-                                ),
-                                padding:
-                                    const EdgeInsets.only(top: 0, left: 10),
-                                child: Stack(
-                                  children: [
-                                    Align(
-                                        alignment: Alignment.topRight,
-                                        child: Container(
-                                          // margin: const EdgeInsets.only(
-                                          //     bottom: 1, right: 1),
-                                          width: 50,
-                                          height: 50,
-
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 10, vertical: 0),
-                                          decoration: BoxDecoration(
-                                            color: Colors.black,
-                                            borderRadius:
-                                                const BorderRadius.only(
-                                              bottomLeft: Radius.circular(100),
-                                            ),
+                            return Column(
+                              children: [
+                                CouponCard(
+                                  curveAxis: Axis.vertical,
+                                  firstChild: Container(
+                                    // alignment: Alignment.topLeft,
+                                    decoration: BoxDecoration(color: Colors.grey),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Container(
+                                        child: CachedNetworkImage(
+                                          fit: BoxFit.cover,
+                                          imageUrl: chat.image!.isNotEmpty
+                                              ? chat.image!
+                                              : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
+                                          placeholder: (context, url) =>
+                                              const CupertinoActivityIndicator(
+                                            color: Colors.white,
                                           ),
-                                        )),
-                                    Container(
-                                      alignment: Alignment.bottomCenter,
-                                      margin: EdgeInsets.only(top: 40),
-                                      child: Align(
-                                        alignment: Alignment.topLeft,
-                                        child: Column(
-                                          // crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              chat.senderName!,
-                                              style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w400,
-                                                  color: Colors.white),
-                                            ),
-                                            const SizedBox(height: 2),
-                                          ],
+                                          errorWidget: (context, url, error) =>
+                                              Icon(Icons.error),
                                         ),
                                       ),
                                     ),
-                                    Align(
-                                        alignment: Alignment.bottomLeft,
-                                        child: Row(
-                                          children: [
-                                            ElevatedButton(
-                                              style: ButtonStyle(
-                                                shape: WidgetStateProperty.all<
-                                                    RoundedRectangleBorder>(
-                                                  RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10.0),
-                                                  ),
+                                  ),
+                                  secondChild: Container(
+                                    decoration: const BoxDecoration(
+                                      color: Colors.black26,
+                                    ),
+                                    padding:
+                                        const EdgeInsets.only(top: 0, left: 10),
+                                    child: Stack(
+                                      children: [
+                                        Align(
+                                            alignment: Alignment.topRight,
+                                            child: Container(
+                                              // margin: const EdgeInsets.only(
+                                              //     bottom: 1, right: 1),
+                                              width: 50,
+                                              height: 50,
+                                
+                                              padding: const EdgeInsets.symmetric(
+                                                  horizontal: 10, vertical: 0),
+                                              decoration: BoxDecoration(
+                                                color: Colors.black,
+                                                borderRadius:
+                                                    const BorderRadius.only(
+                                                  bottomLeft: Radius.circular(100),
                                                 ),
-                                                backgroundColor:
-                                                    WidgetStateProperty
-                                                        .all<Color>(const Color(
-                                                            0xFFDE0A1E)),
                                               ),
-                                              child: Text(
-                                                'Reject',
-                                                style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.white),
-                                              ),
-                                              onPressed: () async {
-                                                await controller
-                                                    .deleteChatRequest(
-                                                        chat.senderEmail!);
-                                                controller.chatRequestList
-                                                    .removeAt(index);
-                                                controller.update();
-                                              },
-                                            ),
-                                            SizedBox(
-                                              width: 10,
-                                            ),
-                                            Expanded(
-                                                child: ElevatedButton(
-                                              style: ButtonStyle(
-                                                shape: WidgetStateProperty.all<
-                                                    RoundedRectangleBorder>(
-                                                  RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10.0),
-                                                  ),
+                                            )),
+                                        Container(
+                                          alignment: Alignment.bottomCenter,
+                                          margin: EdgeInsets.only(top: 40),
+                                          child: Align(
+                                            alignment: Alignment.topLeft,
+                                            child: Column(
+                                              // crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  chat.senderName!,
+                                                  style: TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight: FontWeight.w400,
+                                                      color: Colors.white),
                                                 ),
-                                                backgroundColor:
-                                                    WidgetStateProperty
-                                                        .all<Color>(const Color(
-                                                            0xFFDE0A1E)),
-                                              ),
-                                              child: Text(
-                                                'Accept',
-                                                style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.white),
-                                              ),
-                                              onPressed: () async {
-                                                if (controller.chatRequestList
-                                                        .length >
-                                                    0) {
-                                                  DateTime now = DateTime.now();
-                                                  String formattedDate =
-                                                      DateFormat('MM-dd-yyyy')
-                                                          .format(now);
-                                                  String formattedTime =
-                                                      DateFormat('h:mm a')
-                                                          .format(now);
-                                                  dynamic payload = {
-                                                    'id': '',
-                                                    'taker_id': chat.receiverId,
-                                                    'taker_number':
-                                                        chat.recipientNumber,
-                                                    'taker_email':
-                                                        chat.recipientEmail,
-                                                    'taker_image':
-                                                        chat.receiverImage,
-                                                    'taker_name': chat.name,
-                                                    'date': formattedDate,
-                                                    'time': formattedTime,
-                                                    'donor_id': chat.senderId,
-                                                    'donor_number':
-                                                        chat.senderNumber,
-                                                    'donor_email':
-                                                        chat.senderEmail,
-                                                    'donor_name':
-                                                        chat.senderName,
-                                                    'donor_image': chat.image,
-                                                  };
-                                                  bool result = await controller
-                                                      .acceptChatRequest(
-                                                          payload);
-                                                  if (result) {
+                                                const SizedBox(height: 2),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        Align(
+                                            alignment: Alignment.bottomLeft,
+                                            child: Row(
+                                              children: [
+                                                ElevatedButton(
+                                                  style: ButtonStyle(
+                                                    shape: WidgetStateProperty.all<
+                                                        RoundedRectangleBorder>(
+                                                      RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                10.0),
+                                                      ),
+                                                    ),
+                                                    backgroundColor:
+                                                        WidgetStateProperty
+                                                            .all<Color>(const Color(
+                                                                0xFFDE0A1E)),
+                                                  ),
+                                                  child: Text(
+                                                    'Reject',
+                                                    style: TextStyle(
+                                                        fontSize: 12,
+                                                        color: Colors.white),
+                                                  ),
+                                                  onPressed: () async {
                                                     await controller
-                                                        .updateChatRequest(chat
-                                                            .recipientEmail!);
+                                                        .deleteChatRequest(
+                                                            chat.senderEmail!);
                                                     controller.chatRequestList
                                                         .removeAt(index);
                                                     controller.update();
-                                                  }
-                                                } else {
-                                                  logError(
-                                                      'Invalid index: $index');
-                                                }
-                                              },
+                                                  },
+                                                ),
+                                                SizedBox(
+                                                  width: 10,
+                                                ),
+                                                Expanded(
+                                                    child: ElevatedButton(
+                                                  style: ButtonStyle(
+                                                    shape: WidgetStateProperty.all<
+                                                        RoundedRectangleBorder>(
+                                                      RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                10.0),
+                                                      ),
+                                                    ),
+                                                    backgroundColor:
+                                                        WidgetStateProperty
+                                                            .all<Color>(const Color(
+                                                                0xFFDE0A1E)),
+                                                  ),
+                                                  child: Text(
+                                                    'Accept',
+                                                    style: TextStyle(
+                                                        fontSize: 12,
+                                                        color: Colors.white),
+                                                  ),
+                                                  onPressed: () async {
+                                                    if (controller.chatRequestList
+                                                            .length >
+                                                        0) {
+                                                      DateTime now = DateTime.now();
+                                                      String formattedDate =
+                                                          DateFormat('MM-dd-yyyy')
+                                                              .format(now);
+                                                      String formattedTime =
+                                                          DateFormat('h:mm a')
+                                                              .format(now);
+                                                      Map<String,dynamic> payload = {
+                                                        'id': '',
+                                                        'taker_id': chat.receiverId,
+                                                        'taker_number':
+                                                            chat.recipientNumber,
+                                                        'taker_email':
+                                                            chat.recipientEmail,
+                                                        'taker_image':
+                                                            chat.receiverImage,
+                                                        'taker_name': chat.name,
+                                                        'date': formattedDate,
+                                                        'time': formattedTime,
+                                                        'donor_id': chat.senderId,
+                                                        'donor_number':
+                                                            chat.senderNumber,
+                                                        'donor_email':
+                                                            chat.senderEmail,
+                                                        'donor_name':
+                                                            chat.senderName,
+                                                        'donor_image': chat.image,
+                                                      };
+                                                      bool result = await controller
+                                                          .acceptChatRequest(
+                                                              payload);
+                                                      if (result) {
+                                                        await controller
+                                                            .updateChatRequest(chat
+                                                                .recipientEmail!);
+                                                        controller.chatRequestList
+                                                            .removeAt(index);
+                                                        controller.update();
+                                                      }
+                                                    } else {
+                                                      logError(
+                                                          'Invalid index: $index');
+                                                    }
+                                                  },
+                                                ))
+                                              ],
                                             ))
-                                          ],
-                                        ))
-                                  ],
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                SizedBox(height: 10,),
+                              ],
                             );
                           }
                         },

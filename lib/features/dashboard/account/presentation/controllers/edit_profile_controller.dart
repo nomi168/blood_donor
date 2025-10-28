@@ -46,13 +46,13 @@ class EditProfileController extends GetxController {
     }
   }
 
-  Future<bool> updateProfile(Map<String, dynamic> payload) async {
+  Future<UserModel?> updateProfile(Map<String, dynamic> payload) async {
     try {
       showLoader('updating profile...');
       return await _accountRepository.updateProfile(payload);
     } catch (e) {
       Helper.handleError(e, 'Error while updating profile!');
-      return false;
+      return null;
     } finally {
       await EasyLoading.dismiss();
     }

@@ -7,17 +7,17 @@ import 'package:blood_donor/core/utils/console_logs.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:blood_donor/features/auth/presentation/screens/card_scanning_screen.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/screens/blood_banks_update/taker_blood_bank_screen.dart';
+import 'package:blood_donor/features/dashboard/home/presentation/screens/blood_journey/donor_location_screen.dart';
+import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboatd.dart';
+import 'package:blood_donor/features/dashboard/home/presentation/screens/see_more/taker_analysis_screen.dart';
 import 'package:blood_donor/features/dashboard/notifications/presentation/constroller/notification_controller.dart';
 import 'package:blood_donor/features/dashboard/notifications/presentation/screens/notification_screen.dart';
-import 'package:blood_donor/features/dashboard/feeds/presentation/screens/feed_tab_screen.dart';
-import 'package:blood_donor/features/dashboard/home/data/models/donor_accept_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/taker_model.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/controllers/home_controller.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/screens/blood_banks_update/blood_bank_screen.dart';
-import 'package:blood_donor/features/dashboard/home/presentation/screens/blood_journey/blood_journey_screen.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/screens/donate_blood/donate_bood_screen.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/screens/emergency_help/emergency_taker_screen.dart';
-import 'package:blood_donor/features/dashboard/home/presentation/screens/see_more/taker_reach.dart';
+import 'package:blood_donor/features/dashboard/post_blood/presentation/screens/post_request_screen.dart';
 import 'package:blood_donor/main.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -29,7 +29,6 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../../post_blood/presentation/screens/post_request_screen.dart';
 import 'emergency_help/emergency_donor_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -41,12 +40,15 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
-  // late HomeController _controller;
+class _HomeScreenState extends State<HomeScreen>
+    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
+  late AnimationController animationController;
+  late Animation<Color?> colorAnimation;
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    animationController.dispose();
     super.dispose();
   }
 
@@ -68,6 +70,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    )..repeat(reverse: true);
+
+    colorAnimation = ColorTween(
+      begin: Colors.green,
+      end: Colors.green.withValues(alpha: .3),
+    ).animate(animationController);
   }
 
   @override
@@ -81,6 +92,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           return GetBuilder<HomeController>(
             init: HomeController(),
             builder: (homeController) {
+              // ignore: deprecated_member_use
               return WillPopScope(
                 onWillPop: () => homeController.onWillPop(context),
                 child: SingleChildScrollView(
@@ -100,6 +112,37 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                 fontSize: 16.sp, fontWeight: FontWeight.bold),
                           ),
                           Spacer(),
+                          GestureDetector(
+                            onTap: () async {
+                              await homeController.refreshData();
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: CircleAvatar(
+                                radius: 14,
+                                backgroundColor: const Color(0xFFDE0A1E),
+                                child: homeController.isRefreshHome
+                                    ? const SizedBox(
+                                        height: 16,
+                                        width: 16,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2.0,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  Colors.white),
+                                        ),
+                                      )
+                                    : const Icon(
+                                        Icons.refresh,
+                                        color: Colors.white,
+                                        size: 18,
+                                      ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
                           GestureDetector(
                             onTap: () {
                               showBarModalBottomSheet(
@@ -470,44 +513,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                 : userController.userModel!.type == 'donor'
                                     ? GestureDetector(
                                         onTap: () {
-                                          // ignore: avoid_print
-                                          Navigator.of(context,
-                                                  rootNavigator: true)
-                                              .push(
-                                            PageRouteBuilder(
-                                              pageBuilder: (context, animation,
-                                                  secondaryAnimation) {
-                                                return FeedScreen(
-                                                  id: '12345',
-                                                );
-                                              },
-                                              transitionDuration:
-                                                  const Duration(
-                                                      microseconds: 100),
-                                              transitionsBuilder: (context,
-                                                  animation,
-                                                  secondaryAnimation,
-                                                  child) {
-                                                const begin = Offset(10.0,
-                                                    0.0); // slide in from the right
-                                                const end = Offset.zero;
-                                                const curve =
-                                                    Curves.easeInOutQuart;
-
-                                                var tween = Tween(
-                                                        begin: begin, end: end)
-                                                    .chain(CurveTween(
-                                                        curve: curve));
-                                                var offsetAnimation =
-                                                    animation.drive(tween);
-
-                                                return SlideTransition(
-                                                  position: offsetAnimation,
-                                                  child: child,
-                                                );
-                                              },
-                                            ),
-                                          );
+                                          final dashboardState =
+                                              context.findAncestorStateOfType<
+                                                  DashboardState>();
+                                          dashboardState?.navigateToFeedTab();
                                         },
                                         child: Container(
                                           height: 120,
@@ -1352,41 +1361,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                                 ),
                                               ),
                                               onTap: () {
-                                                String blood = 'O';
-                                                // Navigator.push(
-                                                //   context,
-                                                //   PageRouteBuilder(
-                                                //     pageBuilder: (context, animation,
-                                                //         secondaryAnimation) {
-                                                //       return BloodOptionScreen(blood: blood);
-                                                //     },
-                                                //     transitionDuration:
-                                                //         const Duration(
-                                                //             microseconds: 100),
-                                                //     transitionsBuilder: (context,
-                                                //         animation,
-                                                //         secondaryAnimation,
-                                                //         child) {
-                                                //       const begin = Offset(5.0,
-                                                //           0.0); // slide in from the right
-                                                //       const end = Offset.zero;
-                                                //       const curve =
-                                                //           Curves.easeInOutQuart;
-
-                                                //       var tween = Tween(
-                                                //               begin: begin, end: end)
-                                                //           .chain(CurveTween(
-                                                //               curve: curve));
-                                                //       var offsetAnimation =
-                                                //           animation.drive(tween);
-
-                                                //       return SlideTransition(
-                                                //         position: offsetAnimation,
-                                                //         child: child,
-                                                //       );
-                                                //     },
-                                                //   ),
-                                                // );
+                                                // Navigator.of(context).push(
+                                                //     MaterialPageRoute(
+                                                //         builder: (context) =>
+                                                //             EmergencyTakerScreen()));
+                                                // final dashboardState = context
+                                                //     .findAncestorStateOfType<
+                                                //         DashboardState>();
+                                                // dashboardState
+                                                //     ?.navigateToFeedTab();
                                               },
                                             ),
                                             SizedBox(
@@ -1424,41 +1407,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                                 ),
                                               ),
                                               onTap: () {
-                                                String blood = 'AB';
-                                                // Navigator.push(
-                                                //   context,
-                                                //   PageRouteBuilder(
-                                                //     pageBuilder: (context, animation,
-                                                //         secondaryAnimation) {
-                                                //       return BloodDonor(blood: blood);
-                                                //     },
-                                                //     transitionDuration:
-                                                //         const Duration(
-                                                //             microseconds: 100),
-                                                //     transitionsBuilder: (context,
-                                                //         animation,
-                                                //         secondaryAnimation,
-                                                //         child) {
-                                                //       const begin = Offset(5.0,
-                                                //           0.0); // slide in from the right
-                                                //       const end = Offset.zero;
-                                                //       const curve =
-                                                //           Curves.easeInOutQuart;
-
-                                                //       var tween = Tween(
-                                                //               begin: begin, end: end)
-                                                //           .chain(CurveTween(
-                                                //               curve: curve));
-                                                //       var offsetAnimation =
-                                                //           animation.drive(tween);
-
-                                                //       return SlideTransition(
-                                                //         position: offsetAnimation,
-                                                //         child: child,
-                                                //       );
-                                                //     },
-                                                //   ),
-                                                // );
+                                                // final dashboardState = context
+                                                //     .findAncestorStateOfType<
+                                                //         DashboardState>();
+                                                // dashboardState
+                                                //     ?.navigateToFeedTab();
                                               },
                                             )),
                                             SizedBox(
@@ -1496,41 +1449,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                                 ),
                                               ),
                                               onTap: () {
-                                                String blood = 'B';
-                                                // Navigator.push(
-                                                //   context,
-                                                //   PageRouteBuilder(
-                                                //     pageBuilder: (context, animation,
-                                                //         secondaryAnimation) {
-                                                //       return BloodDonor(blood: blood);
-                                                //     },
-                                                //     transitionDuration:
-                                                //         const Duration(
-                                                //             microseconds: 100),
-                                                //     transitionsBuilder: (context,
-                                                //         animation,
-                                                //         secondaryAnimation,
-                                                //         child) {
-                                                //       const begin = Offset(5.0,
-                                                //           0.0); // slide in from the right
-                                                //       const end = Offset.zero;
-                                                //       const curve =
-                                                //           Curves.easeInOutQuart;
-
-                                                //       var tween = Tween(
-                                                //               begin: begin, end: end)
-                                                //           .chain(CurveTween(
-                                                //               curve: curve));
-                                                //       var offsetAnimation =
-                                                //           animation.drive(tween);
-
-                                                //       return SlideTransition(
-                                                //         position: offsetAnimation,
-                                                //         child: child,
-                                                //       );
-                                                //     },
-                                                //   ),
-                                                // );
+                                                // final dashboardState = context
+                                                //     .findAncestorStateOfType<
+                                                //         DashboardState>();
+                                                // dashboardState
+                                                //     ?.navigateToFeedTab();
                                               },
                                             )),
                                             SizedBox(
@@ -1539,43 +1462,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                             Expanded(
                                                 child: GestureDetector(
                                               onTap: () {
-                                                String blood = 'A-';
-                                                // Navigator.push(
-                                                //   context,
-                                                //   PageRouteBuilder(
-                                                //     pageBuilder: (context, animation,
-                                                //         secondaryAnimation) {
-                                                //       return BloodDonor(
-                                                //         blood: blood,
-                                                //       );
-                                                //     },
-                                                //     transitionDuration:
-                                                //         const Duration(
-                                                //             microseconds: 100),
-                                                //     transitionsBuilder: (context,
-                                                //         animation,
-                                                //         secondaryAnimation,
-                                                //         child) {
-                                                //       const begin = Offset(5.0,
-                                                //           0.0); // slide in from the right
-                                                //       const end = Offset.zero;
-                                                //       const curve =
-                                                //           Curves.easeInOutQuart;
-
-                                                //       var tween = Tween(
-                                                //               begin: begin, end: end)
-                                                //           .chain(CurveTween(
-                                                //               curve: curve));
-                                                //       var offsetAnimation =
-                                                //           animation.drive(tween);
-
-                                                //       return SlideTransition(
-                                                //         position: offsetAnimation,
-                                                //         child: child,
-                                                //       );
-                                                //     },
-                                                //   ),
-                                                // );
+                                                // final dashboardState = context
+                                                //     .findAncestorStateOfType<
+                                                //         DashboardState>();
+                                                // dashboardState
+                                                //     ?.navigateToFeedTab();
                                               },
                                               child: Container(
                                                 height: 65,
@@ -1613,542 +1504,1021 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                     ],
                                   ))
                               : SizedBox(),
+                      SizedBox(
+                        height: 10,
+                      ),
 
                       userController.userModel == null
                           ? SizedBox()
-                          : userController.userModel!.type == 'donor'
-                              ? Container(
-                                  margin: EdgeInsets.only(top: 10),
-                                  child: Row(
-                                    children: [
-                                      SizedBox(
-                                        width: 20,
+                          : userController.userModel!.type == 'donor' &&
+                                  homeController.donorData == null &&
+                                  homeController.isBloodJourney
+                              ? Shimmer.fromColors(
+                                  baseColor: Colors.grey[300]!,
+                                  highlightColor: Colors.grey[100]!,
+                                  child: Container(
+                                    height: 180,
+                                    margin: EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    decoration: ShapeDecoration(
+                                      color: Colors.grey[300],
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
                                       ),
-                                      Text(
-                                        'Donation Request',
-                                        style: TextStyle(
-                                            fontSize: 17.sp,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
+                                    ),
                                   ),
                                 )
-                              : SizedBox(),
-                      userController.userModel != null &&
-                              userController.userModel!.type == 'donor' &&
-                              !homeController.isLoading &&
-                              homeController.takerList.isEmpty
-                          ? Center(child: Text('no data found'))
-                          : SizedBox(
-                              height: 27.h,
-                              child: ListView.builder(
-                                  controller: homeController.scrollController,
-                                  padding: EdgeInsets.symmetric(vertical: 10),
-                                  itemCount: homeController.isLoading
-                                      ? 3
-                                      : homeController.takerList.length,
-                                  // physics: AlwaysScrollableScrollPhysics(),
-                                  scrollDirection: Axis.horizontal,
-                                  shrinkWrap: true,
-                                  itemBuilder: (context, index) {
-                                    if (homeController.isLoading &&
-                                        homeController.takerList.isEmpty) {
-                                      return Shimmer.fromColors(
-                                        baseColor: Colors.grey[300]!,
-                                        highlightColor: Colors.grey[100]!,
-                                        child: Container(
-                                          height: 23.5.h,
-                                          margin: EdgeInsets.symmetric(
-                                              vertical: 0, horizontal: 5.w),
-                                          decoration: ShapeDecoration(
-                                            color: Colors.grey[300],
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
+                              : homeController.donorData != null &&
+                                      !homeController.isBloodJourney
+                                  ? Column(
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 5.w),
+                                          child: Align(
+                                            alignment: Alignment.topLeft,
+                                            child: Text('Blood Journey Map',
+                                                style: TextStyle(
+                                                    fontSize: 17.sp,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                                textAlign: TextAlign.left),
                                           ),
                                         ),
-                                      );
-                                    } else if (!homeController.isLoading &&
-                                        homeController.takerList.isEmpty) {
-                                      return Center(
-                                          child: Text('no data found'));
-                                    } else {
-                                      FeedTakerModel takerFeed =
-                                          homeController.takerList[index];
-                                      return Container(
-                                        margin: EdgeInsets.symmetric(
-                                            horizontal: 10),
-                                        height: 23.5.h,
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 13, vertical: 12),
-                                        clipBehavior: Clip.antiAlias,
-                                        decoration: ShapeDecoration(
-                                          shape: RoundedRectangleBorder(
-                                            side: BorderSide(
-                                                width: 2,
-                                                color: Color(0xFFDDDDDD)),
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                        ),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                              child: Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Container(
-                                                    width: 70,
-                                                    height: 70,
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              40),
-                                                      child: CachedNetworkImage(
-                                                        fit: BoxFit.cover,
-                                                        imageUrl: takerFeed
-                                                                .image!
-                                                                .isNotEmpty
-                                                            ? takerFeed.image!
-                                                            : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
-                                                        placeholder: (context,
-                                                                url) =>
-                                                            const CupertinoActivityIndicator(
-                                                          color: Colors.white,
-                                                        ),
-                                                        errorWidget: (context,
-                                                                url, error) =>
-                                                            Icon(Icons.error),
-                                                      ),
-                                                    ),
+                                        homeController.donorData == null
+                                            ? SizedBox()
+                                            : Container(
+                                                width: double.infinity,
+                                                margin: EdgeInsets.symmetric(
+                                                    horizontal: 5.w,
+                                                    vertical: 6),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 14,
+                                                        vertical: 16),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  color: Colors.white,
+                                                  border: Border.all(
+                                                    width: 1,
+                                                    color: Colors.grey
+                                                        .withValues(alpha: .2),
                                                   ),
-                                                  const SizedBox(width: 5),
-                                                  Container(
-                                                    child: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.max,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.grey
+                                                          .withValues(
+                                                              alpha: 0.15),
+                                                      blurRadius: 8,
+                                                      offset:
+                                                          const Offset(0, 4),
+                                                      spreadRadius: 2,
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    /// TOP ROW: Profile + Info
+                                                    Row(
                                                       crossAxisAlignment:
                                                           CrossAxisAlignment
                                                               .start,
                                                       children: [
-                                                        Row(
-                                                          children: [
-                                                            Text(
-                                                              takerFeed.name!,
-                                                              style: TextStyle(
+                                                        /// Profile Image
+                                                        Container(
+                                                          width: 70,
+                                                          height: 70,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        100),
+                                                            border: Border.all(
                                                                 color: Colors
-                                                                    .black,
-                                                                fontSize: 18,
-                                                                fontFamily:
-                                                                    'Montserrat',
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                                height: 0,
+                                                                    .blueAccent,
+                                                                width: 2),
+                                                          ),
+                                                          child: ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        100),
+                                                            child:
+                                                                CachedNetworkImage(
+                                                              fit: BoxFit.cover,
+                                                              imageUrl: homeController
+                                                                      .donorData!
+                                                                      .image
+                                                                      .isNotEmpty
+                                                                  ? homeController
+                                                                      .donorData!
+                                                                      .image
+                                                                  : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
+                                                              placeholder: (context,
+                                                                      url) =>
+                                                                  const Center(
+                                                                child:
+                                                                    CupertinoActivityIndicator(),
                                                               ),
+                                                              errorWidget: (context,
+                                                                      url,
+                                                                      error) =>
+                                                                  const Icon(
+                                                                      Icons
+                                                                          .error,
+                                                                      color: Colors
+                                                                          .redAccent),
                                                             ),
-                                                            SizedBox(
-                                                              width: 10,
-                                                            ),
-                                                            Container(
-                                                              margin: EdgeInsets
-                                                                  .only(
-                                                                      left:
-                                                                          15.w),
-                                                              child:
-                                                                  CustomPaint(
-                                                                size: Size(
-                                                                    40, 30),
-                                                                painter: BloodDropPainter(
-                                                                    blood: takerFeed
-                                                                        .blood!),
-                                                              ),
-                                                            )
-                                                          ],
+                                                          ),
                                                         ),
                                                         const SizedBox(
-                                                            height: 12),
-                                                        Container(
+                                                            width: 12),
+
+                                                        /// Donor Info
+                                                        Expanded(
                                                           child: Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .start,
                                                             crossAxisAlignment:
                                                                 CrossAxisAlignment
                                                                     .start,
                                                             children: [
-                                                              Container(
-                                                                width: 220,
-                                                                child: Row(
-                                                                  mainAxisSize:
-                                                                      MainAxisSize
-                                                                          .min,
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .start,
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    Text(
-                                                                      'Hospital :',
-                                                                      style:
-                                                                          TextStyle(
-                                                                        color: Color(
-                                                                            0xFF5A5A5A),
-                                                                        fontSize:
-                                                                            12,
-                                                                        fontFamily:
-                                                                            'Montserrat',
-                                                                        fontWeight:
-                                                                            FontWeight.w500,
-                                                                        height:
-                                                                            0.13,
-                                                                      ),
-                                                                    ),
-                                                                    const SizedBox(
-                                                                        width:
-                                                                            5),
-                                                                    Expanded(
-                                                                      child:
-                                                                          SizedBox(
-                                                                        child:
-                                                                            Text(
-                                                                          takerFeed
-                                                                              .hospitalName!,
-                                                                          style:
-                                                                              TextStyle(
-                                                                            color:
-                                                                                Color(0xFF5A5A5A),
-                                                                            fontSize:
-                                                                                13,
-                                                                            fontFamily:
-                                                                                'Montserrat',
-                                                                            fontWeight:
-                                                                                FontWeight.w500,
-                                                                            height:
-                                                                                0.13,
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                    )
-                                                                  ],
+                                                              /// Full name
+                                                              Text(
+                                                                homeController
+                                                                    .donorData!
+                                                                    .fullname,
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontSize: 16,
+                                                                  color: Colors
+                                                                      .black87,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w700,
                                                                 ),
                                                               ),
                                                               const SizedBox(
-                                                                  height: 15),
-                                                              Container(
-                                                                child: Row(
-                                                                  mainAxisSize:
-                                                                      MainAxisSize
-                                                                          .min,
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .start,
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    Text(
-                                                                      'Location :',
+                                                                  height: 8),
+
+                                                              /// Location
+                                                              Row(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  const Text(
+                                                                    'Location: ',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          14,
+                                                                      color: Colors
+                                                                          .black87,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                    ),
+                                                                  ),
+                                                                  Expanded(
+                                                                    child: Text(
+                                                                      homeController
+                                                                          .donorData!
+                                                                          .location,
                                                                       style:
                                                                           TextStyle(
-                                                                        color: Color(
-                                                                            0xFF5A5A5A),
                                                                         fontSize:
-                                                                            12,
-                                                                        fontFamily:
-                                                                            'Montserrat',
-                                                                        fontWeight:
-                                                                            FontWeight.w500,
-                                                                        height:
-                                                                            0.13,
+                                                                            14,
+                                                                        color: Colors
+                                                                            .grey
+                                                                            .shade700,
                                                                       ),
                                                                     ),
-                                                                    const SizedBox(
-                                                                        width:
-                                                                            5),
-                                                                    Text(
-                                                                      takerFeed
-                                                                          .location!,
-                                                                      style:
-                                                                          TextStyle(
-                                                                        color: Color(
-                                                                            0xFF5A5A5A),
-                                                                        fontSize:
-                                                                            13,
-                                                                        fontFamily:
-                                                                            'Montserrat',
-                                                                        fontWeight:
-                                                                            FontWeight.w500,
-                                                                        height:
-                                                                            0.13,
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
+                                                                  ),
+                                                                ],
                                                               ),
                                                               const SizedBox(
-                                                                  height: 15),
-                                                              Container(
-                                                                child: Row(
-                                                                  mainAxisSize:
-                                                                      MainAxisSize
-                                                                          .min,
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .start,
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    Text(
-                                                                      'Date :',
+                                                                  height: 6),
+
+                                                              /// Hospital Name
+                                                              Row(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  const Text(
+                                                                    'Hospital: ',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          14,
+                                                                      color: Colors
+                                                                          .black87,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                    ),
+                                                                  ),
+                                                                  Expanded(
+                                                                    child: Text(
+                                                                      homeController
+                                                                          .donorData!
+                                                                          .hospitalName,
                                                                       style:
                                                                           TextStyle(
-                                                                        color: Color(
-                                                                            0xFF5A5A5A),
                                                                         fontSize:
-                                                                            12,
-                                                                        fontFamily:
-                                                                            'Montserrat',
-                                                                        fontWeight:
-                                                                            FontWeight.w500,
-                                                                        height:
-                                                                            0.13,
+                                                                            14,
+                                                                        color: Colors
+                                                                            .grey
+                                                                            .shade700,
                                                                       ),
                                                                     ),
-                                                                    const SizedBox(
-                                                                        width:
-                                                                            5),
-                                                                    Text(
-                                                                      takerFeed
-                                                                          .date!,
-                                                                      style:
-                                                                          TextStyle(
-                                                                        color: Color(
-                                                                            0xFF5A5A5A),
-                                                                        fontSize:
-                                                                            13,
-                                                                        fontFamily:
-                                                                            'Montserrat',
-                                                                        fontWeight:
-                                                                            FontWeight.w500,
-                                                                        height:
-                                                                            0.13,
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
+                                                                  ),
+                                                                ],
                                                               ),
                                                               const SizedBox(
-                                                                  height: 15),
-                                                              Container(
-                                                                child: Row(
-                                                                  mainAxisSize:
-                                                                      MainAxisSize
-                                                                          .min,
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .start,
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    Text(
-                                                                      'Time :',
+                                                                  height: 6),
+
+                                                              /// Blood Group
+                                                              Row(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  const Text(
+                                                                    'Blood Group: ',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          14,
+                                                                      color: Colors
+                                                                          .black87,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                    ),
+                                                                  ),
+                                                                  Expanded(
+                                                                    child: Text(
+                                                                      homeController
+                                                                          .donorData!
+                                                                          .blood,
                                                                       style:
                                                                           TextStyle(
-                                                                        color: Color(
-                                                                            0xFF5A5A5A),
                                                                         fontSize:
-                                                                            12,
-                                                                        fontFamily:
-                                                                            'Montserrat',
+                                                                            14,
+                                                                        color: Colors
+                                                                            .redAccent,
                                                                         fontWeight:
-                                                                            FontWeight.w500,
-                                                                        height:
-                                                                            0.13,
+                                                                            FontWeight.bold,
                                                                       ),
                                                                     ),
-                                                                    const SizedBox(
-                                                                        width:
-                                                                            5),
-                                                                    Text(
-                                                                      takerFeed
-                                                                          .time!,
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              const SizedBox(
+                                                                  height: 6),
+
+                                                              /// Date
+                                                              Row(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  const Text(
+                                                                    'Date: ',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          14,
+                                                                      color: Colors
+                                                                          .black87,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                    ),
+                                                                  ),
+                                                                  Expanded(
+                                                                    child: Text(
+                                                                      homeController
+                                                                          .donorData!
+                                                                          .date,
                                                                       style:
                                                                           TextStyle(
-                                                                        color: Color(
-                                                                            0xFF5A5A5A),
                                                                         fontSize:
-                                                                            13,
-                                                                        fontFamily:
-                                                                            'Montserrat',
-                                                                        fontWeight:
-                                                                            FontWeight.w500,
-                                                                        height:
-                                                                            0.13,
+                                                                            14,
+                                                                        color: Colors
+                                                                            .grey
+                                                                            .shade700,
                                                                       ),
                                                                     ),
-                                                                  ],
-                                                                ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              const SizedBox(
+                                                                  height: 6),
+
+                                                              /// Time
+                                                              Row(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  const Text(
+                                                                    'Time: ',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          14,
+                                                                      color: Colors
+                                                                          .black87,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                    ),
+                                                                  ),
+                                                                  Expanded(
+                                                                    child: Text(
+                                                                      homeController
+                                                                          .donorData!
+                                                                          .time,
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontSize:
+                                                                            14,
+                                                                        color: Colors
+                                                                            .grey
+                                                                            .shade700,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
                                                               ),
                                                             ],
                                                           ),
                                                         ),
-                                                        const SizedBox(
-                                                            height: 15),
-                                                        Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .end,
-                                                          children: [
-                                                            SizedBox(
-                                                              width: 25.w,
-                                                            ),
-                                                            Align(
-                                                              alignment: Alignment
-                                                                  .centerRight,
-                                                              child: InkWell(
-                                                                onTap: () {
-                                                                  if (homeController
-                                                                          .isAvailability ==
-                                                                      true) {
-                                                                    Get.snackbar(
-                                                                      "Error",
-                                                                      "You have already donated blood. If you want to donate again, please wait for 90 days.",
-                                                                      snackPosition:
-                                                                          SnackPosition
-                                                                              .TOP,
-                                                                      snackStyle:
-                                                                          SnackStyle
-                                                                              .FLOATING,
-                                                                      backgroundColor: Colors
-                                                                          .red
-                                                                          .withValues(
-                                                                              alpha: 0.9),
-                                                                      colorText:
-                                                                          Colors
-                                                                              .white,
-                                                                      margin: EdgeInsets
-                                                                          .all(
-                                                                              10),
-                                                                      duration: Duration(
-                                                                          seconds:
-                                                                              3),
-                                                                      borderRadius:
-                                                                          8,
-                                                                      icon: Icon(
-                                                                          Icons
-                                                                              .error,
-                                                                          color:
-                                                                              Colors.white),
-                                                                    );
-                                                                  } else {
-                                                                    Navigator
-                                                                        .push(
-                                                                      context,
-                                                                      PageRouteBuilder(
-                                                                        pageBuilder: (context,
-                                                                            animation,
-                                                                            secondaryAnimation) {
-                                                                          return DonateBoodScreen(
-                                                                            payload:
-                                                                                takerFeed,
-                                                                            mapController:
-                                                                                homeController.controllers,
-                                                                          );
-                                                                        },
-                                                                        transitionDuration:
-                                                                            const Duration(microseconds: 100),
-                                                                        transitionsBuilder: (context,
-                                                                            animation,
-                                                                            secondaryAnimation,
-                                                                            child) {
-                                                                          const begin = Offset(
-                                                                              10.0,
-                                                                              0.0); // slide in from the right
-                                                                          const end =
-                                                                              Offset.zero;
-                                                                          const curve =
-                                                                              Curves.easeInOutQuart;
+                                                      ],
+                                                    ),
 
-                                                                          var tween =
-                                                                              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-                                                                          var offsetAnimation =
-                                                                              animation.drive(tween);
+                                                    const SizedBox(height: 14),
 
-                                                                          return SlideTransition(
-                                                                            position:
-                                                                                offsetAnimation,
+                                                    /// ACTION BUTTON
+
+                                                    if (colorAnimation
+                                                            .isAnimating ==
+                                                        false)
+                                                      const SizedBox.shrink()
+                                                    else // wait until initialized
+
+                                                      AnimatedBuilder(
+                                                        animation:
+                                                            colorAnimation,
+                                                        builder:
+                                                            (context, child) {
+                                                          return Align(
+                                                            alignment: Alignment
+                                                                .centerRight,
+                                                            child: InkWell(
+                                                              splashColor: Colors
+                                                                  .transparent,
+                                                              splashFactory:
+                                                                  NoSplash
+                                                                      .splashFactory,
+                                                              onTap: () async {
+                                                                bool result =
+                                                                    await homeController
+                                                                        .checkUserCnicVerification();
+                                                                if (result) {
+                                                                  Navigator
+                                                                      .push(
+                                                                    context,
+                                                                    PageRouteBuilder(
+                                                                      pageBuilder: (context,
+                                                                          animation,
+                                                                          secondaryAnimation) {
+                                                                        return DonorLocationScreen(
+                                                                          donateModel:
+                                                                              homeController.donorData!,
+                                                                          mapController:
+                                                                              homeController.controllers,
+                                                                        );
+                                                                      },
+                                                                      transitionDuration:
+                                                                          const Duration(
+                                                                              milliseconds: 300),
+                                                                      transitionsBuilder: (context,
+                                                                          animation,
+                                                                          secondaryAnimation,
+                                                                          child) {
+                                                                        const begin = Offset(
+                                                                            1.0,
+                                                                            0.0);
+                                                                        const end =
+                                                                            Offset.zero;
+                                                                        const curve =
+                                                                            Curves.easeInOutCubic;
+
+                                                                        var tween =
+                                                                            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                                                                        var offsetAnimation =
+                                                                            animation.drive(tween);
+
+                                                                        return SlideTransition(
+                                                                          position:
+                                                                              offsetAnimation,
+                                                                          child:
+                                                                              child,
+                                                                        );
+                                                                      },
+                                                                    ),
+                                                                  );
+                                                                } else {
+                                                                  showDialog(
+                                                                    context:
+                                                                        navigatorKey
+                                                                            .currentContext!,
+                                                                    barrierDismissible:
+                                                                        false,
+                                                                    builder:
+                                                                        (BuildContext
+                                                                            context) {
+                                                                      return AlertDialog(
+                                                                        shape:
+                                                                            RoundedRectangleBorder(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(16),
+                                                                        ),
+                                                                        title:
+                                                                            Row(
+                                                                          children: [
+                                                                            Icon(Icons.verified_user,
+                                                                                color: Colors.redAccent),
+                                                                            SizedBox(width: 8),
+                                                                            Text(
+                                                                              "CNIC Verification Required",
+                                                                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                        content:
+                                                                            Column(
+                                                                          mainAxisSize:
+                                                                              MainAxisSize.min,
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.start,
+                                                                          children: [
+                                                                            Text(
+                                                                              "Please verify your CNIC before proceeding.",
+                                                                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                                                                            ),
+                                                                            SizedBox(height: 12),
+                                                                            Text(
+                                                                              "• If you are a Taker: You cannot request blood without CNIC verification.\n\n"
+                                                                              "• If you are a Donor: You cannot donate blood without verifying your CNIC.\n\n"
+                                                                              "👉 Go to your account section and verify your CNIC to continue.",
+                                                                              style: TextStyle(fontSize: 14, color: Colors.black87),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                        actions: [
+                                                                          TextButton(
+                                                                            onPressed: () =>
+                                                                                Navigator.of(context).pop(),
                                                                             child:
-                                                                                child,
-                                                                          );
-                                                                        },
-                                                                      ),
-                                                                    );
-                                                                  }
-                                                                },
-                                                                child:
-                                                                    Container(
-                                                                  height: 30,
-                                                                  padding: EdgeInsets
-                                                                      .symmetric(
-                                                                          horizontal:
-                                                                              25),
-                                                                  alignment:
-                                                                      Alignment
-                                                                          .center,
-                                                                  decoration:
-                                                                      BoxDecoration(
+                                                                                Text("Later", style: TextStyle(color: Colors.black)),
+                                                                          ),
+                                                                          ElevatedButton(
+                                                                            style:
+                                                                                ElevatedButton.styleFrom(
+                                                                              backgroundColor: Colors.redAccent,
+                                                                              shape: RoundedRectangleBorder(
+                                                                                borderRadius: BorderRadius.circular(8),
+                                                                              ),
+                                                                            ),
+                                                                            onPressed:
+                                                                                () {
+                                                                              Navigator.of(context).pop();
+                                                                              showModalBottomSheet(
+                                                                                context: context,
+                                                                                isDismissible: false,
+                                                                                enableDrag: false,
+                                                                                isScrollControlled: true,
+                                                                                backgroundColor: Colors.transparent,
+                                                                                builder: (BuildContext context) {
+                                                                                  return Container(
+                                                                                    margin: EdgeInsets.only(top: 40),
+                                                                                    decoration: BoxDecoration(
+                                                                                      color: Colors.white,
+                                                                                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                                                                                    ),
+                                                                                    child: ClipRRect(
+                                                                                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                                                                                      child: CardScanningScreen(),
+                                                                                    ),
+                                                                                  );
+                                                                                },
+                                                                              );
+                                                                            },
+                                                                            child:
+                                                                                Text(
+                                                                              "Verify Now",
+                                                                              style: TextStyle(color: Colors.white),
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      );
+                                                                    },
+                                                                  );
+                                                                }
+                                                              },
+                                                              child:
+                                                                  AnimatedContainer(
+                                                                duration:
+                                                                    const Duration(
+                                                                        milliseconds:
+                                                                            300),
+                                                                padding: const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal:
+                                                                        20,
+                                                                    vertical:
+                                                                        8),
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color:
+                                                                      colorAnimation
+                                                                          .value,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              6),
+                                                                  border: Border.all(
+                                                                      color: Colors
+                                                                          .transparent),
+                                                                ),
+                                                                child: Text(
+                                                                  'Start Journey',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        17.sp,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
                                                                     color: Colors
-                                                                        .green,
-                                                                    borderRadius:
-                                                                        BorderRadius
-                                                                            .circular(5),
-                                                                  ),
-                                                                  child: Text(
-                                                                    'Accept',
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            14,
-                                                                        color: Colors
-                                                                            .white),
+                                                                        .white,
                                                                   ),
                                                                 ),
                                                               ),
                                                             ),
-                                                          ],
-                                                        )
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
+                                                          );
+                                                        },
+                                                      )
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                          ],
+                                      ],
+                                    )
+                                  : SizedBox(),
+
+                      userController.userModel == null
+                          ? SizedBox()
+                          : userController.userModel!.type == 'donor' &&
+                                  homeController.takerList.isEmpty &&
+                                  homeController.isLoading
+                              ? Shimmer.fromColors(
+                                  baseColor: Colors.grey[300]!,
+                                  highlightColor: Colors.grey[100]!,
+                                  child: Container(
+                                    height: 180,
+                                    margin: EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 20),
+                                    decoration: ShapeDecoration(
+                                      color: Colors.grey[300],
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : homeController.takerList.isNotEmpty &&
+                                      !homeController.isLoading
+                                  ? Column(
+                                      children: [
+                                        Container(
+                                          margin: EdgeInsets.only(top: 10),
+                                          child: Row(
+                                            children: [
+                                              SizedBox(
+                                                width: 20,
+                                              ),
+                                              Text(
+                                                'Donation Request',
+                                                style: TextStyle(
+                                                    fontSize: 17.sp,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      );
-                                    }
-                                  }),
-                            ),
+                                        SizedBox(
+                                          // height: 33.h,
+                                          child: ListView.builder(
+                                              controller: homeController
+                                                  .scrollController,
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 10),
+                                              itemCount:
+                                                  homeController.isLoading
+                                                      ? 3
+                                                      : homeController
+                                                          .takerList.length,
+                                              // physics: AlwaysScrollableScrollPhysics(),
+                                              scrollDirection: Axis.vertical,
+                                              shrinkWrap: true,
+                                              itemBuilder: (context, index) {
+                                                if (homeController.isLoading &&
+                                                    homeController
+                                                        .takerList.isEmpty) {
+                                                  return Shimmer.fromColors(
+                                                    baseColor:
+                                                        Colors.grey[300]!,
+                                                    highlightColor:
+                                                        Colors.grey[100]!,
+                                                    child: Container(
+                                                      height: 23.5.h,
+                                                      margin:
+                                                          EdgeInsets.symmetric(
+                                                              vertical: 0,
+                                                              horizontal: 5.w),
+                                                      decoration:
+                                                          ShapeDecoration(
+                                                        color: Colors.grey[300],
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                } else if (!homeController
+                                                        .isLoading &&
+                                                    homeController
+                                                        .takerList.isEmpty) {
+                                                  return Center(
+                                                      child: Text(
+                                                          'no data found'));
+                                                } else {
+                                                  FeedTakerModel takerFeed =
+                                                      homeController
+                                                          .takerList[index];
+                                                  return Column(
+                                                    children: [
+                                                      Container(
+                                                        margin: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal: 20),
+                                                        width: 90.w,
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 10,
+                                                                vertical: 12),
+                                                        clipBehavior:
+                                                            Clip.antiAlias,
+                                                        decoration:
+                                                            ShapeDecoration(
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            side: BorderSide(
+                                                                width: 2,
+                                                                color: Color(
+                                                                    0xFFDDDDDD)),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                          ),
+                                                        ),
+                                                        child: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .start,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Container(
+                                                              child: Row(
+                                                                mainAxisSize:
+                                                                    MainAxisSize
+                                                                        .min,
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .center,
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Container(
+                                                                    width: 70,
+                                                                    height: 70,
+                                                                    child:
+                                                                        ClipRRect(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              40),
+                                                                      child:
+                                                                          CachedNetworkImage(
+                                                                        fit: BoxFit
+                                                                            .cover,
+                                                                        imageUrl: takerFeed.image!.isNotEmpty
+                                                                            ? takerFeed.image!
+                                                                            : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
+                                                                        placeholder:
+                                                                            (context, url) =>
+                                                                                const CupertinoActivityIndicator(
+                                                                          color:
+                                                                              Colors.white,
+                                                                        ),
+                                                                        errorWidget: (context,
+                                                                                url,
+                                                                                error) =>
+                                                                            Icon(Icons.error),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  const SizedBox(
+                                                                      width: 5),
+                                                                  Container(
+                                                                    child:
+                                                                        Column(
+                                                                      mainAxisSize:
+                                                                          MainAxisSize
+                                                                              .max,
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .start,
+                                                                      crossAxisAlignment:
+                                                                          CrossAxisAlignment
+                                                                              .start,
+                                                                      children: [
+                                                                        Row(
+                                                                          children: [
+                                                                            Text(
+                                                                              takerFeed.name!,
+                                                                              style: TextStyle(
+                                                                                color: Colors.black,
+                                                                                fontSize: 14,
+                                                                                fontFamily: 'Montserrat',
+                                                                                fontWeight: FontWeight.w500,
+                                                                                height: 0,
+                                                                              ),
+                                                                            ),
+                                                                            SizedBox(
+                                                                              width: 10,
+                                                                            ),
+                                                                            Container(
+                                                                              margin: EdgeInsets.only(left: 5),
+                                                                              child: CustomPaint(
+                                                                                size: Size(40, 30),
+                                                                                painter: BloodDropPainter(blood: takerFeed.blood!),
+                                                                              ),
+                                                                            )
+                                                                          ],
+                                                                        ),
+                                                                        const SizedBox(
+                                                                            height:
+                                                                                12),
+                                                                        Container(
+                                                                          child:
+                                                                              Column(
+                                                                            mainAxisSize:
+                                                                                MainAxisSize.min,
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.start,
+                                                                            crossAxisAlignment:
+                                                                                CrossAxisAlignment.start,
+                                                                            children: [
+                                                                              Container(
+                                                                                width: 220,
+                                                                                child: Row(
+                                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                  children: [
+                                                                                    const Text(
+                                                                                      'Hosiptal: ',
+                                                                                      style: TextStyle(
+                                                                                        fontSize: 14,
+                                                                                        color: Colors.black87,
+                                                                                        fontWeight: FontWeight.w500,
+                                                                                      ),
+                                                                                    ),
+                                                                                    Expanded(
+                                                                                      child: Text(
+                                                                                        takerFeed.hospitalName!,
+                                                                                        style: TextStyle(
+                                                                                          fontSize: 14,
+                                                                                          color: Colors.grey.shade700,
+                                                                                        ),
+                                                                                      ),
+                                                                                    ),
+                                                                                  ],
+                                                                                ),
+                                                                              ),
+                                                                              const SizedBox(height: 15),
+                                                                              Row(
+                                                                                children: [
+                                                                                  Text(
+                                                                                    'Location:',
+                                                                                    style: TextStyle(
+                                                                                      color: Color(0xFF5A5A5A),
+                                                                                      fontSize: 12,
+                                                                                      fontFamily: 'Montserrat',
+                                                                                      fontWeight: FontWeight.w500,
+                                                                                    ),
+                                                                                  ),
+                                                                                  const SizedBox(width: 5),
+                                                                                  buildLocationText(context, takerFeed.location!),
+                                                                                ],
+                                                                              ),
+                                                                              const SizedBox(height: 15),
+                                                                              Container(
+                                                                                child: Row(
+                                                                                  mainAxisSize: MainAxisSize.min,
+                                                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                  children: [
+                                                                                    Text(
+                                                                                      'Date :',
+                                                                                      style: TextStyle(
+                                                                                        color: Color(0xFF5A5A5A),
+                                                                                        fontSize: 12,
+                                                                                        fontFamily: 'Montserrat',
+                                                                                        fontWeight: FontWeight.w500,
+                                                                                        height: 0.13,
+                                                                                      ),
+                                                                                    ),
+                                                                                    const SizedBox(width: 5),
+                                                                                    Text(
+                                                                                      takerFeed.date!,
+                                                                                      style: TextStyle(
+                                                                                        color: Color(0xFF5A5A5A),
+                                                                                        fontSize: 13,
+                                                                                        fontFamily: 'Montserrat',
+                                                                                        fontWeight: FontWeight.w500,
+                                                                                        height: 0.13,
+                                                                                      ),
+                                                                                    ),
+                                                                                  ],
+                                                                                ),
+                                                                              ),
+                                                                              const SizedBox(height: 15),
+                                                                              Container(
+                                                                                child: Row(
+                                                                                  mainAxisSize: MainAxisSize.min,
+                                                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                  children: [
+                                                                                    Text(
+                                                                                      'Time :',
+                                                                                      style: TextStyle(
+                                                                                        color: Color(0xFF5A5A5A),
+                                                                                        fontSize: 12,
+                                                                                        fontFamily: 'Montserrat',
+                                                                                        fontWeight: FontWeight.w500,
+                                                                                        height: 0.13,
+                                                                                      ),
+                                                                                    ),
+                                                                                    const SizedBox(width: 5),
+                                                                                    Text(
+                                                                                      takerFeed.time!,
+                                                                                      style: TextStyle(
+                                                                                        color: Color(0xFF5A5A5A),
+                                                                                        fontSize: 13,
+                                                                                        fontFamily: 'Montserrat',
+                                                                                        fontWeight: FontWeight.w500,
+                                                                                        height: 0.13,
+                                                                                      ),
+                                                                                    ),
+                                                                                  ],
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                        const SizedBox(
+                                                                            height:
+                                                                                15),
+                                                                        Row(
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.end,
+                                                                          children: [
+                                                                            SizedBox(
+                                                                              width: 25.w,
+                                                                            ),
+                                                                            Align(
+                                                                              alignment: Alignment.centerRight,
+                                                                              child: InkWell(
+                                                                                onTap: () {
+                                                                                  if (UserController.to.userModel!.bloodgroup != takerFeed.blood) {
+                                                                                    Get.snackbar(
+                                                                                      "Info",
+                                                                                      "You cannot donate blood because your blood group is ${UserController.to.userModel!.bloodgroup} while the blood request requires ${takerFeed.blood}.",
+                                                                                      snackPosition: SnackPosition.TOP,
+                                                                                      snackStyle: SnackStyle.FLOATING,
+                                                                                      backgroundColor: Colors.blue.withValues(alpha: 0.9),
+                                                                                      colorText: Colors.white,
+                                                                                      margin: EdgeInsets.all(10),
+                                                                                      duration: Duration(seconds: 3),
+                                                                                      borderRadius: 8,
+                                                                                      icon: Icon(Icons.info, color: Colors.white),
+                                                                                    );
+                                                                                  } else {
+                                                                                    if (homeController.isAvailability == true) {
+                                                                                      Get.snackbar(
+                                                                                        "Error",
+                                                                                        "You have already donated blood. If you want to donate again, please wait for 90 days.",
+                                                                                        snackPosition: SnackPosition.TOP,
+                                                                                        snackStyle: SnackStyle.FLOATING,
+                                                                                        backgroundColor: Colors.red.withValues(alpha: 0.9),
+                                                                                        colorText: Colors.white,
+                                                                                        margin: EdgeInsets.all(10),
+                                                                                        duration: Duration(seconds: 3),
+                                                                                        borderRadius: 8,
+                                                                                        icon: Icon(Icons.error, color: Colors.white),
+                                                                                      );
+                                                                                    } else {
+                                                                                      Navigator.push(
+                                                                                        context,
+                                                                                        PageRouteBuilder(
+                                                                                          pageBuilder: (context, animation, secondaryAnimation) {
+                                                                                            return DonateBoodScreen(
+                                                                                              payload: takerFeed,
+                                                                                              mapController: homeController.controllers,
+                                                                                            );
+                                                                                          },
+                                                                                          transitionDuration: const Duration(microseconds: 100),
+                                                                                          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                                                                            const begin = Offset(10.0, 0.0); // slide in from the right
+                                                                                            const end = Offset.zero;
+                                                                                            const curve = Curves.easeInOutQuart;
+
+                                                                                            var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                                                                                            var offsetAnimation = animation.drive(tween);
+
+                                                                                            return SlideTransition(
+                                                                                              position: offsetAnimation,
+                                                                                              child: child,
+                                                                                            );
+                                                                                          },
+                                                                                        ),
+                                                                                      );
+                                                                                    }
+                                                                                  }
+                                                                                },
+                                                                                child: Container(
+                                                                                  height: 30,
+                                                                                  padding: EdgeInsets.symmetric(horizontal: 25),
+                                                                                  alignment: Alignment.center,
+                                                                                  decoration: BoxDecoration(
+                                                                                    color: Colors.green,
+                                                                                    borderRadius: BorderRadius.circular(5),
+                                                                                  ),
+                                                                                  child: Text(
+                                                                                    'Accept',
+                                                                                    style: TextStyle(fontSize: 14, color: Colors.white),
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          ],
+                                                                        )
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        height: 10,
+                                                      ),
+                                                    ],
+                                                  );
+                                                }
+                                              }),
+                                        ),
+                                      ],
+                                    )
+                                  : SizedBox(),
 
                       if (userController.userModel != null &&
                           userController.userModel!.type == 'taker')
@@ -2161,7 +2531,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           : userController.userModel!.type == 'taker'
                               ? Container(
                                   margin: EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 0),
+                                      horizontal: 20, vertical: 0),
                                   alignment: Alignment.centerLeft,
                                   child: Text(
                                     'See Donor Acceptanace',
@@ -2175,779 +2545,193 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       userController.userModel == null
                           ? SizedBox()
                           : userController.userModel!.type == 'taker'
-                              ? homeController.seeList.isEmpty
+                              ? homeController.seeList == null
                                   ? Center(
                                       child: Text(
                                         'no data found',
                                         style: TextStyle(fontSize: 14),
                                       ),
                                     )
-                                  : ListView.builder(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 8, horizontal: 12),
-                                      itemCount: homeController.seeList.length,
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      shrinkWrap: true,
-                                      itemBuilder: (context, index) {
-                                        DonateAcceptModel donor =
-                                            homeController.seeList[index];
-
-                                        return Card(
-                                          color: Colors.white,
-                                          elevation: 3,
-                                          margin: const EdgeInsets.symmetric(
-                                              vertical: 8),
-                                          shape: RoundedRectangleBorder(
+                                  : Card(
+                                      color: Colors.white,
+                                      elevation: 3,
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 8, horizontal: 20),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12)),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(12),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            // Avatar
+                                            ClipRRect(
                                               borderRadius:
-                                                  BorderRadius.circular(12)),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(12),
-                                            child: Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                // Avatar
-                                                ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(40),
-                                                  child: CachedNetworkImage(
-                                                    width: 70,
-                                                    height: 70,
-                                                    fit: BoxFit.cover,
-                                                    imageUrl: donor.donorImage
-                                                            .isNotEmpty
-                                                        ? donor.donorImage
-                                                        : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
-                                                    placeholder: (context,
-                                                            url) =>
-                                                        const CupertinoActivityIndicator(),
-                                                    errorWidget: (context, url,
-                                                            error) =>
+                                                  BorderRadius.circular(40),
+                                              child: CachedNetworkImage(
+                                                width: 70,
+                                                height: 70,
+                                                fit: BoxFit.cover,
+                                                imageUrl: homeController
+                                                        .seeList!
+                                                        .donorImage
+                                                        .isNotEmpty
+                                                    ? homeController
+                                                        .seeList!.donorImage
+                                                    : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
+                                                placeholder: (context, url) =>
+                                                    const CupertinoActivityIndicator(),
+                                                errorWidget:
+                                                    (context, url, error) =>
                                                         const Icon(Icons.error),
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 12),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
 
-                                                // Info Column
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
+                                            // Info Column
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  // Name + Blood type
+                                                  Row(
                                                     children: [
-                                                      // Name + Blood type
-                                                      Row(
-                                                        children: [
-                                                          Expanded(
-                                                            child: Text(
-                                                              donor.donorName,
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontSize: 18,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600,
-                                                                color: Colors
-                                                                    .black,
-                                                              ),
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
-                                                            ),
+                                                      Expanded(
+                                                        child: Text(
+                                                          homeController
+                                                              .seeList!
+                                                              .donorName,
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            color: Colors.black,
                                                           ),
-                                                          CustomPaint(
-                                                            size: const Size(
-                                                                45, 30),
-                                                            painter:
-                                                                BloodDropPainter(
-                                                                    blood: donor
-                                                                        .blood),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      const SizedBox(
-                                                          height: 10),
-
-                                                      // Details with icons
-                                                      _infoRow(
-                                                          Icons.local_hospital,
-                                                          donor.hospitalName),
-                                                      const SizedBox(height: 6),
-                                                      _infoRow(
-                                                          Icons.location_on,
-                                                          donor.location),
-                                                      const SizedBox(height: 6),
-                                                      _infoRow(Icons.date_range,
-                                                          donor.date),
-                                                      const SizedBox(height: 6),
-                                                      _infoRow(
-                                                          Icons.access_time,
-                                                          donor.time),
-
-                                                      const SizedBox(
-                                                          height: 12),
-
-                                                      // See more button
-                                                      Align(
-                                                        alignment: Alignment
-                                                            .centerLeft,
-                                                        child: ElevatedButton(
-                                                          onPressed: () {
-                                                            Navigator.push(
-                                                              context,
-                                                              PageRouteBuilder(
-                                                                pageBuilder: (context,
-                                                                    animation,
-                                                                    secondaryAnimation) {
-                                                                  return TakerReachScreen(
-                                                                    acceptModel:
-                                                                        donor,
-                                                                    mapController:
-                                                                        homeController
-                                                                            .controllers,
-                                                                  );
-                                                                },
-                                                                transitionsBuilder:
-                                                                    (context,
-                                                                        animation,
-                                                                        secondaryAnimation,
-                                                                        child) {
-                                                                  var tween = Tween(
-                                                                          begin: const Offset(
-                                                                              1.0,
-                                                                              0.0),
-                                                                          end: Offset
-                                                                              .zero)
-                                                                      .chain(CurveTween(
-                                                                          curve:
-                                                                              Curves.easeInOut));
-                                                                  return SlideTransition(
-                                                                    position: animation
-                                                                        .drive(
-                                                                            tween),
-                                                                    child:
-                                                                        child,
-                                                                  );
-                                                                },
-                                                              ),
-                                                            );
-                                                          },
-                                                          style: ElevatedButton
-                                                              .styleFrom(
-                                                            backgroundColor:
-                                                                PRIMARY_COLOR,
-                                                            shape:
-                                                                RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          8),
-                                                            ),
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .symmetric(
-                                                                    horizontal:
-                                                                        20,
-                                                                    vertical:
-                                                                        8),
-                                                          ),
-                                                          child: const Text(
-                                                            "See More",
-                                                            style: TextStyle(
-                                                                fontSize: 14,
-                                                                color: Colors
-                                                                    .white),
-                                                          ),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
                                                         ),
+                                                      ),
+                                                      CustomPaint(
+                                                        size:
+                                                            const Size(45, 30),
+                                                        painter: BloodDropPainter(
+                                                            blood:
+                                                                homeController
+                                                                    .seeList!
+                                                                    .blood),
                                                       ),
                                                     ],
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    )
-// Reusable info row widget
+                                                  const SizedBox(height: 10),
 
-                              : SizedBox(),
+                                                  // Details with icons
+                                                  _infoRow(
+                                                      Icons.local_hospital,
+                                                      homeController.seeList!
+                                                          .hospitalName),
+                                                  const SizedBox(height: 6),
+                                                  _infoRow(
+                                                      Icons.location_on,
+                                                      homeController
+                                                          .seeList!.location),
+                                                  const SizedBox(height: 6),
+                                                  _infoRow(
+                                                      Icons.date_range,
+                                                      homeController
+                                                          .seeList!.date),
+                                                  const SizedBox(height: 6),
+                                                  _infoRow(
+                                                      Icons.access_time,
+                                                      homeController
+                                                          .seeList!.time),
 
-                      userController.userModel == null
-                          ? SizedBox()
-                          : userController.userModel!.type == 'donor'
-                              ? Column(
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.only(left: 5.w),
-                                      child: Align(
-                                        alignment: Alignment.topLeft,
-                                        child: Text('Blood Journey Map',
-                                            style: TextStyle(
-                                                fontSize: 17.sp,
-                                                fontWeight: FontWeight.bold),
-                                            textAlign: TextAlign.left),
-                                      ),
-                                    ),
-                                    ListView.builder(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 5),
-                                      itemCount:
-                                          homeController.donorList.length,
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      shrinkWrap: true,
-                                      itemBuilder: (context, index) {
-                                        if (homeController.donorList.isEmpty) {
-                                          return const Center(
-                                            child: Text(
-                                              'No data found',
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black54,
-                                              ),
-                                            ),
-                                          );
-                                        } else {
-                                          DonateAcceptModel list =
-                                              homeController.donorList[index];
-                                          return Container(
-                                            width: double.infinity,
-                                            margin: EdgeInsets.symmetric(
-                                                horizontal: 5.w, vertical: 6),
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 14, vertical: 16),
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              color: Colors.white,
-                                              border: Border.all(
-                                                width: 1,
-                                                color: Colors.grey
-                                                    .withValues(alpha: .2),
-                                              ),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.grey
-                                                      .withValues(alpha: 0.15),
-                                                  blurRadius: 8,
-                                                  offset: const Offset(0, 4),
-                                                  spreadRadius: 2,
-                                                ),
-                                              ],
-                                            ),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                /// TOP ROW: Profile + Info
-                                                Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    /// Profile Image
-                                                    Container(
-                                                      width: 70,
-                                                      height: 70,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(100),
-                                                        border: Border.all(
-                                                            color: Colors
-                                                                .blueAccent,
-                                                            width: 2),
-                                                      ),
-                                                      child: ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(100),
-                                                        child:
-                                                            CachedNetworkImage(
-                                                          fit: BoxFit.cover,
-                                                          imageUrl: list.image
-                                                                  .isNotEmpty
-                                                              ? list.image
-                                                              : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
-                                                          placeholder:
-                                                              (context, url) =>
-                                                                  const Center(
-                                                            child:
-                                                                CupertinoActivityIndicator(),
-                                                          ),
-                                                          errorWidget: (context,
-                                                                  url, error) =>
-                                                              const Icon(
-                                                                  Icons.error,
-                                                                  color: Colors
-                                                                      .redAccent),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    const SizedBox(width: 12),
+                                                  const SizedBox(height: 12),
 
-                                                    /// Donor Info
-                                                    Expanded(
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          /// Full name
-                                                          Text(
-                                                            list.fullname,
-                                                            style:
-                                                                const TextStyle(
-                                                              fontSize: 16,
-                                                              color: Colors
-                                                                  .black87,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w700,
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                              height: 8),
-
-                                                          /// Location
-                                                          Row(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              const Text(
-                                                                'Location: ',
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontSize: 14,
-                                                                  color: Colors
-                                                                      .black87,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                ),
-                                                              ),
-                                                              Expanded(
-                                                                child: Text(
-                                                                  list.location,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        14,
-                                                                    color: Colors
-                                                                        .grey
-                                                                        .shade700,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          const SizedBox(
-                                                              height: 6),
-
-                                                          /// Hospital Name
-                                                          Row(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              const Text(
-                                                                'Hospital: ',
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontSize: 14,
-                                                                  color: Colors
-                                                                      .black87,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                ),
-                                                              ),
-                                                              Expanded(
-                                                                child: Text(
-                                                                  list.hospitalName,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        14,
-                                                                    color: Colors
-                                                                        .grey
-                                                                        .shade700,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          const SizedBox(
-                                                              height: 6),
-
-                                                          /// Blood Group
-                                                          Row(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              const Text(
-                                                                'Blood Group: ',
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontSize: 14,
-                                                                  color: Colors
-                                                                      .black87,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                ),
-                                                              ),
-                                                              Expanded(
-                                                                child: Text(
-                                                                  list.blood,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        14,
-                                                                    color: Colors
-                                                                        .redAccent,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          const SizedBox(
-                                                              height: 6),
-
-                                                          /// Date
-                                                          Row(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              const Text(
-                                                                'Date: ',
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontSize: 14,
-                                                                  color: Colors
-                                                                      .black87,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                ),
-                                                              ),
-                                                              Expanded(
-                                                                child: Text(
-                                                                  list.date,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        14,
-                                                                    color: Colors
-                                                                        .grey
-                                                                        .shade700,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          const SizedBox(
-                                                              height: 6),
-
-                                                          /// Time
-                                                          Row(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              const Text(
-                                                                'Time: ',
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontSize: 14,
-                                                                  color: Colors
-                                                                      .black87,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                ),
-                                                              ),
-                                                              Expanded(
-                                                                child: Text(
-                                                                  list.time,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        14,
-                                                                    color: Colors
-                                                                        .grey
-                                                                        .shade700,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-
-                                                const SizedBox(height: 14),
-
-                                                /// ACTION BUTTON
-                                                Align(
-                                                  alignment:
-                                                      Alignment.centerRight,
-                                                  child: InkWell(
-                                                    onTap: () async {
-                                                      bool result =
-                                                          await homeController
-                                                              .checkUserCnicVerification();
-                                                      if (result) {
+                                                  // See more button
+                                                  Align(
+                                                    alignment:
+                                                        Alignment.centerLeft,
+                                                    child: ElevatedButton(
+                                                      onPressed: () {
                                                         Navigator.push(
                                                           context,
                                                           PageRouteBuilder(
                                                             pageBuilder: (context,
                                                                 animation,
                                                                 secondaryAnimation) {
-                                                              return BloodJourneyScreen(
+                                                              return TakerAnalysisScreen(
                                                                 donateModel:
-                                                                    list,
+                                                                    homeController
+                                                                        .seeList!,
                                                                 mapController:
                                                                     homeController
                                                                         .controllers,
                                                               );
                                                             },
-                                                            transitionDuration:
-                                                                const Duration(
-                                                                    milliseconds:
-                                                                        300),
                                                             transitionsBuilder:
                                                                 (context,
                                                                     animation,
                                                                     secondaryAnimation,
                                                                     child) {
-                                                              const begin =
-                                                                  Offset(
-                                                                      1.0, 0.0);
-                                                              const end =
-                                                                  Offset.zero;
-                                                              const curve = Curves
-                                                                  .easeInOutCubic;
-
                                                               var tween = Tween(
-                                                                      begin:
-                                                                          begin,
-                                                                      end: end)
+                                                                      begin: const Offset(
+                                                                          1.0,
+                                                                          0.0),
+                                                                      end: Offset
+                                                                          .zero)
                                                                   .chain(CurveTween(
-                                                                      curve:
-                                                                          curve));
-                                                              var offsetAnimation =
-                                                                  animation
-                                                                      .drive(
-                                                                          tween);
-
+                                                                      curve: Curves
+                                                                          .easeInOut));
                                                               return SlideTransition(
-                                                                position:
-                                                                    offsetAnimation,
+                                                                position: animation
+                                                                    .drive(
+                                                                        tween),
                                                                 child: child,
                                                               );
                                                             },
                                                           ),
                                                         );
-                                                      } else {
-                                                        showDialog(
-                                                          context: navigatorKey
-                                                              .currentContext!,
-                                                          barrierDismissible:
-                                                              false,
-                                                          builder: (BuildContext
-                                                              context) {
-                                                            return AlertDialog(
-                                                              shape:
-                                                                  RoundedRectangleBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            16),
-                                                              ),
-                                                              title: Row(
-                                                                children: [
-                                                                  Icon(
-                                                                      Icons
-                                                                          .verified_user,
-                                                                      color: Colors
-                                                                          .redAccent),
-                                                                  SizedBox(
-                                                                      width: 8),
-                                                                  Text(
-                                                                    "CNIC Verification Required",
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            16,
-                                                                        fontWeight:
-                                                                            FontWeight.w500),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              content: Column(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .min,
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Text(
-                                                                    "Please verify your CNIC before proceeding.",
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            15,
-                                                                        fontWeight:
-                                                                            FontWeight.w500),
-                                                                  ),
-                                                                  SizedBox(
-                                                                      height:
-                                                                          12),
-                                                                  Text(
-                                                                    "• If you are a Taker: You cannot request blood without CNIC verification.\n\n"
-                                                                    "• If you are a Donor: You cannot donate blood without verifying your CNIC.\n\n"
-                                                                    "👉 Go to your account section and verify your CNIC to continue.",
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            14,
-                                                                        color: Colors
-                                                                            .black87),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              actions: [
-                                                                TextButton(
-                                                                  onPressed: () =>
-                                                                      Navigator.of(
-                                                                              context)
-                                                                          .pop(),
-                                                                  child: Text(
-                                                                      "Later",
-                                                                      style: TextStyle(
-                                                                          color:
-                                                                              Colors.black)),
-                                                                ),
-                                                                ElevatedButton(
-                                                                  style: ElevatedButton
-                                                                      .styleFrom(
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .redAccent,
-                                                                    shape:
-                                                                        RoundedRectangleBorder(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              8),
-                                                                    ),
-                                                                  ),
-                                                                  onPressed:
-                                                                      () {
-                                                                    Navigator.of(
-                                                                            context)
-                                                                        .pop();
-                                                                    showModalBottomSheet(
-                                                                      context:
-                                                                          context,
-                                                                      isDismissible:
-                                                                          false,
-                                                                      enableDrag:
-                                                                          false,
-                                                                      isScrollControlled:
-                                                                          true,
-                                                                      backgroundColor:
-                                                                          Colors
-                                                                              .transparent,
-                                                                      builder:
-                                                                          (BuildContext
-                                                                              context) {
-                                                                        return Container(
-                                                                          margin:
-                                                                              EdgeInsets.only(top: 40),
-                                                                          decoration:
-                                                                              BoxDecoration(
-                                                                            color:
-                                                                                Colors.white,
-                                                                            borderRadius:
-                                                                                BorderRadius.vertical(top: Radius.circular(20)),
-                                                                          ),
-                                                                          child:
-                                                                              ClipRRect(
-                                                                            borderRadius:
-                                                                                BorderRadius.vertical(top: Radius.circular(20)),
-                                                                            child:
-                                                                                CardScanningScreen(),
-                                                                          ),
-                                                                        );
-                                                                      },
-                                                                    );
-                                                                  },
-                                                                  child: Text(
-                                                                    "Verify Now",
-                                                                    style: TextStyle(
-                                                                        color: Colors
-                                                                            .white),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            );
-                                                          },
-                                                        );
-                                                      }
-                                                    },
-                                                    child: Container(
-                                                      height: 40,
-                                                      width: 140,
-                                                      alignment:
-                                                          Alignment.center,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors
-                                                            .green.shade600,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(8),
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            color: Colors.green
-                                                                .withValues(
-                                                                    alpha: 0.2),
-                                                            blurRadius: 6,
-                                                            offset:
-                                                                const Offset(
-                                                                    0, 3),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      child: Text(
-                                                        'Accepted',
-                                                        style: TextStyle(
-                                                          fontSize: 15.sp,
-                                                          color: Colors.white,
-                                                          fontWeight:
-                                                              FontWeight.w600,
+                                                      },
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        backgroundColor:
+                                                            PRIMARY_COLOR,
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8),
                                                         ),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 20,
+                                                                vertical: 8),
+                                                      ),
+                                                      child: const Text(
+                                                        "See More",
+                                                        style: TextStyle(
+                                                            fontSize: 14,
+                                                            color:
+                                                                Colors.white),
                                                       ),
                                                     ),
                                                   ),
-                                                ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
-                                          );
-                                        }
-                                      },
+                                          ],
+                                        ),
+                                      ),
                                     )
-                                  ],
-                                )
+
+// Reusable info row widget\
                               : SizedBox(),
+
                       SizedBox(
                         height: 13.h,
                       )
@@ -3023,4 +2807,115 @@ class BloodDropPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return oldDelegate != this;
   }
+}
+
+Widget buildLocationText(BuildContext context, String location) {
+  // Trimmed text if longer than 20 characters
+  final bool isLongText = location.length > 20;
+  final String displayedText =
+      isLongText ? '${location.substring(0, 13)}' : location;
+
+  return InkWell(
+    onTap: isLongText
+        ? () {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return Dialog(
+                  backgroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  insetPadding:
+                      EdgeInsets.symmetric(horizontal: 25, vertical: 40),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Full Location',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.redAccent,
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.close, color: Colors.grey[700]),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          location,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.black87,
+                            height: 1.4,
+                            fontFamily: 'Montserrat',
+                          ),
+                        ),
+                        const SizedBox(height: 15),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.redAccent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 18, vertical: 10),
+                            ),
+                            icon: Icon(Icons.location_on_outlined,
+                                color: Colors.white),
+                            label: Text(
+                              'Close',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 14),
+                            ),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          }
+        : null,
+    child: RichText(
+      text: TextSpan(
+        children: [
+          TextSpan(
+            text: displayedText,
+            style: const TextStyle(
+              color: Color(0xFF5A5A5A),
+              fontSize: 13,
+              fontFamily: 'Montserrat',
+              fontWeight: FontWeight.w500,
+              height: 0.13,
+            ),
+          ),
+          if (isLongText)
+            const TextSpan(
+              text: ' Read more',
+              style: TextStyle(
+                color: Colors.blue,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'Montserrat',
+              ),
+            ),
+        ],
+      ),
+    ),
+  );
 }

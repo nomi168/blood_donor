@@ -210,36 +210,66 @@ class PostRequestScreen extends StatelessWidget {
                       height: 10,
                     ),
                     Container(
-                      margin: EdgeInsets.symmetric(horizontal: 5),
+                      margin: const EdgeInsets.symmetric(horizontal: 5),
                       child: Material(
                         color: Colors.white,
-                        elevation: 7.0, // Add shadow/elevation
-                        borderRadius:
-                            BorderRadius.circular(10.0), // Add border radius
+                        elevation: 7.0,
+                        borderRadius: BorderRadius.circular(10.0),
                         child: TextFormField(
                           controller: controller.location,
                           decoration: InputDecoration(
                             label: const Text('Address'),
+                            hintText: 'Address',
                             contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16.0), // Adjust padding
+                                horizontal: 16.0, vertical: 14.0),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8.0),
-                              borderSide: const BorderSide(
-                                  color: Colors.grey), // Border color
+                              borderSide: const BorderSide(color: Colors.grey),
                             ),
-                            suffixIcon: const Icon(Icons.location_city),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8.0),
-                              borderSide: const BorderSide(
-                                  color:
-                                      Colors.blue), // Border color when focused
+                              borderSide: const BorderSide(color: Colors.blue),
                             ),
-                            hintText: 'Address',
+                            suffixIcon: IconButton(
+                              icon: controller.isLoading
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2))
+                                  : Container(
+                                      width: 120,
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 10),
+                                      decoration: BoxDecoration(
+                                          color: Colors.blue,
+                                          borderRadius:
+                                              BorderRadius.circular(06)),
+                                      child: Row(
+                                        children: [
+                                          const Icon(Icons.my_location,
+                                              color: Colors.white),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          Text(
+                                            'Location',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                              onPressed: controller.isLoading
+                                  ? null
+                                  : controller.getCurrentAddress,
+                            ),
                           ),
                           validator: validateAddress,
                         ),
                       ),
                     ),
+
                     SizedBox(
                       height: 5,
                     ),
@@ -297,30 +327,6 @@ class PostRequestScreen extends StatelessWidget {
                             ),
                           ),
                           SizedBox(width: 10),
-                          // Expanded(
-                          //   child: InkWell(
-                          //     splashColor: Colors.transparent,
-                          //     splashFactory: NoSplash.splashFactory,
-                          //     onTap: () {
-                          //       // Add your AI verification logic here
-                          //     },
-                          //     child: Container(
-                          //       padding: EdgeInsets.symmetric(
-                          //           horizontal: 10, vertical: 10),
-                          //       decoration: BoxDecoration(
-                          //         color: Colors.grey.shade300,
-                          //         borderRadius: BorderRadius.circular(6),
-                          //       ),
-                          //       child: Text(
-                          //         'Verify to AI',
-                          //         style: TextStyle(
-                          //             fontSize: 14,
-                          //             fontWeight: FontWeight.w500),
-                          //         textAlign: TextAlign.center,
-                          //       ),
-                          //     ),
-                          //   ),
-                          // ),
                         ],
                       ),
                     ),
@@ -397,37 +403,48 @@ class PostRequestScreen extends StatelessWidget {
                       height: 10,
                     ),
                     Container(
-                      margin: EdgeInsets.symmetric(horizontal: 5),
+                      margin: const EdgeInsets.symmetric(horizontal: 5),
                       child: Material(
                         color: Colors.white,
-                        elevation: 7.0, // Add shadow/elevation
-                        borderRadius:
-                            BorderRadius.circular(10.0), // Add border radius
-                        child: TextFormField(
-                          controller: controller.blood,
+                        elevation: 7.0,
+                        borderRadius: BorderRadius.circular(10.0),
+                        child: DropdownButtonFormField<String>(
                           decoration: InputDecoration(
                             label: const Text('Blood Group'),
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16.0), // Adjust padding
+                            contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8.0),
-                              borderSide: const BorderSide(
-                                  color: Colors.grey), // Border color
+                              borderSide: const BorderSide(color: Colors.grey),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide: const BorderSide(color: Colors.blue),
                             ),
                             suffixIcon: const Icon(
                               Icons.bloodtype,
                               color: Color(0xFFDE0A1E),
                               size: 35.0,
                             ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              borderSide: const BorderSide(
-                                  color:
-                                      Colors.blue), // Border color when focused
-                            ),
-                            hintText: 'Blood Group',
                           ),
-                          validator: validateBlood,
+                          hint: const Text('Select Blood Group'),
+                          value: controller.blood.text.isEmpty
+                              ? null
+                              : controller.blood.text,
+                          items: controller.bloodGroups.map((group) {
+                            return DropdownMenuItem(
+                              value: group,
+                              child: Text(group),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            if (value != null) {
+                              controller.blood.text = value;
+                            }
+                          },
+                          validator: (value) => value == null || value.isEmpty
+                              ? 'Please select blood group'
+                              : null,
                         ),
                       ),
                     ),
@@ -461,8 +478,7 @@ class PostRequestScreen extends StatelessWidget {
 
                               if (value) {
                                 controller.selectedValue = 'critical';
-                              }
-                              else {
+                              } else {
                                 controller.selectedValue = 'normal';
                               }
                               controller.update();
@@ -663,7 +679,7 @@ class PostRequestScreen extends StatelessWidget {
                             .getUserList(controller.blood.text.trim());
                         await controller.getUserLocationList();
 
-                        dynamic payload = {
+                        Map<String,dynamic> payload = {
                           'taker_id': UserController.to.userModel!.id,
                           'email': UserController.to.userModel!.email,
                           'name':

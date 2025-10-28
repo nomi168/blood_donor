@@ -1,5 +1,6 @@
 // ignore_for_file: file_names
 
+import 'package:blood_donor/features/dashboard/menus/presentation/screens/Invite_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
@@ -132,6 +133,63 @@ class _RefferalInvitationScreenState extends State<RefferalInvitationScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+                InkWell(
+                onTap: (){
+                   Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (_, __, ___) => const InviteScreen(),
+                      transitionsBuilder: (_, animation, __, child) {
+                        return SlideTransition(
+                          position:
+                              Tween(begin: const Offset(1, 0), end: Offset.zero)
+                                  .animate(CurvedAnimation(
+                                      parent: animation,
+                                      curve: Curves.easeInOutQuart)),
+                          child: child,
+                        );
+                      },
+                    ));
+                },
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 6,
+                        offset: Offset(0, 2),
+                      )
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      CircleAvatar(
+                        radius: 28,
+                        backgroundColor: Colors.orange.withValues(alpha: .1),
+                        child: Image.network(
+                          'https://static.vecteezy.com/system/resources/previews/053/687/866/non_2x/invitation-letter-icon-concept-of-receiving-important-message-or-notification-free-vector.jpg',
+                          height: 34,
+                          width: 34,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Invite',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.orange.shade700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(width: 30,),
               // WhatsApp Button
               InkWell(
                 onTap: _launchWhatsApp,

@@ -88,7 +88,7 @@ dependencies:
   get: ^4.7.2
   flashy_tab_bar2: ^0.0.10
   modal_bottom_sheet: ^3.0.0
-  font_awesome_flutter: ^10.8.0
+  font_awesome_flutter: ^10.9.1
   badges: ^3.1.2
   flutter_animate: ^4.5.2
   floating_bottom_bar: ^0.0.3
@@ -111,7 +111,7 @@ flutter_icons:
   android: true
 
   ios: true
-  image_path: "images/svg/Logo.svg"
+  image_path: "images/app_icon.jpg"
 
 
   # The "flutter_lints" package below contains a set of recommended lints to
@@ -138,23 +138,10 @@ flutter:
    - images/image1.jpeg
    - images/image2.jpeg
    - images/image3.jpeg
-   - images/image4.jpeg
    - images/pic1.jpg
-   - images/pic2.jpeg
-   - images/award.jpeg
    - images/pic3.png
-   - images/active.jpeg
-   - images/cross.jpg
-   - images/person.png
-   - images/good.png
-   - images/injection.png
-   - images/person1.png
-   - images/star.png
-   - images/correct.png
    - images/svg1.png
    - images/pop.jpeg
-   - images/hero.jpeg
-   - images/do.png
    - images/applogo.jpeg
    - images/svg/
    - images/

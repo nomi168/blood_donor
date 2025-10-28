@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:blood_donor/core/constants.dart';
@@ -11,9 +12,11 @@ import 'package:blood_donor/features/dashboard/post_blood/domain/repository_post
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 
 class PostRequestController extends GetxController {
   final String bloodgroup;
@@ -30,13 +33,16 @@ class PostRequestController extends GetxController {
   TextEditingController blood = TextEditingController();
   TextEditingController unit = TextEditingController();
 
-  List<String> bloodType = ['blood', 'platelets', 'exchange blood'];
+  List<String> bloodType = ['Blood', 'Platelets', 'Exchange Blood'];
+  List<String> bloodGroups = ['A+', 'B+', 'O+', 'AB+', 'A-', 'B-', 'O-', 'AB-'];
+
   String selectedBlood = '';
 
   bool isToggled = false;
   bool isTerm = false;
   String selectedValue = 'normal';
-  bool isEmergencyHelp=false;
+  bool isEmergencyHelp = false;
+  bool isLoading = false;
   File? selectedImage;
   List<UserModel> userList = [];
   List<UserLocationModel> userLocationList = [];
@@ -76,6 +82,75 @@ class PostRequestController extends GetxController {
     }
 
     update();
+  }
+
+  Future<void> getCurrentAddress() async {
+    try {
+      isLoading = true;
+      update();
+
+      // Request permission if not granted
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          Get.snackbar(
+            "Error",
+            "Location permission denied",
+            snackPosition: SnackPosition.TOP,
+            snackStyle: SnackStyle.FLOATING,
+            backgroundColor: Colors.red.withValues(alpha: 0.9),
+            colorText: Colors.white,
+            margin: EdgeInsets.all(10),
+            duration: Duration(seconds: 3),
+            borderRadius: 8,
+            icon: Icon(Icons.error, color: Colors.white),
+          );
+
+          isLoading = false;
+          update();
+
+          return;
+        }
+      }
+
+      String locations = "";
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      const apiKey = "AIzaSyAn6fh8krl1H-wflk6gHJ2aWoFEGAuaseI";
+      final url =
+          "https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=$apiKey";
+
+      final response = await http.get(Uri.parse(url));
+      final data = jsonDecode(response.body);
+
+      if (data['status'] == 'OK' && data['results'].isNotEmpty) {
+        locations = data['results'][0]['formatted_address'];
+      }
+      if (locations.isNotEmpty) {
+        location.text = locations;
+      } else {
+        location.text = "Address not found";
+      }
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        "Location permission denied",
+        snackPosition: SnackPosition.TOP,
+        snackStyle: SnackStyle.FLOATING,
+        backgroundColor: Colors.red.withValues(alpha: 0.9),
+        colorText: Colors.white,
+        margin: EdgeInsets.all(10),
+        duration: Duration(seconds: 3),
+        borderRadius: 8,
+        icon: Icon(Icons.error, color: Colors.white),
+      );
+    } finally {
+      isLoading = false;
+      update();
+    }
   }
 
   Future<void> selectDate(BuildContext context) async {

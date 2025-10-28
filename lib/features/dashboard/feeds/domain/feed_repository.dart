@@ -19,7 +19,7 @@ class FeedRepository {
     }
   }
 
-  Future<bool> sendChatRequest(dynamic payload) async {
+  Future<bool> sendChatRequest(Map<String, dynamic> payload) async {
     try {
       return await _feedDatasource.sendChatRequest(payload);
     } catch (e) {
@@ -59,7 +59,7 @@ class FeedRepository {
     }
   }
 
-  Future<bool> acceptChatRequest(dynamic payload) async {
+  Future<bool> acceptChatRequest(Map<String, dynamic> payload) async {
     try {
       return await _feedDatasource.acceptChatRequest(payload);
     } catch (e) {
@@ -91,7 +91,7 @@ class FeedRepository {
     }
   }
 
-  Future<bool> aceeptDonationRequest(dynamic payload) async {
+  Future<bool> aceeptDonationRequest(Map<String, dynamic> payload) async {
     try {
       return await _feedDatasource.aceeptDonationRequest(payload);
     } catch (e) {
@@ -102,6 +102,38 @@ class FeedRepository {
   Future<bool> checkUserCnicVerification(String card) async {
     try {
       return await _feedDatasource.checkUserCnicVerification(card);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> checkChatBox(Map<String, dynamic> payload) async {
+    try {
+      return await _feedDatasource.checkChatBox(payload);
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  Future<String?> getDonorCurrentLocation(String donorEmail) async {
+    try {
+      return await _feedDatasource.getDonorCurrentLocation(donorEmail);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<FeedTakerModel>> getTakerList() async {
+    try {
+      return await _feedDatasource.getTakerList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> deleteBloodRequest(bool isActive) async {
+    try {
+      return await _feedDatasource.deleteBloodRequest(isActive);
     } catch (e) {
       rethrow;
     }

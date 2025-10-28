@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:local_auth/local_auth.dart';
 
 class LoginController extends GetxController {
+    static LoginController get to => Get.find();
   final AuthRepository _authRepository = AuthRepository();
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
@@ -16,6 +17,7 @@ class LoginController extends GetxController {
   LocalAuthentication authentication = LocalAuthentication();
   bool _isFingerprintAuthenticated = false;
   bool isPasswordVisible = false;
+  UserModel? userModel;
  
   Future<void> checkBio() async {
     try {

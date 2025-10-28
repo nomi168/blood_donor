@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:blood_donor/core/utils/console_logs.dart';
+import 'package:blood_donor/features/auth/data/models/user_model.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:blood_donor/features/dashboard/account/data/models/history_model.dart';
 import 'package:blood_donor/features/dashboard/account/data/models/voucher_model.dart';
@@ -27,7 +28,7 @@ class RemoteAccountDatasource {
 
         return userDoc['status'];
       } else if (querySnapshot.docs.isEmpty) {
-        return true;
+        return false;
       } else {
         return false;
       }
@@ -171,7 +172,7 @@ class RemoteAccountDatasource {
     }
   }
 
-  Future<bool> updateProfile(Map<String, dynamic> payload) async {
+  Future<UserModel?> updateProfile(Map<String, dynamic> payload) async {
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('users')
@@ -182,9 +183,11 @@ class RemoteAccountDatasource {
         DocumentSnapshot documentSnapshot = querySnapshot.docs.first;
         String documentId = documentSnapshot.id;
 
-        // If payload['image'] is a valid file path and the file exists, upload it
-        final String imagePath = payload['image'];
-        if (!imagePath.startsWith('http')) {
+        // Handle image upload
+        final String? imagePath = payload['image'];
+        if (imagePath != null &&
+            imagePath.isNotEmpty &&
+            !imagePath.startsWith('http')) {
           final File imageFile = File(imagePath);
 
           if (imageFile.existsSync()) {
@@ -197,19 +200,32 @@ class RemoteAccountDatasource {
             payload['image'] = imageUrl;
           } else {
             debugPrint("❌ Image file does not exist at: $imagePath");
-            // You can also choose to remove it from payload or handle differently
-            return false;
+            return null;
           }
         }
 
+        // ✅ Update user data
         await FirebaseFirestore.instance
             .collection('users')
             .doc(documentId)
             .update(payload);
 
-        return true;
+        // ✅ Fetch updated document
+        DocumentSnapshot updatedDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(documentId)
+            .get();
+
+        // ✅ Convert to UserModel
+        UserModel updatedUser =
+            UserModel.fromJson(updatedDoc.data() as Map<String, dynamic>);
+
+        // ✅ Optionally update global user data
+        // UserController.to.userModel = updatedUser;
+
+        return updatedUser;
       } else {
-        return false;
+        return null;
       }
     } catch (e) {
       debugPrint("❌ Update Profile Error: $e");

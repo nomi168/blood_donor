@@ -226,7 +226,7 @@ class CompleteTakerJourneyScreen extends StatelessWidget {
                                 fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            'Taker received at donor\ts location.',
+                            'Donor reachead at Taker\ts location.',
                             style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.black,

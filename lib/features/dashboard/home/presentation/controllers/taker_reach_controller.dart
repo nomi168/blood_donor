@@ -1,27 +1,28 @@
 import 'dart:async';
 import 'dart:convert';
-
-import 'package:blood_donor/core/temp_data/custom_map_design.dart';
 import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/core/utils/api_response.dart';
-import 'package:blood_donor/core/utils/console_logs.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/donor_accept_model.dart';
+import 'package:blood_donor/features/dashboard/home/data/models/donor_update_location_model.dart';
 import 'package:blood_donor/features/dashboard/home/domain/home_repository.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:blood_donor/features/dashboard/home/presentation/controllers/taker_anaylsis_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:googleapis_auth/auth_io.dart' as auth;
 import 'package:http/http.dart' as http;
+import 'package:collection/collection.dart';
 
 class TakerReachController extends GetxController {
   final DonateAcceptModel payload;
   final Completer<GoogleMapController> mapController;
-  TakerReachController({required this.payload, required this.mapController});
+  final String donorLocation;
+  TakerReachController(
+      {required this.payload,
+      required this.mapController,
+      required this.donorLocation});
   final HomeRepository _homeRepository = HomeRepository();
   Completer<GoogleMapController> controllers = Completer<GoogleMapController>();
   CameraPosition kGooglePlex = CameraPosition(
@@ -42,8 +43,16 @@ class TakerReachController extends GetxController {
   int minutes = 0;
   int seconds = 0;
   double distanceInKm = 0.0;
+  StreamSubscription<Position>? positionStream;
+  var totalDistance = ''.obs;
+  var totalDuration = ''.obs;
+  var isTrafficEnabled = true.obs;
+  var isNavigating = false.obs;
+  Stream<LocationUpdateModel?>? locationUpdateStream;
+  StreamSubscription<LocationUpdateModel?>? locationUpdateSubscription;
+  LocationUpdateModel? locationUpdateModel;
   @override
-  void onInit() {
+  Future<void> onInit() async {
     super.onInit();
     if (!mapController.isCompleted) {
       controllers = mapController;
@@ -51,183 +60,235 @@ class TakerReachController extends GetxController {
       controllers = Completer<GoogleMapController>();
     }
 
-    toController.text = payload.location;
-    getCurrentLocation();
+    await showPath(donorLocation);
+    // getCurrentLocation();
   }
 
-  Future<void> getCurrentLocation() async {
-    // Get current location
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
+  @override
+  void onClose() {
+    positionStream?.cancel();
+    super.onClose();
+  }
 
-    final GoogleMapController controller = await controllers.future;
+  // Stream<void> streamDonorUpdateLocationModel() {
+  //   locationUpdateStream = streamDonorUpdateLocation(payload.id);
+  //   update();
+  //   return locationUpdateStream!;
+  // }
+  Stream<void> streamDonorUpdateLocationModel(String donorId) {
+    locationUpdateStream = streamDonorUpdateLocation(donorId);
 
-    circles.clear();
+    locationUpdateSubscription?.cancel();
+    locationUpdateSubscription = locationUpdateStream!.listen((data) {
+      locationUpdateModel = data;
+      if (data != null) {
+        // Update donor location in real time
+        LatLng donorLatLng = LatLng(data.latitude, data.longitude);
+        _updateDonorMarker(donorLatLng);
+      }
+      update();
+    });
+
+    return locationUpdateStream!.map((_) {});
+  }
+
+  /// Update donor marker and route when donor location changes
+  Future<void> _updateDonorMarker(LatLng donorLatLng) async {
+    if (circles.any((c) => c.circleId.value == 'DestinationCircle')) {
+      circles.removeWhere((c) => c.circleId.value == 'DestinationCircle');
+    }
+
     circles.add(Circle(
-      circleId: const CircleId('CurrentLocationCircle'),
-      center: LatLng(position.latitude, position.longitude),
-      radius: 120.0,
-      fillColor: Colors.blue.withValues(alpha: 0.3),
-      strokeColor: Colors.blue,
-      strokeWidth: 10,
+      circleId: const CircleId('DestinationCircle'),
+      center: donorLatLng,
+      radius: 20,
+      fillColor: Colors.green.withValues(alpha: .3),
+      strokeColor: Colors.green,
+      strokeWidth: 6,
     ));
 
-    controller.animateCamera(
-      CameraUpdate.newLatLngZoom(
-        LatLng(position.latitude, position.longitude),
-        9.6,
-      ),
-    );
+    // If taker already has a circle, update the path between them
+    final takerCircle = circles
+        .firstWhereOrNull((c) => c.circleId.value == 'CurrentLocationCircle');
+    if (takerCircle != null) {
+      await _updateRoute(takerCircle.center, donorLatLng);
+    }
 
-    fromController.text =
-        "${position.latitude.toString()}, ${position.longitude.toString()}";
     update();
-    await showPath(payload.donorEmail);
   }
 
-  Future<void> goToCurrentLocation() async {
-    await getCurrentLocation();
-  }
-
-  Future<void> showPath(String location) async {
+  Future<void> showPath(String donorAddress) async {
     try {
-      String from = payload.location;
-      String? to = await getDonorCurrentLocation(location);
+    
 
-      // Fetch locations for 'from' and 'to'
-      List<Location> fromLocations = await locationFromAddress(from);
-      List<Location> toLocations = await locationFromAddress(to!);
-
-      if (fromLocations.isNotEmpty && toLocations.isNotEmpty) {
-        Location fromLocation = fromLocations.first;
-
-        // Allow user to choose the correct destination from multiple results
-        Location? toLocation = await _chooseLocation(toLocations);
-
-        if (toLocation != null) {
-          final GoogleMapController controller = await controllers.future;
-
-          LatLng fromLatLng =
-              LatLng(fromLocation.latitude, fromLocation.longitude);
-          LatLng toLatLng = LatLng(toLocation.latitude, toLocation.longitude);
-
-          // Fetch the directions from Google Directions API
-          String url =
-              "https://maps.googleapis.com/maps/api/directions/json?origin=${fromLocation.latitude},${fromLocation.longitude}&destination=${toLocation.latitude},${toLocation.longitude}&key=AIzaSyAn6fh8krl1H-wflk6gHJ2aWoFEGAuaseI";
-
-          var response = await http.get(Uri.parse(url));
-          Map<String, dynamic> data = jsonDecode(response.body);
-
-          if (data['routes'] != null && data['routes'].isNotEmpty) {
-            var route = data['routes'][0];
-            var points = route['overview_polyline']['points'];
-            var durationInSeconds =
-                route['legs'][0]['duration']['value']; // in seconds
-            // String durationText =
-            //     route['legs'][0]['duration']['text']; // Readable format
-
-            // Convert duration into hours, minutes, and seconds
-            hours = 0;
-            minutes = 0;
-            seconds = 0;
-            hours = durationInSeconds ~/ 3600;
-            minutes = (durationInSeconds % 3600) ~/ 60;
-            seconds = durationInSeconds % 60;
-
-            List<LatLng> polylineCoordinates = _decodePolyline(points);
-
-            polylines.clear();
-            circles.clear();
-
-            // Add polyline following the road
-            polylines.add(Polyline(
-              polylineId: const PolylineId('Path'),
-              color: Colors.blue.shade500,
-              width: 5,
-              points: polylineCoordinates,
-            ));
-
-            // Add circles for the start and end points
-            circles.add(Circle(
-              circleId: const CircleId('CurrentLocationCircle'),
-              center: fromLatLng,
-              radius: 120.0,
-              fillColor: Colors.blue.withValues(alpha: 0.3),
-              strokeColor: Colors.blue,
-              strokeWidth: 10,
-            ));
-            circles.add(Circle(
-              circleId: const CircleId('DestinationCircle'),
-              center: toLatLng,
-              radius: 120.0,
-              fillColor: Colors.green.withValues(alpha: 0.3),
-              strokeColor: Colors.green,
-              strokeWidth: 10,
-            ));
-
-            update();
-
-            // Animate the camera to fit both points
-            LatLngBounds bounds = LatLngBounds(
-              southwest: LatLng(
-                fromLocation.latitude < toLocation.latitude
-                    ? fromLocation.latitude
-                    : toLocation.latitude,
-                fromLocation.longitude < toLocation.longitude
-                    ? fromLocation.longitude
-                    : toLocation.longitude,
-              ),
-              northeast: LatLng(
-                fromLocation.latitude > toLocation.latitude
-                    ? fromLocation.latitude
-                    : toLocation.latitude,
-                fromLocation.longitude > toLocation.longitude
-                    ? fromLocation.longitude
-                    : toLocation.longitude,
-              ),
-            );
-            controller
-                .animateCamera(CameraUpdate.newLatLngBounds(bounds, 50.0));
-
-            double distance = await Geolocator.distanceBetween(
-              fromLocation.latitude,
-              fromLocation.longitude,
-              toLocation.latitude,
-              toLocation.longitude,
-            );
-            distanceInKm = 0.0;
-
-            distanceInKm = distance / 1000;
-
-            // Show distance and travel time in Snackbar
-            // ScaffoldMessenger.of(context).showSnackBar(
-            //   SnackBar(
-            //     content: Text(
-            //         'Distance: ${distanceInKm.toStringAsFixed(2)} km\nTime: ${hours}h ${minutes}m ${seconds}s'),
-            //   ),
-            // );
-          } else {
-            logError('No route found');
-          }
-        }
+      List<Location> donorLocations = await locationFromAddress(donorAddress);
+      if (donorLocations.isEmpty) {
+        debugPrint("No donor location found");
+        return;
       }
+      List<Location> takerLocations =
+          await locationFromAddress(payload.location);
+      if (takerLocations.isEmpty) {
+        debugPrint("No taker location found");
+        return;
+      }
+
+      LatLng donorLatLng = LatLng(
+        donorLocations.first.latitude,
+        donorLocations.first.longitude,
+      );
+      LatLng takerLatLng =
+          LatLng(takerLocations.first.latitude, takerLocations.first.longitude);
+
+      await _updateRoute(takerLatLng, donorLatLng);
+
+      circles.clear();
+      circles.add(Circle(
+        circleId: const CircleId('CurrentLocationCircle'),
+        center: takerLatLng,
+        radius: 15,
+        fillColor: Colors.blue.withValues(alpha: .3),
+        strokeColor: Colors.blue,
+        strokeWidth: 6,
+      ));
+      circles.add(Circle(
+        circleId: const CircleId('DestinationCircle'),
+        center: donorLatLng,
+        radius: 15,
+        fillColor: Colors.green.withValues(alpha: .3),
+        strokeColor: Colors.green,
+        strokeWidth: 6,
+      ));
+
+      update();
+
+      final GoogleMapController mapController = await controllers.future;
+      LatLngBounds bounds = LatLngBounds(
+        southwest: LatLng(
+          takerLatLng.latitude < donorLatLng.latitude
+              ? takerLatLng.latitude
+              : donorLatLng.latitude,
+          takerLatLng.longitude < donorLatLng.longitude
+              ? takerLatLng.longitude
+              : donorLatLng.longitude,
+        ),
+        northeast: LatLng(
+          takerLatLng.latitude > donorLatLng.latitude
+              ? takerLatLng.latitude
+              : donorLatLng.latitude,
+          takerLatLng.longitude > donorLatLng.longitude
+              ? takerLatLng.longitude
+              : donorLatLng.longitude,
+        ),
+      );
+      mapController.animateCamera(CameraUpdate.newLatLngBounds(bounds, 80));
+
+      _startRealTimeTracking(donorLatLng);
     } catch (e) {
-      logError("Error: $e");
+      debugPrint("Error in showPath: $e");
     }
   }
 
+  /// Start live tracking of the taker's movement
+  void _startRealTimeTracking(LatLng donorLatLng) async {
+    positionStream?.cancel();
+
+    positionStream = Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 5,
+      ),
+    ).listen((Position position) async {
+      LatLng takerLatLng = LatLng(position.latitude, position.longitude);
+
+      circles.removeWhere((c) => c.circleId.value == 'CurrentLocationCircle');
+      circles.add(Circle(
+        circleId: const CircleId('CurrentLocationCircle'),
+        center: takerLatLng,
+        radius: 100,
+        fillColor: Colors.blue.withValues(alpha: .3),
+        strokeColor: Colors.blue,
+        strokeWidth: 6,
+      ));
+
+      final GoogleMapController controller = await controllers.future;
+      controller.animateCamera(CameraUpdate.newLatLng(takerLatLng));
+
+      double distance = await Geolocator.distanceBetween(
+        takerLatLng.latitude,
+        takerLatLng.longitude,
+        donorLatLng.latitude,
+        donorLatLng.longitude,
+      );
+
+      distanceInKm = distance / 1000;
+
+      if (distanceInKm < 0.10) {
+        positionStream?.cancel();
+        Get.snackbar(
+          "Arrived",
+          "You have reached the donor location!",
+          snackPosition: SnackPosition.TOP,
+          snackStyle: SnackStyle.FLOATING,
+          backgroundColor: Colors.green.withValues(alpha: 0.9),
+          colorText: Colors.white,
+          margin: EdgeInsets.all(10),
+          duration: Duration(seconds: 3),
+          borderRadius: 8,
+          icon: Icon(Icons.check_circle, color: Colors.white),
+        );
+
+        TakerAnaylsisController.to.isReceived = true;
+        update();
+        return;
+      }
+
+      await _updateRoute(takerLatLng, donorLatLng);
+      update();
+    });
+  }
+
+  Future<void> _updateRoute(LatLng from, LatLng to) async {
+    try {
+      const String apiKey = "AIzaSyAn6fh8krl1H-wflk6gHJ2aWoFEGAuaseI";
+      String url =
+          "https://maps.googleapis.com/maps/api/directions/json?origin=${from.latitude},${from.longitude}&destination=${to.latitude},${to.longitude}&key=$apiKey";
+
+      var response = await http.get(Uri.parse(url));
+      Map<String, dynamic> data = jsonDecode(response.body);
+
+      if (data['routes'] != null && data['routes'].isNotEmpty) {
+        var route = data['routes'][0];
+        var points = route['overview_polyline']['points'];
+        var durationInSeconds = route['legs'][0]['duration']['value'];
+
+        hours = durationInSeconds ~/ 3600;
+        minutes = (durationInSeconds % 3600) ~/ 60;
+        seconds = durationInSeconds % 60;
+
+        List<LatLng> polylineCoordinates = _decodePolyline(points);
+
+        polylines.clear();
+        polylines.add(Polyline(
+          polylineId: const PolylineId('DynamicPath'),
+          color: Colors.blue.shade600,
+          width: 6,
+          points: polylineCoordinates,
+        ));
+      }
+    } catch (e) {
+      debugPrint("Route update failed: $e");
+    }
+  }
+
+  /// Decode polyline
   List<LatLng> _decodePolyline(String polyline) {
     List<LatLng> polylineCoordinates = [];
-    int index = 0;
-    int len = polyline.length;
-    int lat = 0;
-    int lng = 0;
+    int index = 0, len = polyline.length;
+    int lat = 0, lng = 0;
 
     while (index < len) {
-      int shift = 0;
-      int result = 0;
-      int b;
+      int shift = 0, result = 0, b;
       do {
         b = polyline.codeUnitAt(index++) - 63;
         result |= (b & 0x1F) << shift;
@@ -246,186 +307,67 @@ class TakerReachController extends GetxController {
       int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
       lng += dlng;
 
-      LatLng point = LatLng((lat / 1E5).toDouble(), (lng / 1E5).toDouble());
-      polylineCoordinates.add(point);
+      polylineCoordinates.add(LatLng(lat / 1E5, lng / 1E5));
     }
+
     return polylineCoordinates;
   }
 
-  Future<Location?> _chooseLocation(List<Location> locations) async {
-    // You can implement a UI to let the user choose the correct location
-    // For simplicity, here we choose the first location from the list
-    return locations.first;
-  }
-
-  Future<void> toggleMapMode() async {
-    final GoogleMapController controller = await controllers.future;
-    controller.setMapStyle(isLightMode ? null : darkMapStyle);
-  }
-
-  Future<bool> sendNotificationToDonor(
-      String email, int hours, int minutes, int seconds) async {
+  Future<void> getCurrentLocation() async {
     try {
-      showLoader('please wait...');
-      String projectId = 'blood-app-8f4c2';
+      // 1️⃣ Get the current GPS position of the taker
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
 
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .where('email', isEqualTo: email)
-          .get();
+      final GoogleMapController controller = await controllers.future;
 
-      // If no users found, return false
-      if (querySnapshot.docs.isEmpty) {
-        logError("No user found with email: $email");
-        return false;
+      // 2️⃣ Convert latitude/longitude to a readable address
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      String readableAddress = "Unknown location";
+      if (placemarks.isNotEmpty) {
+        final place = placemarks.first;
+        readableAddress =
+            "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
       }
 
-      // Iterate over each user document
-      for (QueryDocumentSnapshot userDoc in querySnapshot.docs) {
-        // Get the device token and name from the user document
-        String firstName = userDoc['firstname'];
-        String lastName = userDoc['lastname'];
-        String name = "$firstName $lastName";
+      // 3️⃣ Update the map circle for the taker’s current position
+      circles.clear();
+      circles.add(Circle(
+        circleId: const CircleId('CurrentLocationCircle'),
+        center: LatLng(position.latitude, position.longitude),
+        radius: 120.0,
+        fillColor: Colors.blue.withValues(alpha: 0.3),
+        strokeColor: Colors.blue,
+        strokeWidth: 10,
+      ));
 
-        String deviceToken = userDoc['deviceToken'];
+      // 4️⃣ Animate map camera to the current location
+      controller.animateCamera(
+        CameraUpdate.newLatLngZoom(
+          LatLng(position.latitude, position.longitude),
+          14.5,
+        ),
+      );
 
-        logSuccess("Device Token: $deviceToken");
+      // 5️⃣ Set the English-readable address in your text controller
+      fromController.text = readableAddress;
 
-        var data = {
-          'message': {
-            'token': deviceToken,
-            'notification': {
-              'title': 'Blood Request',
-              'body':
-                  'Hello $name I am on my way and will arrive in ${hours > 0 ? "$hours hours, " : ""}${minutes > 0 ? "$minutes minutes, " : ""}${seconds > 0 ? "$seconds seconds" : ""}.',
-            },
-            'apns': {
-              'payload': {
-                'aps': {
-                  'sound': 'custom_sound.wav',
-                }
-              }
-            },
-            'data': {'type': 'request_notification', 'id': 'Nomi12345'}
-          }
-        };
+      update();
 
-        // Generate OAuth2 token using service account
-        var jsonString = await rootBundle.loadString('images/json/key1.json');
-        var clientCredentials =
-            auth.ServiceAccountCredentials.fromJson(jsonString);
-        var scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
-        var client =
-            await auth.clientViaServiceAccount(clientCredentials, scopes);
-
-        var response = await http.post(
-          Uri.parse(
-              'https://fcm.googleapis.com/v1/projects/$projectId/messages:send'),
-          headers: {
-            'Authorization': 'Bearer ${client.credentials.accessToken.data}',
-            'Content-Type': 'application/json',
-          },
-          body: jsonEncode(data),
-        );
-
-        // Check response status
-        if (response.statusCode == 200) {
-          logSuccess('Notification sent successfully to user: $name');
-          return true;
-        } else {
-          logError(
-              'Failed to send notification to user: ${userDoc.id}. Status code: ${response.statusCode}');
-          logError('Response body: ${response.body}');
-        }
-      }
+      // 6️⃣ Call your route function with this address
+      await showPath(payload.donorEmail);
     } catch (e) {
-      logError('Error sending notification: $e');
-    } finally {
-      await EasyLoading.dismiss();
+      debugPrint("Error getting current location: $e");
     }
-
-    // Ensure function always returns a value
-    return false;
   }
 
-  Future<bool> sendNotificationToDonorReached(String email) async {
-    try {
-      showLoader('please wait...');
-      String projectId = 'blood-app-8f4c2';
-
-      // Fetch all users from Firestore who are donors
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .where('email', isEqualTo: email)
-          .get();
-
-      // If no users found, return false
-      if (querySnapshot.docs.isEmpty) {
-        logError("No user found with email: $email");
-        return false;
-      }
-
-      // Iterate over each user document
-      for (QueryDocumentSnapshot userDoc in querySnapshot.docs) {
-        // Get the device token and name from the user document
-        String firstName = userDoc['firstname'];
-        String lastName = userDoc['lastname'];
-        String name = "$firstName $lastName";
-
-        String deviceToken = userDoc['deviceToken'];
-
-        var data = {
-          'message': {
-            'token': deviceToken,
-            'notification': {
-              'title': 'Blood Request',
-              'body': 'Hello $name I am reached on your location.',
-            },
-            'apns': {
-              'payload': {
-                'aps': {
-                  'sound': 'custom_sound.wav',
-                }
-              }
-            },
-            'data': {'type': 'request_notification', 'id': 'Nomi12345'}
-          }
-        };
-
-        // Generate OAuth2 token using service account
-        var jsonString = await rootBundle.loadString('images/json/key1.json');
-        var clientCredentials =
-            auth.ServiceAccountCredentials.fromJson(jsonString);
-        var scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
-        var client =
-            await auth.clientViaServiceAccount(clientCredentials, scopes);
-
-        var response = await http.post(
-          Uri.parse(
-              'https://fcm.googleapis.com/v1/projects/$projectId/messages:send'),
-          headers: {
-            'Authorization': 'Bearer ${client.credentials.accessToken.data}',
-            'Content-Type': 'application/json',
-          },
-          body: jsonEncode(data),
-        );
-
-        // Check response status
-        if (response.statusCode == 200) {
-          updateReceivedStatue(payload.email, payload.donorEmail);
-          return true;
-        } else {
-          logError('Response body: ${response.body}');
-        }
-      }
-    } catch (e) {
-      logError('Error sending notification: $e');
-    } finally {
-      await EasyLoading.dismiss();
-    }
-
-    // Ensure function always returns a value
-    return false;
+  Future<void> goToCurrentLocation() async {
+    await getCurrentLocation();
   }
 
   Future<String?> getDonorCurrentLocation(String donorEmail) async {
@@ -434,15 +376,6 @@ class TakerReachController extends GetxController {
     } catch (e) {
       Helper.handleError(e, 'Error while getting location!');
       return null;
-    }
-  }
-
-  Future<void> updateReceivedStatue(
-      String takerEmail, String donorEmail) async {
-    try {
-      return await _homeRepository.updateReceivedStatue(takerEmail, donorEmail);
-    } catch (e) {
-      Helper.handleError(e, 'Error while updating status!');
     }
   }
 
@@ -455,6 +388,15 @@ class TakerReachController extends GetxController {
       return false;
     } finally {
       await EasyLoading.dismiss();
+    }
+  }
+
+  Stream<LocationUpdateModel?>? streamDonorUpdateLocation(String id) {
+    try {
+      return _homeRepository.streamDonorUpdateLocation(id);
+    } catch (e) {
+      Helper.handleError(e, 'Error while updating status!');
+      return null;
     }
   }
 }

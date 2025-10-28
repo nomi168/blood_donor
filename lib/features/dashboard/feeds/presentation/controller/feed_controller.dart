@@ -8,6 +8,7 @@ import 'package:blood_donor/features/dashboard/feeds/data/models/feed_taker_mode
 import 'package:blood_donor/features/dashboard/feeds/domain/feed_repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -36,16 +37,75 @@ class FeedController extends GetxController {
     takerList.clear();
     isLoading = true;
     update();
-    takerList = await getFeedTakerData();
-    takerList.sort((a, b) {
-      if (a.situation == 'critical' && b.situation != 'critical') return -1;
-      if (a.situation != 'critical' && b.situation == 'critical') return 1;
-      return 0;
-    });
-    isLoading = false;
 
+    try {
+      // ✅ Step 1: Get donor's current live location
+      Position donorPosition = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      // ✅ Step 2: Fetch all takers
+      List<FeedTakerModel> allTakers = await getFeedTakerData();
+
+      // ✅ Step 3: Filter takers within 50 km radius
+      List<FeedTakerModel> nearbyTakers = [];
+
+      for (var taker in allTakers) {
+        if (taker.location == null || taker.location!.isEmpty) continue;
+
+        try {
+          // Convert taker address to coordinates
+          List<Location> takerLocations =
+              await locationFromAddress(taker.location!);
+
+          if (takerLocations.isNotEmpty) {
+            double distanceInMeters = Geolocator.distanceBetween(
+              donorPosition.latitude,
+              donorPosition.longitude,
+              takerLocations.first.latitude,
+              takerLocations.first.longitude,
+            );
+
+            // ✅ Only add if within 50km
+            if (distanceInMeters <= 50000) {
+              nearbyTakers.add(taker);
+            }
+          }
+        } catch (e) {
+          debugPrint("Error converting taker location: $e");
+        }
+      }
+
+      // ✅ Step 4: Sort by situation (critical first)
+      nearbyTakers.sort((a, b) {
+        if (a.situation == 'critical' && b.situation != 'critical') return -1;
+        if (a.situation != 'critical' && b.situation == 'critical') return 1;
+        return 0;
+      });
+
+      takerList = nearbyTakers;
+    } catch (e) {
+      debugPrint("Error in getTakerData: $e");
+    }
+
+    isLoading = false;
     update();
   }
+
+  // Future<void> getTakerData() async {
+  //   takerList.clear();
+  //   isLoading = true;
+  //   update();
+  //   takerList = await getFeedTakerData();
+  //   takerList.sort((a, b) {
+  //     if (a.situation == 'critical' && b.situation != 'critical') return -1;
+  //     if (a.situation != 'critical' && b.situation == 'critical') return 1;
+  //     return 0;
+  //   });
+  //   isLoading = false;
+
+  //   update();
+  // }
 
   void filterUsers(String? query) {
     if (query == null || query.trim().isEmpty) {
@@ -81,6 +141,7 @@ class FeedController extends GetxController {
       logError("Error: $e");
     }
   }
+   
 
   Future<List<FeedTakerModel>> getFeedTakerData() async {
     try {
@@ -91,7 +152,7 @@ class FeedController extends GetxController {
     }
   }
 
-  Future<bool> sendChatRequest(dynamic payload) async {
+  Future<bool> sendChatRequest(Map<String, dynamic> payload) async {
     try {
       showLoader('sending request...');
       return await _feedRepository.sendChatRequest(payload);
@@ -138,6 +199,15 @@ class FeedController extends GetxController {
       return false;
     } finally {
       await EasyLoading.dismiss();
+    }
+  }
+
+  Future<bool> checkChatBox(Map<String, dynamic> payload) async {
+    try {
+      return await _feedRepository.checkChatBox(payload);
+    } catch (e) {
+      Helper.handleError(e, 'Error while checking chat box!');
+      return false;
     }
   }
 }

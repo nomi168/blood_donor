@@ -5,6 +5,7 @@ import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/core/utils/api_response.dart';
 import 'package:blood_donor/core/utils/console_logs.dart';
 import 'package:blood_donor/features/auth/data/models/user_model.dart';
+import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboatd.dart';
 import 'package:blood_donor/features/dashboard/post_blood/data/models/user_location_model.dart';
 import 'package:blood_donor/features/dashboard/post_blood/domain/repository_post_request.dart';
@@ -40,18 +41,29 @@ class MapRequestController extends GetxController {
 
   @override
   void onInit() {
-    if (!controller1.isCompleted) {
-      controller1 = controller;
-    } else {
+    super.onInit();
+
+    // Reset the internal controller if it was completed
+    if (controller1.isCompleted) {
       controller1 = Completer<GoogleMapController>();
     }
+
+    // If the external controller is completed, use its valu
+    if (controller.isCompleted) {
+      controller.future.then((ctrl) {
+        if (!controller1.isCompleted) {
+          controller1.complete(ctrl);
+        }
+      });
+    }
+
+    // Load donors on the map
     donorOnMap();
-    super.onInit();
   }
 
   Future<void> justPostRequest() async {
     try {
-      bool result = await postBloodRequest(payload);
+      bool result = await justPostBloodRequest(payload);
       if (result) {
         _showDonatePopup();
       }
@@ -470,7 +482,6 @@ class MapRequestController extends GetxController {
           }
         }
 
-        // Process the extra locations (taker location)
         for (String extraLocation in extraLocations) {
           List<Location> locations = await locationFromAddress(extraLocation);
           if (locations.isNotEmpty) {
@@ -486,11 +497,11 @@ class MapRequestController extends GetxController {
             // ));
 
             // Animate camera to the taker location
-            final GoogleMapController controller1 = await controller.future;
-            controller1.animateCamera(
+            final GoogleMapController controller2 = await controller1.future;
+            controller2.animateCamera(
               CameraUpdate.newLatLngZoom(
                 LatLng(loc.latitude, loc.longitude),
-                10.0,
+                10.0, // Adjust zoom level as needed
               ),
             );
           }
@@ -693,98 +704,6 @@ class MapRequestController extends GetxController {
       await EasyLoading.dismiss();
     }
   }
-  // Future<void> getDonorLocation15KM() async {
-  //   try {
-  //     showLoader("please wait...");
-  //     showLoader("please wait...");
-
-  //     // Fetch all donor locations
-  //     final donorSnapshot =
-  //         await FirebaseFirestore.instance.collection('donor_location').get();
-
-  //     if (donorSnapshot.docs.isEmpty) {
-  //       logError('No donors found.');
-  //       return;
-  //     }
-
-  //     final List<Map<String, double>> receiverLocs = [];
-  //     final Set<Marker> newMarkers = {};
-  //     final List<Future<void>> locationFutures = [];
-
-  //     final String takerAddress = payload['location'];
-  //     final Location takerLoc = (await locationFromAddress(takerAddress)).first;
-
-  //     final double takerLat = takerLoc.latitude;
-  //     final double takerLng = takerLoc.longitude;
-
-  //     receiverLocs.add({'latitude': takerLat, 'longitude': takerLng});
-
-  //     // Add taker marker
-  //     newMarkers.add(Marker(
-  //       markerId: MarkerId('taker_location'),
-  //       position: LatLng(takerLat, takerLng),
-  //       infoWindow: InfoWindow(title: takerAddress),
-  //     ));
-
-  //     // Animate camera to taker location
-  //     final GoogleMapController controller1 = await controller.future;
-  //     controller1.animateCamera(
-  //       CameraUpdate.newLatLngZoom(LatLng(takerLat, takerLng), 10.0),
-  //     );
-
-  //     // Parallel geocode donor locations
-  //     for (var doc in donorSnapshot.docs) {
-  //       final String donorAddress = doc['donor_location'];
-
-  //       locationFutures.add(() async {
-  //         try {
-  //           final donorLocList = await locationFromAddress(donorAddress);
-  //           if (donorLocList.isEmpty) return;
-
-  //           final Location donorLoc = donorLocList.first;
-  //           final double distanceInKm = Geolocator.distanceBetween(
-  //                 takerLat,
-  //                 takerLng,
-  //                 donorLoc.latitude,
-  //                 donorLoc.longitude,
-  //               ) /
-  //               1000;
-
-  //           // Add marker for all donors
-  //           newMarkers.add(Marker(
-  //             markerId: MarkerId(donorAddress),
-  //             position: LatLng(donorLoc.latitude, donorLoc.longitude),
-  //             infoWindow: InfoWindow(title: donorAddress),
-  //           ));
-
-  //           // Save nearby donors
-  //           if (distanceInKm <= 15) {
-  //             receiverLocs.add({
-  //               'latitude': donorLoc.latitude,
-  //               'longitude': donorLoc.longitude
-  //             });
-  //             nearbyDonors.add(donorAddress);
-  //           }
-  //         } catch (e) {
-  //           logError("Failed to geocode $donorAddress: $e");
-  //         }
-  //       }());
-  //     }
-
-  //     Future.wait(locationFutures); // wait for all donors to be processed
-
-  //     // Set values
-  //     receiverLocations = receiverLocs;
-  //     markers = newMarkers;
-  //     update();
-
-  //     logSuccess('Nearby donors saved.');
-  //     await EasyLoading.dismiss();
-  //     await sendNotificationsToNearbyDonors(nearbyDonors);
-  //   } catch (e) {
-  //     logError('Error: $e');
-  //   } finally {}
-  // }
 
   Future<void> getDonorLocation20KM() async {
     try {
@@ -882,96 +801,6 @@ class MapRequestController extends GetxController {
       await EasyLoading.dismiss();
     }
   }
-  // Future<void> getDonorLocation20KM() async {
-  //   try {
-  //     showLoader("please wait...");
-  //     showLoader("please wait...");
-
-  //     // Fetch all donor locations from Firestore
-  //     final donorSnapshot =
-  //         await FirebaseFirestore.instance.collection('donor_location').get();
-  //     if (donorSnapshot.docs.isEmpty) {
-  //       logError('No donors found.');
-  //       return;
-  //     }
-
-  //     final List<Map<String, double>> receiverLocs = [];
-  //     final Set<Marker> newMarkers = {};
-  //     final List<Future<void>> geocodeTasks = [];
-
-  //     // Get taker location from payload
-  //     final String takerAddress = payload['location'];
-  //     final Location takerLocation =
-  //         (await locationFromAddress(takerAddress)).first;
-  //     final double takerLat = takerLocation.latitude;
-  //     final double takerLng = takerLocation.longitude;
-
-  //     // Add taker location to receiverLocs and markers
-  //     receiverLocs.add({'latitude': takerLat, 'longitude': takerLng});
-  //     newMarkers.add(Marker(
-  //       markerId: MarkerId(takerAddress),
-  //       position: LatLng(takerLat, takerLng),
-  //       infoWindow: InfoWindow(title: takerAddress),
-  //     ));
-
-  //     // Animate camera to taker location once
-  //     final GoogleMapController controller1 = await controller.future;
-  //     controller1.animateCamera(CameraUpdate.newLatLngZoom(
-  //       LatLng(takerLat, takerLng),
-  //       10.0,
-  //     ));
-
-  //     // Geocode all donor locations in parallel
-  //     for (var doc in donorSnapshot.docs) {
-  //       final String donorAddress = doc['donor_location'];
-
-  //       geocodeTasks.add(() async {
-  //         try {
-  //           final locs = await locationFromAddress(donorAddress);
-  //           if (locs.isEmpty) return;
-
-  //           final donorLoc = locs.first;
-  //           final double distanceKm = Geolocator.distanceBetween(
-  //                 takerLat,
-  //                 takerLng,
-  //                 donorLoc.latitude,
-  //                 donorLoc.longitude,
-  //               ) /
-  //               1000;
-
-  //           newMarkers.add(Marker(
-  //             markerId: MarkerId(donorAddress),
-  //             position: LatLng(donorLoc.latitude, donorLoc.longitude),
-  //             infoWindow: InfoWindow(title: donorAddress),
-  //           ));
-
-  //           if (distanceKm <= 20) {
-  //             receiverLocs.add({
-  //               'latitude': donorLoc.latitude,
-  //               'longitude': donorLoc.longitude,
-  //             });
-  //             nearbyDonors.add(donorAddress);
-  //           }
-  //         } catch (e) {
-  //           logError('Failed to geocode $donorAddress: $e');
-  //         }
-  //       }());
-  //     }
-
-  //     Future.wait(geocodeTasks);
-
-  //     // Update state
-  //     receiverLocations = receiverLocs;
-  //     markers = newMarkers;
-  //     update();
-
-  //     logSuccess('Nearby donors saved.');
-  //     await EasyLoading.dismiss();
-  //     await sendNotificationsToNearbyDonors(nearbyDonors);
-  //   } catch (e) {
-  //     logError('Error: $e');
-  //   } finally {}
-  // }
 
   Future<void> sendNotificationsToNearbyDonors(
       List<String> nearbyLocations) async {
@@ -1023,18 +852,6 @@ class MapRequestController extends GetxController {
                 CupertinoActionSheetAction(
                   onPressed: () {
                     // Action for 20km
-                    Navigator.pop(context, '30km');
-                    getNearDonoesByLocations(30, 4);
-                    // Call your function to search within 20km
-                  },
-                  child: Text(
-                    '30km',
-                    style: TextStyle(color: PRIMARY_COLOR),
-                  ),
-                ),
-                CupertinoActionSheetAction(
-                  onPressed: () {
-                    // Action for 20km
                     Navigator.pop(context, '');
                     justPostRequest();
                     // Call your function to search within 20km
@@ -1080,59 +897,92 @@ class MapRequestController extends GetxController {
         for (String userId in nonDuplicateList) {
           for (var i = 0; i < userList.length; i++) {
             if (userList[i].id == userId) {
-              var data = {
-                'message': {
-                  'token': userList[i].deviceToken,
-                  'notification': {
-                    'title': 'New Blood Request',
-                    'body':
-                        'You have a new blood request from ${payload['name']} for blood ${payload['blood']}.'
-                  },
-                  'apns': {
-                    'payload': {
-                      'aps': {
-                        'sound': 'custom_sound.wav',
+              if (UserController.to.userModel!.id != userId) {
+                var data = {
+                  'message': {
+                    'token': userList[i].deviceToken,
+                    'notification': {
+                      'title': 'Blood Request',
+                      'body':
+                          'You have a new blood request from ${payload['name']} for blood ${payload['blood']}.',
+                      'sound': 'custom_sound.wav', // ✅ For Android sound
+                    },
+                    'android': {
+                      'notification': {
+                        'sound':
+                            'custom_sound.wav', // ✅ Custom sound for Android
+                        'default_vibrate_timings': true, // ✅ Enables vibration
+                        'priority': 'high',
                       }
-                    }
+                    },
+                    'apns': {
+                      'payload': {
+                        'aps': {
+                          'sound': 'custom_sound.wav', // ✅ For iOS sound
+                          'alert': {
+                            'title': 'Blood Request',
+                            'body':
+                                'You have a new blood request from ${payload['name']} for blood ${payload['blood']}.',
+                          }
+                        }
+                      }
+                    },
+                    'data': {'type': 'request_notification', 'id': 'Nomi12345'}
+                  }
+                };
+                // var data = {
+                //   'message': {
+                //     'token': userList[i].deviceToken,
+                //     'notification': {
+                //       'title': 'New Blood Request',
+                //       'body':
+                //           'You have a new blood request from ${payload['name']} for blood ${payload['blood']}.'
+                //     },
+                //     'apns': {
+                //       'payload': {
+                //         'aps': {
+                //           'sound': 'custom_sound.wav',
+                //         }
+                //       }
+                //     },
+                //     'data': {'type': 'request_notification', 'id': 'Nomi12345'}
+                //   }
+                // };
+
+                var jsonString =
+                    await rootBundle.loadString('images/json/key1.json');
+                var clientCredentials =
+                    auth.ServiceAccountCredentials.fromJson(jsonString);
+                var scopes = [
+                  'https://www.googleapis.com/auth/firebase.messaging'
+                ];
+                var client = await auth.clientViaServiceAccount(
+                    clientCredentials, scopes);
+
+                var response = await http.post(
+                  Uri.parse(
+                      'https://fcm.googleapis.com/v1/projects/$projectId/messages:send'),
+                  headers: {
+                    'Authorization':
+                        'Bearer ${client.credentials.accessToken.data}',
+                    'Content-Type': 'application/json',
                   },
-                  'data': {'type': 'request_notification', 'id': 'Nomi12345'}
+                  body: jsonEncode(data),
+                );
+
+                if (response.statusCode == 200) {
+                  logSuccess(
+                      'Notification sent successfully to user: ${userList[i].id}');
+                } else {
+                  logError(
+                      'Failed to send notification to user: ${userList[i].id} Status code: ${response.statusCode}');
+                  logError('Response body: ${response.body}');
                 }
-              };
-
-              var jsonString =
-                  await rootBundle.loadString('images/json/key1.json');
-              var clientCredentials =
-                  auth.ServiceAccountCredentials.fromJson(jsonString);
-              var scopes = [
-                'https://www.googleapis.com/auth/firebase.messaging'
-              ];
-              var client =
-                  await auth.clientViaServiceAccount(clientCredentials, scopes);
-
-              var response = await http.post(
-                Uri.parse(
-                    'https://fcm.googleapis.com/v1/projects/$projectId/messages:send'),
-                headers: {
-                  'Authorization':
-                      'Bearer ${client.credentials.accessToken.data}',
-                  'Content-Type': 'application/json',
-                },
-                body: jsonEncode(data),
-              );
-
-              if (response.statusCode == 200) {
-                EasyLoading.dismiss();
-                logSuccess(
-                    'Notification sent successfully to user: ${userList[i].id}');
-              } else {
-                logError(
-                    'Failed to send notification to user: ${userList[i].id} Status code: ${response.statusCode}');
-                logError('Response body: ${response.body}');
-                await EasyLoading.dismiss();
               }
             }
           }
         }
+        await EasyLoading.dismiss();
 
         bool result = await postBloodRequest(payload);
         if (result) {
@@ -1146,9 +996,23 @@ class MapRequestController extends GetxController {
     }
   }
 
+  Future<bool> justPostBloodRequest(Map<String, dynamic> payload) async {
+    try {
+      showLoader('adding request...');
+      showLoader('adding request...');
+      return await _postRequest.postBloodRequest(payload);
+    } catch (e) {
+      Helper.handleError(e, 'Error while post blood requst!');
+      return false;
+    } finally {
+      await EasyLoading.dismiss();
+    }
+  }
+
   Future<bool> postBloodRequest(Map<String, dynamic> payload) async {
     try {
       showLoader('adding request...');
+
       return await _postRequest.postBloodRequest(payload);
     } catch (e) {
       Helper.handleError(e, 'Error while post blood requst!');
@@ -1161,6 +1025,7 @@ class MapRequestController extends GetxController {
   void _showDonatePopup() {
     showDialog(
       context: navigatorKey.currentContext!,
+       barrierDismissible: false,
       builder: (BuildContext context) {
         return GetBuilder<MapRequestController>(builder: (homeController) {
           return AlertDialog(

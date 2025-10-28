@@ -17,7 +17,7 @@ class RemoteAuthDataSource {
   }
 
   Future<bool> checkEmail(String email) async {
-    final FirebaseAuth _auth = FirebaseAuth.instance;
+    // final FirebaseAuth _auth = FirebaseAuth.instance;
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     CollectionReference users = _firestore.collection('users');
 
@@ -25,23 +25,26 @@ class RemoteAuthDataSource {
       QuerySnapshot existingUsers =
           await users.where('email', isEqualTo: email).get();
 
-      if (existingUsers.docs.isNotEmpty) {
+      if (existingUsers.docs.isEmpty) {
         // Email exists in Firestore
         logError("Email found in Firestore users collection.");
 
+        return true;
+      }
+      else {
         return false;
       }
 
-      // Check if email exists in Firebase Authentication
-      List<String> signInMethods =
-          // ignore: deprecated_member_use
-          await _auth.fetchSignInMethodsForEmail(email);
+      // // Check if email exists in Firebase Authentication
+      // List<String> signInMethods =
+      //     // ignore: deprecated_member_use
+      //     await _auth.fetchSignInMethodsForEmail(email);
 
-      if (signInMethods.isNotEmpty) {
-        return false;
-      }
+      // if (signInMethods.isNotEmpty) {
+      //   return false;
+      // }
 
-      return true;
+      
     } catch (error) {
       rethrow;
     }
@@ -352,7 +355,7 @@ class RemoteAuthDataSource {
   //   }
   // }
 
-  Future<bool> forgotPassword(dynamic payload) async {
+  Future<UserModel?> forgotPassword(Map<String,dynamic> payload) async {
     try {
       FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -373,13 +376,22 @@ class RemoteAuthDataSource {
           'password': payload['password']
           // replace _newPassword with your password variable
         });
+         DocumentSnapshot updatedDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .get();
+
+        // ✅ Convert to UserModel
+        UserModel updatedUser =
+            UserModel.fromJson(updatedDoc.data() as Map<String, dynamic>);
+
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('user_email', payload['email']);
         Get.put(UserController(), permanent: true);
         prefs.setString('user_uid', userDoc.id);
-        return true;
+        return updatedUser;
       }
-      return false;
+      return null;
     } catch (e) {
       rethrow;
     }

@@ -47,7 +47,7 @@ class ChatRequestController extends GetxController {
     }
   }
 
-  Future<bool> acceptChatRequest(dynamic payload) async {
+  Future<bool> acceptChatRequest(Map<String,dynamic> payload) async {
     try {
       showLoader('accepting request...');
       return await _feedRepository.acceptChatRequest(payload);

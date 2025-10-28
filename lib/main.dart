@@ -2,6 +2,7 @@
 
 import 'dart:developer';
 
+import 'package:blood_donor/core/utils/console_logs.dart';
 import 'package:blood_donor/core/utils/services/notification_storage.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:blood_donor/features/dashboard/notifications/data/model/notificationModel.dart';
@@ -36,9 +37,20 @@ void main() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String? userUid = prefs.getString('user_uid');
   if (userUid != null && userUid.isNotEmpty) {
-    await Get.put(UserController(), permanent: true);
-  }
+    final userController = Get.put(UserController(), permanent: true);
 
+    // Wait for user data to load (assuming you have a method like fetchUserData)
+    await userController.getUserData();
+
+    if (userController.userModel != null) {
+      logSuccess("✅ User found: ${userController.userModel!.email}");
+      // You can now safely proceed with logged-in user logic
+    } else {
+      logError("⚠️ User model is null — navigating to login screen.");
+    }
+  } else {
+    logError("⚠️ No saved UID found — first-time user or logged out.");
+  }
   NotificationStorage.initializeNotificationsStorage1();
   Get.put(NotificationsProvider(), permanent: true);
   NotificationServices.requestNotificationPermission();

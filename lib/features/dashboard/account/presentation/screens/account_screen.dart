@@ -7,12 +7,9 @@ import 'package:blood_donor/features/auth/presentation/screens/card_scanning_scr
 import 'package:blood_donor/features/dashboard/account/presentation/controllers/account_controller.dart';
 import 'package:blood_donor/features/dashboard/account/presentation/screens/edit_profile_screen.dart';
 import 'package:blood_donor/features/dashboard/account/presentation/screens/history_screen.dart';
-import 'package:blood_donor/features/dashboard/account/presentation/screens/manage_address_screen.dart';
-import 'package:blood_donor/features/dashboard/account/presentation/screens/voucher_screen.dart';
 import 'package:blood_donor/features/dashboard/account/presentation/screens/refferral_screen.dart';
-import 'package:blood_donor/features/dashboard/menus/presentation/screens/Invite_screen.dart';
+import 'package:blood_donor/features/dashboard/account/presentation/screens/voucher_screen.dart';
 import 'package:blood_donor/features/dashboard/menus/presentation/screens/faqs_screen.dart';
-import 'package:blood_donor/features/dashboard/menus/presentation/screens/help_center_screen.dart';
 import 'package:blood_donor/features/dashboard/menus/presentation/screens/logout_screen.dart';
 import 'package:blood_donor/features/dashboard/menus/presentation/screens/privacy_policy_screen.dart';
 import 'package:blood_donor/features/dashboard/menus/presentation/screens/setting_screen.dart';
@@ -570,30 +567,6 @@ class _AccountScreenState extends State<AccountScreen>
                 },
               ),
 
-              // Manage Address
-              ProfileMenuTile(
-                icon: Icons.location_on,
-                title: "Manage Address",
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                        pageBuilder: (_, __, ___) =>
-                            const ManageAddressScreen(),
-                        transitionsBuilder: (_, animation, __, child) {
-                          return SlideTransition(
-                            position: Tween(
-                                    begin: const Offset(1, 0), end: Offset.zero)
-                                .animate(CurvedAnimation(
-                                    parent: animation,
-                                    curve: Curves.easeInOutQuart)),
-                            child: child,
-                          );
-                        },
-                      ));
-                },
-              ),
-
               // Reward Points
               // ProfileMenuTile(
               //   icon: Icons.point_of_sale,
@@ -616,30 +589,6 @@ class _AccountScreenState extends State<AccountScreen>
               //         ));
               //   },
               // ),
-
-              // Referral Invitation
-              ProfileMenuTile(
-                icon: Icons.card_membership,
-                title: "Referral Invitation",
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                        pageBuilder: (_, __, ___) =>
-                            const RefferalInvitationScreen(),
-                        transitionsBuilder: (_, animation, __, child) {
-                          return SlideTransition(
-                            position: Tween(
-                                    begin: const Offset(1, 0), end: Offset.zero)
-                                .animate(CurvedAnimation(
-                                    parent: animation,
-                                    curve: Curves.easeInOutQuart)),
-                            child: child,
-                          );
-                        },
-                      ));
-                },
-              ),
 
               // History
               ProfileMenuTile(
@@ -687,6 +636,28 @@ class _AccountScreenState extends State<AccountScreen>
                         ));
                   },
                 ),
+              ProfileMenuTile(
+                icon: Icons.card_membership,
+                title: "Referral Invitation",
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        pageBuilder: (_, __, ___) =>
+                            const RefferalInvitationScreen(),
+                        transitionsBuilder: (_, animation, __, child) {
+                          return SlideTransition(
+                            position: Tween(
+                                    begin: const Offset(1, 0), end: Offset.zero)
+                                .animate(CurvedAnimation(
+                                    parent: animation,
+                                    curve: Curves.easeInOutQuart)),
+                            child: child,
+                          );
+                        },
+                      ));
+                },
+              ),
               ProfileMenuTile(
                 icon: Icons.policy,
                 title: "Terms & Condition",
@@ -752,48 +723,7 @@ class _AccountScreenState extends State<AccountScreen>
                       ));
                 },
               ),
-              ProfileMenuTile(
-                icon: Icons.insert_invitation,
-                title: "Invite",
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                        pageBuilder: (_, __, ___) => const InviteScreen(),
-                        transitionsBuilder: (_, animation, __, child) {
-                          return SlideTransition(
-                            position: Tween(
-                                    begin: const Offset(1, 0), end: Offset.zero)
-                                .animate(CurvedAnimation(
-                                    parent: animation,
-                                    curve: Curves.easeInOutQuart)),
-                            child: child,
-                          );
-                        },
-                      ));
-                },
-              ),
-              ProfileMenuTile(
-                icon: Icons.help_center,
-                title: "Help Center",
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                        pageBuilder: (_, __, ___) => const HelpCenterScreen(),
-                        transitionsBuilder: (_, animation, __, child) {
-                          return SlideTransition(
-                            position: Tween(
-                                    begin: const Offset(1, 0), end: Offset.zero)
-                                .animate(CurvedAnimation(
-                                    parent: animation,
-                                    curve: Curves.easeInOutQuart)),
-                            child: child,
-                          );
-                        },
-                      ));
-                },
-              ),
+
               ProfileMenuTile(
                 icon: Icons.settings,
                 title: "Settings",
@@ -852,6 +782,7 @@ class _AccountScreenState extends State<AccountScreen>
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 prefs.remove('user_uid');
                 prefs.remove('user_email');
+                await prefs.clear();
 
                 UserController.to.updateAppStatus(false);
                 Get.delete<UserController>(force: true);

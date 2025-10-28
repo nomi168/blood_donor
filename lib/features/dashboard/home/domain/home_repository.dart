@@ -3,6 +3,7 @@ import 'package:blood_donor/features/dashboard/home/data/models/active_user_mode
 import 'package:blood_donor/features/dashboard/home/data/models/banner_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/blood_bank_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/donor_accept_model.dart';
+import 'package:blood_donor/features/dashboard/home/data/models/donor_update_location_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/taker_model.dart';
 
 class HomeRepository {
@@ -46,7 +47,7 @@ class HomeRepository {
     }
   }
 
-  Future<List<DonateAcceptModel>> getAcceptanceDonor() async {
+  Future<DonateAcceptModel?> getAcceptanceDonor() async {
     try {
       return await _datasource.getAcceptanceDonor();
     } catch (e) {
@@ -70,7 +71,7 @@ class HomeRepository {
     }
   }
 
-  Future<List<DonateAcceptModel>> seeTakerAcceptanceData() async {
+  Future<DonateAcceptModel?> seeTakerAcceptanceData() async {
     try {
       return await _datasource.seeTakerAcceptanceData();
     } catch (e) {
@@ -78,7 +79,7 @@ class HomeRepository {
     }
   }
 
-  Future<bool> aceeptDonationRequest(dynamic payload) async {
+  Future<bool> aceeptDonationRequest(Map<String, dynamic> payload) async {
     try {
       return await _datasource.aceeptDonationRequest(payload);
     } catch (e) {
@@ -86,7 +87,7 @@ class HomeRepository {
     }
   }
 
-  Future<bool> deleteAcceptedRequest(dynamic payload) async {
+  Future<bool> deleteAcceptedRequest(Map<String, dynamic> payload) async {
     try {
       return await _datasource.deleteAcceptedRequest(payload);
     } catch (e) {
@@ -118,10 +119,9 @@ class HomeRepository {
     }
   }
 
-  Future<void> updateReceivedStatue(
-      String takerEmail, String donorEmail) async {
+  Future<bool> updateReceivedStatue(String id) async {
     try {
-      return await _datasource.updateReceivedStatue(takerEmail, donorEmail);
+      return await _datasource.updateReceivedStatue(id);
     } catch (e) {
       rethrow;
     }
@@ -161,9 +161,9 @@ class HomeRepository {
     }
   }
 
-  Future<void> updateDonorStatus(String takerID, String donorId) async {
+  Future<void> updateDonorStatus(String id) async {
     try {
-      return await _datasource.updateDonorStatus(takerID, donorId);
+      return await _datasource.updateDonorStatus(id);
     } catch (e) {
       rethrow;
     }
@@ -277,6 +277,70 @@ class HomeRepository {
   Future<bool> checkUserCnicVerification() async {
     try {
       return await _datasource.checkUserCnicVerification();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> sendLocationToApi(Map<String, dynamic> payload) async {
+    try {
+      return await _datasource.sendLocationToApi(payload);
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  Stream<LocationUpdateModel?> streamDonorUpdateLocation(String id) {
+    try {
+      return _datasource.streamDonorUpdateLocation(id);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> expiredAcceptedRequests() async {
+    try {
+      return await _datasource.expiredAcceptedRequests();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> checkIsNextProcess(String id) async {
+    try {
+      return await _datasource.checkIsNextProcess(id);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> updateAcceptanceData(String id) async {
+    try {
+      return await _datasource.updateAcceptanceData(id);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Stream<bool> checkIsNextProcessRealTime(String id) {
+    try {
+      return _datasource.checkIsNextProcessRealTime(id);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<String?> getCurrentDonorLocation(String id) async {
+    try {
+      return await _datasource.getCurrentDonorLocation(id);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> sendNotification(String email) async {
+    try {
+      return await _datasource.sendNotification(email);
     } catch (e) {
       rethrow;
     }

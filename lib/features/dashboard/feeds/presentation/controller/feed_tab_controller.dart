@@ -4,10 +4,12 @@ import 'package:get/get.dart';
 
 class FeedTabController extends GetxController {
   final FeedRepository _feedRepository = FeedRepository();
+  static FeedTabController get to => Get.find();
   int index = 1;
   @override
   void onInit() {
     super.onInit();
+  
     // updateAppStatus();
   }
 
@@ -16,6 +18,15 @@ class FeedTabController extends GetxController {
       return await _feedRepository.updateAppStatus(status);
     } catch (e) {
       Helper.handleError(e, 'Error while checking app status!');
+    }
+  }
+
+  Future<String?> getDonorCurrentLocation(String donorEmail) async {
+    try {
+      return await _feedRepository.getDonorCurrentLocation(donorEmail);
+    } catch (e) {
+      Helper.handleError(e, 'Error while checking app status!');
+      return null;
     }
   }
 }

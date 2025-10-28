@@ -18,9 +18,9 @@ class CompleteJourneyController extends GetxController {
     }
   }
 
-  Future<void> updateDonorStatus(String takerId, String donorId) async {
+  Future<void> updateDonorStatus(String id) async {
     try {
-      return await _homeRepository.updateDonorStatus(takerId, donorId);
+      return await _homeRepository.updateDonorStatus(id);
     } catch (e) {
       Helper.handleError(e, 'Error while updating status!');
     }

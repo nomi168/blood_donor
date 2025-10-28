@@ -1,6 +1,7 @@
 import 'package:blood_donor/core/utils/console_logs.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:blood_donor/features/dashboard/feeds/presentation/controller/feed_tab_controller.dart';
+import 'package:blood_donor/features/dashboard/feeds/presentation/screens/blood_request_screen.dart';
 import 'package:blood_donor/features/dashboard/feeds/presentation/screens/chat_request_screen.dart';
 import 'package:blood_donor/features/dashboard/feeds/presentation/screens/feed_screen.dart';
 import 'package:flutter/material.dart';
@@ -73,7 +74,7 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
                                   minimumSize: Size(double.infinity, 6.h),
                                 ),
                                 child: Text(
-                                  'Request',
+                                  'Blood Request',
                                   style: TextStyle(
                                     color: controller.index == 1
                                         ? const Color(0xFFFFFFFF)
@@ -81,7 +82,41 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
                                   ),
                                 ),
                                 onPressed: () {
+                                  controller.index = 1;
+                                  controller.update();
                                   // Optionally switch tabs for taker
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Material(
+                            child: Container(
+                              padding: EdgeInsets.fromLTRB(1.w, 5.h, 5.w, 0),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                  elevation: 7,
+                                  shadowColor: const Color(0x00e3e3e3),
+                                  backgroundColor: controller.index == 2
+                                      ? const Color(0xFFDE0A1E)
+                                      : Colors.grey.shade300,
+                                  minimumSize: Size(double.infinity, 6.h),
+                                ),
+                                child: Text(
+                                  'Chat Request',
+                                  style: TextStyle(
+                                    color: controller.index == 2
+                                        ? const Color(0xFFFFFFFF)
+                                        : const Color(0xFF353535),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  controller.index = 2;
+                                  controller.update();
                                 },
                               ),
                             ),
@@ -140,7 +175,7 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
                                   minimumSize: Size(double.infinity, 6.h),
                                 ),
                                 child: Text(
-                                  'Request',
+                                  'Chat Request',
                                   style: TextStyle(
                                     color: controller.index == 2
                                         ? const Color(0xFFFFFFFF)
@@ -158,7 +193,12 @@ class _FeedScreenState extends State<FeedScreen> with WidgetsBindingObserver {
                       ],
                     ),
               UserController.to.userModel!.type == 'taker'
-                  ? Expanded(child: ChatRequestScreen())
+                  ? Expanded(
+                      child: controller.index == 1
+                          ? BloodRequestScreen()
+                          : controller.index == 2
+                              ? ChatRequestScreen()
+                              : Container())
                   : Expanded(
                       child: controller.index == 1
                           ? FeedsScreen()

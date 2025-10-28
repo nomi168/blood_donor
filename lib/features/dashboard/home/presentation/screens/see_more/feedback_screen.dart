@@ -113,8 +113,8 @@ class FeedbackDonorScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                         child: CachedNetworkImage(
                           fit: BoxFit.cover,
-                          imageUrl: donateModel.image.isNotEmpty
-                              ? donateModel.image
+                          imageUrl: donateModel.donorImage.isNotEmpty
+                              ? donateModel.donorImage
                               : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
                           placeholder: (context, url) =>
                               const CupertinoActivityIndicator(
@@ -132,14 +132,14 @@ class FeedbackDonorScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          donateModel.fullname,
+                          donateModel.donorName,
                           style: TextStyle(
                               fontSize: 16.sp,
                               fontWeight: FontWeight.bold,
                               color: Colors.black),
                         ),
                         Text(
-                          donateModel.hospitalName,
+                          donateModel.donorBlood,
                           style:
                               TextStyle(fontSize: 16.sp, color: Colors.black),
                         ),
@@ -186,7 +186,7 @@ class FeedbackDonorScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text(
-                          'Location-',
+                          'Contact No-',
                           style: TextStyle(
                               fontSize: 14,
                               color: Colors.black.withValues(alpha: 0.7),
@@ -194,7 +194,7 @@ class FeedbackDonorScreen extends StatelessWidget {
                         ),
                         Spacer(),
                         Text(
-                          donateModel.location,
+                          donateModel.donorNumber,
                           style: TextStyle(
                               fontSize: 14,
                               color: Colors.black,
@@ -372,6 +372,7 @@ class FeedbackDonorScreen extends StatelessWidget {
                     bool result =
                         await controller.updateAcceptDonationData(payload);
                     if (result) {
+                      await controller.updateAcceptanceData(donateModel.id);
                       Navigator.push(
                         context,
                         PageRouteBuilder(

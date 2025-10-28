@@ -1,6 +1,7 @@
 // ignore_for_file: file_names, use_build_context_synchronously
 
 import 'package:blood_donor/core/constants.dart';
+import 'package:blood_donor/features/auth/data/models/user_model.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/forgot_password_controller.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboatd.dart';
 import 'package:flutter/material.dart';
@@ -222,7 +223,7 @@ class _OTPForgetScreenState extends State<OTPForgetScreen> {
                               );
                               return;
                             }
-                            bool? result = await controller
+                            bool result = await controller
                                 .checkEmail(controller.email.text.trim());
                             if (!result) {
                               controller.isCheck = true;
@@ -465,12 +466,13 @@ class _OTPForgetScreenState extends State<OTPForgetScreen> {
 
                           return;
                         }
-                        dynamic payload = {
+                        Map<String,dynamic> payload = {
                           'email': controller.email.text.trim(),
                           'password': controller.pass.text.trim()
                         };
-                        bool result = await controller.forgotPassword(payload);
-                        if (result) {
+                        UserModel? result =
+                            await controller.forgotPassword(payload);
+                        if (result != null) {
                           Get.snackbar(
                             "Success",
                             "Changed password successfully",

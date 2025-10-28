@@ -1,7 +1,6 @@
 // ignore_for_file: file_names, use_build_context_synchronously
 import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/core/validate_test_field.dart';
-import 'package:blood_donor/features/auth/data/models/user_model.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/login_controller.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:blood_donor/features/auth/presentation/screens/forgot_screen.dart';
@@ -220,22 +219,25 @@ class LoginScreen extends StatelessWidget {
 
                               return;
                             }
-                            UserModel? result =
+                            controller.userModel =
                                 await controller.loginToFirebase(
                                     controller.email.text.trim(),
                                     controller.password.text.trim());
-                            if (result != null) {
+                            if (controller.userModel != null) {
                               await Get.put(UserController(), permanent: true);
-                              UserController.to.userModel = result;
+                              UserController.to.userModel =
+                                  controller.userModel;
                               UserController.to.isUserData = true;
                               controller.update();
                               SharedPreferences prefs =
                                   await SharedPreferences.getInstance();
 
-                              result.email;
-                              prefs.setString('user_email', result.email);
+                              controller.userModel!.email;
+                              prefs.setString(
+                                  'user_email', controller.userModel!.email);
 
-                              prefs.setString('user_uid', result.id);
+                              prefs.setString(
+                                  'user_uid', controller.userModel!.id);
                               Get.snackbar(
                                 "Success",
                                 "login successfully",
@@ -250,6 +252,8 @@ class LoginScreen extends StatelessWidget {
                                 icon: Icon(Icons.check_circle,
                                     color: Colors.white),
                               );
+                              controller.email.clear();
+                              controller.password.clear();
 
                               Get.offAll(() => Dashboard());
                             }

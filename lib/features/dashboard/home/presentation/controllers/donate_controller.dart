@@ -33,9 +33,10 @@ class DonateBloodController extends GetxController {
   Set<Circle> circles = {};
   Set<Polyline> polylines = {};
   bool isLightMode = false;
+  double distance = 0.0;
 
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
     if (!mapController.isCompleted) {
       controllers = mapController;
@@ -44,7 +45,7 @@ class DonateBloodController extends GetxController {
     }
 
     toController.text = payload.location!;
-    getCurrentLocation();
+    await getCurrentLocation();
   }
 
   Future<void> toggleMapMode() async {
@@ -113,7 +114,30 @@ class DonateBloodController extends GetxController {
               LatLng(fromLocation.latitude, fromLocation.longitude);
           LatLng toLatLng = LatLng(toLocation.latitude, toLocation.longitude);
 
-          // Fetch the directions from Google Directions API
+          // ✅ Calculate distance between two coordinates
+          double distanceInMeters = Geolocator.distanceBetween(
+            fromLocation.latitude,
+            fromLocation.longitude,
+            toLocation.latitude,
+            toLocation.longitude,
+          );
+
+          double distanceInKm = distanceInMeters / 1000;
+          distance = distanceInKm;
+
+          // ✅ Optional: Show info or snackbar
+          // Get.snackbar(
+          //   "Distance Info",
+          //   "The distance between both points is ${distanceInKm.toStringAsFixed(2)} km",
+          //   snackPosition: SnackPosition.TOP,
+          //   backgroundColor: Colors.blue.withValues(alpha: 0.9),
+          //   colorText: Colors.white,
+          //   duration: const Duration(seconds: 3),
+          //   borderRadius: 8,
+          //   margin: const EdgeInsets.all(10),
+          // );
+
+          // ✅ Continue your polyline logic
           String url =
               "https://maps.googleapis.com/maps/api/directions/json?origin=${fromLocation.latitude},${fromLocation.longitude}&destination=${toLocation.latitude},${toLocation.longitude}&key=AIzaSyAn6fh8krl1H-wflk6gHJ2aWoFEGAuaseI";
 
@@ -135,7 +159,7 @@ class DonateBloodController extends GetxController {
               points: polylineCoordinates,
             ));
 
-            // Add circles for the start and end points
+            // Add circles for start and end points
             circles.add(Circle(
               circleId: const CircleId('CurrentLocationCircle'),
               center: fromLatLng,
@@ -152,9 +176,10 @@ class DonateBloodController extends GetxController {
               strokeColor: Colors.green,
               strokeWidth: 10,
             ));
+
             update();
 
-            // Animate the camera to fit both points
+            // Animate the camera
             LatLngBounds bounds = LatLngBounds(
               southwest: LatLng(
                 fromLocation.latitude < toLocation.latitude
@@ -173,8 +198,25 @@ class DonateBloodController extends GetxController {
                     : toLocation.longitude,
               ),
             );
+
             controller
                 .animateCamera(CameraUpdate.newLatLngBounds(bounds, 50.0));
+            update();
+
+            // ✅ Optional logic: Check range
+            // if (distanceInKm > 20) {
+            //   Get.snackbar(
+            //     "Info",
+            //     "You cannot donate blood because you are not within a 20 km range.",
+            //     snackPosition: SnackPosition.TOP,
+            //     backgroundColor: Colors.red.withValues(alpha: 0.9),
+            //     colorText: Colors.white,
+            //     duration: const Duration(seconds: 3),
+            //     borderRadius: 8,
+            //     margin: const EdgeInsets.all(10),
+            //     icon: const Icon(Icons.location_off, color: Colors.white),
+            //   );
+            // }
           } else {
             logError('No route found');
           }
@@ -226,7 +268,7 @@ class DonateBloodController extends GetxController {
     return locations.first;
   }
 
-  Future<bool> aceeptDonationRequest(dynamic payload) async {
+  Future<bool> aceeptDonationRequest(Map<String, dynamic> payload) async {
     try {
       showLoader('adding request...');
       return await _homeRepository.aceeptDonationRequest(payload);
@@ -246,6 +288,14 @@ class DonateBloodController extends GetxController {
     } catch (e) {
       Helper.handleError(e, 'Error while getting donation request!');
       return null;
+    }
+  }
+
+  Future<void> sendNotification(String email) async {
+    try {
+      return await _homeRepository.sendNotification(email);
+    } catch (e) {
+      Helper.handleError(e, 'Error while sending notification request!');
     }
   }
 }

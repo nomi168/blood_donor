@@ -61,7 +61,7 @@ class OtpScreen extends StatelessWidget {
                       BorderRadius.circular(10.0), // Add border radius
                   child: TextFormField(
                     controller: otpController.email,
-                    readOnly: false,
+                    readOnly: true,
                     decoration: InputDecoration(
                       label: const Text('Email'),
                       contentPadding: const EdgeInsets.symmetric(

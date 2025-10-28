@@ -198,15 +198,15 @@ class EditProfileScreen extends StatelessWidget {
                             'firstname': controller.fname.text.trim(),
                             'lastname': controller.lname.text.trim(),
                             'location': controller.location.text.trim(),
-                            'blood': controller.selectedBloodGroup,
+                            'bloodgroup': controller.selectedBloodGroup,
                             'image': controller.image == null ||
                                     controller.image!.path.isEmpty
                                 ? model.image
                                 : controller.image!.path,
                           };
 
-                          bool result = await controller.updateProfile(payload);
-                          if (result) {
+                          UserModel? result = await controller.updateProfile(payload);
+                          if (result!=null) {
                             Get.snackbar(
                               "Success",
                               "update profile successfully",
@@ -222,9 +222,10 @@ class EditProfileScreen extends StatelessWidget {
                                   Icon(Icons.check_circle, color: Colors.white),
                             );
 
-                            UserController.to.userModel == null;
+                            UserController.to.userModel = result;
                             UserController.to.update();
-                            UserController.to.onInit();
+                         
+                            // UserController.to.onInit();
 
                             Get.offAll(() => Dashboard());
                           }

@@ -1,6 +1,9 @@
 // ignore_for_file: file_names
 
+import 'package:blood_donor/common/widgets/profile_icons.dart';
+import 'package:blood_donor/features/dashboard/account/presentation/screens/manage_address_screen.dart';
 import 'package:blood_donor/features/dashboard/menus/presentation/controllers/setting_controller.dart';
+import 'package:blood_donor/features/dashboard/menus/presentation/screens/help_center_screen.dart';
 import 'package:blood_donor/features/dashboard/menus/presentation/screens/menu_setting_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -219,6 +222,71 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ))
                   ],
                 )),
+            // ProfileMenuTile(
+            //   icon: Icons.insert_invitation,
+            //   title: "Invite",
+            //   onTap: () {
+            //     Navigator.push(
+            //         context,
+            //         PageRouteBuilder(
+            //           pageBuilder: (_, __, ___) => const InviteScreen(),
+            //           transitionsBuilder: (_, animation, __, child) {
+            //             return SlideTransition(
+            //               position:
+            //                   Tween(begin: const Offset(1, 0), end: Offset.zero)
+            //                       .animate(CurvedAnimation(
+            //                           parent: animation,
+            //                           curve: Curves.easeInOutQuart)),
+            //               child: child,
+            //             );
+            //           },
+            //         ));
+            //   },
+            // ),
+            ProfileMenuTile(
+              icon: Icons.help_center,
+              title: "Help Center",
+              onTap: () {
+                Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (_, __, ___) => const HelpCenterScreen(),
+                      transitionsBuilder: (_, animation, __, child) {
+                        return SlideTransition(
+                          position:
+                              Tween(begin: const Offset(1, 0), end: Offset.zero)
+                                  .animate(CurvedAnimation(
+                                      parent: animation,
+                                      curve: Curves.easeInOutQuart)),
+                          child: child,
+                        );
+                      },
+                    ));
+              },
+            ),
+            ProfileMenuTile(
+              icon: Icons.location_on,
+              title: "Manage Address",
+              onTap: () {
+                Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (_, __, ___) => const ManageAddressScreen(),
+                      transitionsBuilder: (_, animation, __, child) {
+                        return SlideTransition(
+                          position:
+                              Tween(begin: const Offset(1, 0), end: Offset.zero)
+                                  .animate(CurvedAnimation(
+                                      parent: animation,
+                                      curve: Curves.easeInOutQuart)),
+                          child: child,
+                        );
+                      },
+                    ));
+              },
+            ),
+
+            // Referral Invitation
           ]);
         },
       ),

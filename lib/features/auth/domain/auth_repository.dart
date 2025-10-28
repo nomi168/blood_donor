@@ -65,7 +65,7 @@ class AuthRepository {
     }
   }
 
-  Future<bool> forgotPassword(dynamic payload) async {
+  Future<UserModel?> forgotPassword(Map<String,dynamic> payload) async {
     try {
       return await _authDataSource.forgotPassword(payload);
     } catch (e) {

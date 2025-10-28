@@ -60,7 +60,6 @@ class MessageController extends GetxController {
       String deviceToken = userDoc['deviceToken'];
       String name = userDoc['firstname'] + " " + userDoc['lastname'];
 
-      // Prepare notification data (v1 API format)
       var data = {
         'message': {
           'token': deviceToken,
@@ -68,18 +67,31 @@ class MessageController extends GetxController {
             'title': 'New message',
             'body': 'You have a new message from $name',
           },
+          'android': {
+            'priority': 'HIGH', // ✅ Correct place for priority
+            'notification': {
+              'sound': 'custom_sound', // ✅ Do NOT include .wav extension
+              'default_vibrate_timings': true,
+              'icon': 'ic_blood_request', // Optional custom icon name
+              'color': '#DE0A1E',
+            },
+          },
           'apns': {
             'payload': {
               'aps': {
                 'sound': 'custom_sound.wav',
-              }
-            }
+                'alert': {
+                  'title': 'New Message',
+                  'body': 'You have a new message from $name',
+                },
+              },
+            },
           },
           'data': {
             'type': 'chat',
             'id': 'Nomi12345',
           }
-        }
+        },
       };
 
       // Generate OAuth2 token using service account

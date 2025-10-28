@@ -1,3 +1,4 @@
+import 'package:blood_donor/features/auth/data/models/user_model.dart';
 import 'package:blood_donor/features/dashboard/account/data/datasource/remote_account_datasource.dart';
 import 'package:blood_donor/features/dashboard/account/data/models/history_model.dart';
 import 'package:blood_donor/features/dashboard/account/data/models/voucher_model.dart';
@@ -84,7 +85,7 @@ class AccountRepository {
     }
   }
 
-  Future<bool> updateProfile(Map<String, dynamic> payload) async {
+  Future<UserModel?> updateProfile(Map<String, dynamic> payload) async {
     try {
       return await _datasource.updateProfile(payload);
     } catch (e) {

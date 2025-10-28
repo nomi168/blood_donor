@@ -34,13 +34,14 @@ class MapDonateController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    // logJSON(object: payload);
     if (!mapController.isCompleted) {
       controllers = mapController;
     } else {
       controllers = Completer<GoogleMapController>();
     }
 
-    toController.text = payload['location'];
+    fromController.text = payload['location'];
     getCurrentLocation();
   }
 
@@ -69,7 +70,7 @@ class MapDonateController extends GetxController {
         ),
       );
 
-      fromController.text =
+      toController.text =
           "${position.latitude.toString()}, ${position.longitude.toString()}";
       update();
 
@@ -81,8 +82,8 @@ class MapDonateController extends GetxController {
 
   Future<void> showPathOnMap(String location) async {
     try {
-      String from = fromController.text;
-      String to = location;
+      String from = location;
+      String to = toController.text;
 
       // Fetch locations for 'from' and 'to'
       List<Location> fromLocations = await locationFromAddress(from);
@@ -245,7 +246,7 @@ class MapDonateController extends GetxController {
     controller.setMapStyle(isLightMode ? null : darkMapStyle);
   }
 
-  Future<bool> aceeptDonationRequest(dynamic payload) async {
+  Future<bool> aceeptDonationRequest(Map<String, dynamic> payload) async {
     try {
       showLoader('adding request...');
       return await _feedRepository.aceeptDonationRequest(payload);
@@ -255,5 +256,13 @@ class MapDonateController extends GetxController {
     } finally {
       await EasyLoading.dismiss();
     }
+  }
+
+  Future<void> sendNotification(String email) async {
+    try {
+      return await _feedRepository.sendNotification(email);
+    } catch (e) {
+      Helper.handleError(e, 'Error while sending notification request!');
+    } 
   }
 }

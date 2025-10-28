@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/core/utils/api_response.dart';
 import 'package:blood_donor/core/utils/console_logs.dart';
+import 'package:blood_donor/features/auth/presentation/controllers/login_controller.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:blood_donor/features/auth/presentation/screens/card_scanning_screen.dart';
 import 'package:blood_donor/features/dashboard/feeds/presentation/screens/notification.dart';
@@ -16,12 +17,12 @@ import 'package:blood_donor/main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class HomeController extends GetxController {
   final HomeRepository _homeRepository = HomeRepository();
@@ -32,8 +33,8 @@ class HomeController extends GetxController {
 
   Set<Circle> circles = {};
   List<FeedTakerModel> takerList = [];
-  List<DonateAcceptModel> donorList = [];
-  List<DonateAcceptModel> seeList = [];
+  DonateAcceptModel? donorData;
+  DonateAcceptModel? seeList;
   List<ActiveUserModel> activeUserModel = [];
   List<BannerModel> bannerList = [];
 
@@ -53,13 +54,19 @@ class HomeController extends GetxController {
   bool isLoading = false;
   bool? isAvailability;
   bool isUrdu = false;
+  bool isBloodJourney = false;
+  bool isRefreshHome = false;
+
   @override
   Future<void> onInit() async {
     super.onInit();
-    getBannersList();
-    checkCNICVerification();
 
-    final updatedUser = UserController.to.userModel;
+    getBannersList();
+    await checkCNICVerification();
+
+    final updatedUser = UserController.to.userModel == null
+        ? LoginController.to.userModel
+        : UserController.to.userModel;
 
     if (updatedUser != null) {
       if (updatedUser.type == 'donor') {
@@ -68,9 +75,28 @@ class HomeController extends GetxController {
         await getInitTakerData();
       }
 
+      await deleteExpiredRequests();
+      // await expiredAcceptedRequests();
       await getNotificationToken();
       await getTodayActiveUsersList();
     }
+  }
+
+  @override
+  void onClose() {
+    // animationController.dispose();
+
+    super.onClose();
+  }
+
+  Future<void> refreshData() async {
+    isRefreshHome = true;
+    update();
+    await getAcceptanceDonorList();
+    await getTakerListByBlood();
+    await seeTakerAcceptanceList();
+    isRefreshHome = false;
+    update(); // refresh UI
   }
 
   Future<void> waitForUser() async {
@@ -135,12 +161,11 @@ class HomeController extends GetxController {
                     context: context,
                     isDismissible: false,
                     enableDrag: false,
-                    isScrollControlled: true, 
-                    backgroundColor:
-                        Colors.transparent, 
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
                     builder: (BuildContext context) {
                       return Container(
-                        margin: EdgeInsets.only(top: 40), 
+                        margin: EdgeInsets.only(top: 40),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius:
@@ -166,13 +191,6 @@ class HomeController extends GetxController {
       );
     }
   }
-
-  // Future<void> getBannersList() async {
-  //   bannerList.clear();
-  //   bannerList = await getBanners();
-
-  //   update();
-  // }
 
   Future<void> getBannersList() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -230,31 +248,45 @@ class HomeController extends GetxController {
   Future<void> getTakerListByBlood() async {
     takerList.clear();
     isLoading = true;
-    update();
-    takerList = await getTakersList();
+
+    // Get all takers
+    final allTakers = await getTakersList();
+
+    final userBloodGroup = UserController.to.userModel?.bloodgroup;
+
+    final matchingBlood =
+        allTakers.where((taker) => taker.bloodType == userBloodGroup).toList();
+
+    final otherBlood =
+        allTakers.where((taker) => taker.bloodType != userBloodGroup).toList();
+
+    takerList = [...matchingBlood, ...otherBlood];
+
     isLoading = false;
     update();
   }
 
   Future<void> getAcceptanceDonorList() async {
-    donorList.clear();
-    donorList = await getAcceptanceDonor();
+    donorData == null;
+    isBloodJourney = true;
+    donorData = await getAcceptanceDonor();
+    isBloodJourney = false;
     update();
   }
 
   Future<void> seeTakerAcceptanceList() async {
-    seeList.clear();
+    seeList = null;
     seeList = await seeTakerAcceptanceData();
     update();
   }
 
   Future<void> getInitDonorData() async {
-    getCurrentLocation();
-    await getTakerListByBlood();
-    await getavailableDonor(UserController.to.userModel!.email);
     await getAcceptanceDonorList();
+    await getTakerListByBlood();
+    await getCurrentLocation();
+    await getavailableDonor(UserController.to.userModel!.email);
+
     await checkAvailabilityDonor();
-    await deleteExpiredRequests();
   }
 
   Future<void> getInitTakerData() async {
@@ -292,38 +324,25 @@ class HomeController extends GetxController {
 
   Future<void> getCurrentLocation() async {
     try {
+      String location = "";
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
 
-      List<Placemark> placemarks =
-          await placemarkFromCoordinates(position.latitude, position.longitude);
-      Placemark place = placemarks[0];
+      const apiKey = "AIzaSyAn6fh8krl1H-wflk6gHJ2aWoFEGAuaseI";
+      final url =
+          "https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=$apiKey";
 
-      String address =
-          "${place.name}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
-      updateDonorLocation(address, UserController.to.userModel!.id);
+      final response = await http.get(Uri.parse(url));
+      final data = jsonDecode(response.body);
 
-      final GoogleMapController controller = await controllers.future;
+      if (data['status'] == 'OK' && data['results'].isNotEmpty) {
+        location = data['results'][0]['formatted_address'];
+      }
+      if (location.isNotEmpty) {
+        await updateDonorLocation(location, UserController.to.userModel!.id);
+      }
 
-      circles.clear();
-      circles.add(Circle(
-        circleId: const CircleId('CurrentLocationCircle'),
-        center: LatLng(position.latitude, position.longitude),
-        radius: 120.0,
-        fillColor: Colors.blue.withValues(alpha: 0.3),
-        strokeColor: Colors.blue,
-        strokeWidth: 10,
-      ));
-
-      controller.animateCamera(
-        CameraUpdate.newLatLngZoom(
-          LatLng(position.latitude, position.longitude),
-          9.6,
-        ),
-      );
-
-      // fromController.text = address;
       update();
     } catch (e) {
       logError("Error: $e");
@@ -363,12 +382,12 @@ class HomeController extends GetxController {
     }
   }
 
-  Future<List<DonateAcceptModel>> getAcceptanceDonor() async {
+  Future<DonateAcceptModel?> getAcceptanceDonor() async {
     try {
       return await _homeRepository.getAcceptanceDonor();
     } catch (e) {
       Helper.handleError(e, 'Error while getting acceptance donor!');
-      return [];
+      return null;
     }
   }
 
@@ -390,12 +409,12 @@ class HomeController extends GetxController {
     return null;
   }
 
-  Future<List<DonateAcceptModel>> seeTakerAcceptanceData() async {
+  Future<DonateAcceptModel?> seeTakerAcceptanceData() async {
     try {
       return await _homeRepository.seeTakerAcceptanceData();
     } catch (e) {
       Helper.handleError(e, 'Error while see taker acceptance data!');
-      return [];
+      return null;
     }
   }
 
@@ -404,6 +423,14 @@ class HomeController extends GetxController {
       return await _homeRepository.deleteExpiredRequests();
     } catch (e) {
       Helper.handleError(e, 'Error while deleting exipry request!');
+    }
+  }
+
+  Future<void> expiredAcceptedRequests() async {
+    try {
+      return await _homeRepository.expiredAcceptedRequests();
+    } catch (e) {
+      Helper.handleError(e, 'Error while deleting exipry accepted request!');
     }
   }
 

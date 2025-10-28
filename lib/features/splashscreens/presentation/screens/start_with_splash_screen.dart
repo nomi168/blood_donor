@@ -1,10 +1,10 @@
 // ignore_for_file: file_names
-
 import 'package:blood_donor/features/auth/presentation/screens/signup_screen.dart';
-import 'package:blood_donor/features/splashscreens/presentation/screens/splash_with_middle_screen.dart';
+import 'package:blood_donor/features/splashscreens/presentation/controllers/splash_animator_controller.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
 class StartWithSplashScreen extends StatefulWidget {
   const StartWithSplashScreen({Key? key}) : super(key: key);
@@ -14,130 +14,151 @@ class StartWithSplashScreen extends StatefulWidget {
 }
 
 class _StartWithSplashScreenState extends State<StartWithSplashScreen> {
-  int currentPage = 0;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          Center(child: Image.asset('images/image1.jpeg')),
-          SizedBox(
-            height: 20.h,
-          ),
-          Center(
-            child: Text(
-              'Easy Donor Search',
-              style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold),
-            ),
-          ),
-          SizedBox(
-            height: 10.h,
-          ),
-          Center(
-            child: Text(
-              'Easy to find available donors nearby.',
-              style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black54),
-            ),
-          ),
-          SizedBox(
-            height: 2.h,
-          ),
-          Center(
-            child: Text(
-              'Verified donors willing to help.',
-              style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black54),
-            ),
-          ),
-          SizedBox(
-            height: 100.h,
-          ),
-          Center(
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>SplashMiddleScreen()));
-                // Navigator.push(
-                //   context,
-                //   PageRouteBuilder(
-                //     pageBuilder: (context, animation, secondaryAnimation) {
-                //       return const SplashMiddleScreen();
-                //     },
-                //     transitionDuration: const Duration(microseconds: 100),
-                //     transitionsBuilder:
-                //         (context, animation, secondaryAnimation, child) {
-                //       const begin =
-                //           Offset(10.0, 0.0); // slide in from the right
-                //       const end = Offset.zero;
-                //       const curve = Curves.easeInOutQuart;
+      body: SafeArea(
+        child: GetBuilder<SplashAnimatorController>(
+          init: SplashAnimatorController(),
+          builder: (controller) {
+            return Column(
+              children: [
+                Expanded(
+                  flex: 7,
+                  child: PageView.builder(
+                    controller: controller.pageController,
+                    itemCount: controller.splashData.length,
+                    onPageChanged: (value) {
+                      controller.currentPage = value;
+                      controller.update();
+                    },
+                    itemBuilder: (context, index) => _buildPageContent(
+                      image: controller.splashData[index]["image"]!,
+                      title: controller.splashData[index]["title"]!,
+                      subtitle1: controller.splashData[index]["subtitle1"]!,
+                      subtitle2: controller.splashData[index]["subtitle2"]!,
+                    ),
+                  ),
+                ),
 
-                //       var tween = Tween(begin: begin, end: end)
-                //           .chain(CurveTween(curve: curve));
-                //       var offsetAnimation = animation.drive(tween);
+                SizedBox(height: 20.h),
 
-                //       return SlideTransition(
-                //         position: offsetAnimation,
-                //         child: child,
-                //       );
-                //     },
-                //   ),
-                // );
-              },
-              style: ElevatedButton.styleFrom(
-                  shape: const CircleBorder(),
-                  elevation: 8,
-                  padding: EdgeInsets.all(10.w),
-                  backgroundColor: const Color(0xFFDE0A1E)),
-              child: const Icon(
-                Icons.arrow_forward,
-                size: 32,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 120.h,
-          ),
-          DotsIndicator(
-            dotsCount: 3,
-            position: currentPage.toDouble().toInt(),
-            // ignore: prefer_const_constructors
-            decorator: DotsDecorator(
-              color: Colors.grey, // Inactive dot color
-              activeColor: const Color(0xFFDE0A1E), // Active dot color
-              size: const Size(10.0, 10.0), // Dot size
-              activeSize: const Size(14.0, 14.0), // Active dot size
-            ),
-          ),
-          Container(
-            alignment: Alignment.centerRight,
-            margin: EdgeInsets.only(right: 10.h),
-            child: InkWell(
-              splashColor: Colors.transparent,
-              splashFactory: NoSplash.splashFactory,
-              onTap: () async {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>SignUpScreen()));
+                // ✅ Dots indicator
+                DotsIndicator(
+                  dotsCount: controller.splashData.length,
+                  position: controller.currentPage.toInt(),
+                  decorator: const DotsDecorator(
+                    color: Colors.grey,
+                    activeColor: Color(0xFFDE0A1E),
+                    size: Size(10.0, 10.0),
+                    activeSize: Size(14.0, 14.0),
+                  ),
+                ),
 
-                // 
-                
-              },
-              child: Text(
-                'Skip',
-                style: TextStyle(
-                    fontSize: 17.sp,
-                    color: Colors.black54,
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
-          )
-        ],
+                SizedBox(height: 40.h),
+
+                // ✅ Main action buttons
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Preview button — hide on first page
+                    if (controller.currentPage > 0)
+                      TextButton(
+                        onPressed: controller.onPreviewPressed,
+                        child: Text(
+                          "Previous",
+                          style: TextStyle(
+                            fontSize: 17.sp,
+                            color: Colors.black54,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      )
+                    else
+                      const SizedBox(width: 90), // keep layout aligned
+
+                    // Skip button
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SignUpScreen()),
+                        );
+                      },
+                      child: Text(
+                        "Skip",
+                        style: TextStyle(
+                          fontSize: 17.sp,
+                          color: Colors.black54,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+
+                  
+                      TextButton(
+                        onPressed: controller.onNextPressed,
+                        child: Text(
+                          "Next",
+                          style: TextStyle(
+                            fontSize: 17.sp,
+                            color: Colors.black54,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      )
+                   
+                  ],
+                ),
+
+                SizedBox(height: 30.h),
+              ],
+            );
+          },
+        ),
       ),
+    );
+  }
+
+  Widget _buildPageContent({
+    required String image,
+    required String title,
+    required String subtitle1,
+    required String subtitle2,
+  }) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Image.asset(image, height: 280.h),
+        SizedBox(height: 20.h),
+        Text(
+          title,
+          style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        ),
+        SizedBox(height: 10.h),
+        Text(
+          subtitle1,
+          style: TextStyle(
+            fontSize: 16.sp,
+            fontWeight: FontWeight.bold,
+            color: Colors.black54,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        SizedBox(height: 5.h),
+        Text(
+          subtitle2,
+          style: TextStyle(
+            fontSize: 16.sp,
+            fontWeight: FontWeight.bold,
+            color: Colors.black54,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
 }

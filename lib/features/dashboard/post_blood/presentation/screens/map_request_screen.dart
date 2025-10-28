@@ -6,6 +6,7 @@ import 'package:blood_donor/features/dashboard/post_blood/presentation/controlle
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class MapRequestScreen extends StatelessWidget {
   final Map<String, dynamic> payload;
@@ -25,24 +26,39 @@ class MapRequestScreen extends StatelessWidget {
         body: SafeArea(
       child: GetBuilder<MapRequestController>(
         init: MapRequestController(
-            payload: payload, controller: controller, userList: userList,locationList: userLocationList),
+            payload: payload,
+            controller: controller,
+            userList: userList,
+            locationList: userLocationList),
         builder: (mapController) {
           return Stack(children: [
             GoogleMap(
-              myLocationButtonEnabled: true,
-              minMaxZoomPreference: MinMaxZoomPreference.unbounded,
-              mapToolbarEnabled: true,
-              mapType: MapType.hybrid,
-              onMapCreated: (GoogleMapController controllern) {
+              myLocationEnabled: true,
+              myLocationButtonEnabled: false, // use your own floating button
+              zoomControlsEnabled: false, // cleaner UI
+              mapToolbarEnabled: false,
+              compassEnabled: true,
+              trafficEnabled: true,
+              tiltGesturesEnabled: true,
+              rotateGesturesEnabled: true,
+              scrollGesturesEnabled: true,
+              zoomGesturesEnabled: true,
+              mapType: MapType.terrain, // cleaner than terrain for UI
+              markers: mapController.markers,
+              initialCameraPosition: const CameraPosition(
+                target: LatLng(33.6844, 73.0479), // Example: Islamabad
+                zoom: 13.5,
+                tilt: 40,
+                bearing: 30,
+              ),
+              onMapCreated: (GoogleMapController controllern) async {
                 if (!mapController.controller1.isCompleted) {
                   mapController.controller1.complete(controllern);
                 }
+                String style =
+                    await rootBundle.loadString('images/json/google_map.json');
+                controllern.setMapStyle(style);
               },
-              markers: mapController.markers,
-              initialCameraPosition: CameraPosition(
-                  target: LatLng(0, 0), // Default position, adjust as needed
-                  zoom: 10 // Default zoom level, adjust as needed
-                  ),
             ),
             Align(
                 alignment: Alignment.topRight,
