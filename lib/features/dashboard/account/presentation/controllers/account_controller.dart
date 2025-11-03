@@ -85,7 +85,7 @@ class AccountController extends GetxController {
   Future<void> checkingDonorAvailable() async {
     availablility =
         await checkDonorAvailability(UserController.to.userModel!.email);
-        availablility;
+    availablility;
     update();
   }
 

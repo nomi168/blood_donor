@@ -3,6 +3,7 @@
 import 'package:blood_donor/features/dashboard/menus/presentation/screens/Invite_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -33,6 +34,18 @@ class _RefferalInvitationScreenState extends State<RefferalInvitationScreen> {
     if (await canLaunch(emailUrl)) {
       await launch(emailUrl);
     } else {
+      Get.snackbar(
+        "Error",
+        "Oops, please try again after few seconds",
+        snackPosition: SnackPosition.TOP,
+        snackStyle: SnackStyle.FLOATING,
+        backgroundColor: Colors.red.withValues(alpha: 0.9),
+        colorText: Colors.white,
+        margin: EdgeInsets.all(10),
+        duration: Duration(seconds: 3),
+        borderRadius: 8,
+        icon: Icon(Icons.error, color: Colors.white),
+      );
       throw 'Could not launch email';
     }
   }
@@ -133,23 +146,23 @@ class _RefferalInvitationScreenState extends State<RefferalInvitationScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-                InkWell(
-                onTap: (){
-                   Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (_, __, ___) => const InviteScreen(),
-                      transitionsBuilder: (_, animation, __, child) {
-                        return SlideTransition(
-                          position:
-                              Tween(begin: const Offset(1, 0), end: Offset.zero)
-                                  .animate(CurvedAnimation(
-                                      parent: animation,
-                                      curve: Curves.easeInOutQuart)),
-                          child: child,
-                        );
-                      },
-                    ));
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        pageBuilder: (_, __, ___) => const InviteScreen(),
+                        transitionsBuilder: (_, animation, __, child) {
+                          return SlideTransition(
+                            position: Tween(
+                                    begin: const Offset(1, 0), end: Offset.zero)
+                                .animate(CurvedAnimation(
+                                    parent: animation,
+                                    curve: Curves.easeInOutQuart)),
+                            child: child,
+                          );
+                        },
+                      ));
                 },
                 borderRadius: BorderRadius.circular(12),
                 child: Container(
@@ -189,7 +202,9 @@ class _RefferalInvitationScreenState extends State<RefferalInvitationScreen> {
                   ),
                 ),
               ),
-              SizedBox(width: 30,),
+              SizedBox(
+                width: 30,
+              ),
               // WhatsApp Button
               InkWell(
                 onTap: _launchWhatsApp,

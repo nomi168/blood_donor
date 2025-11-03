@@ -39,12 +39,10 @@ void main() async {
   if (userUid != null && userUid.isNotEmpty) {
     final userController = Get.put(UserController(), permanent: true);
 
-    // Wait for user data to load (assuming you have a method like fetchUserData)
     await userController.getUserData();
 
     if (userController.userModel != null) {
       logSuccess("✅ User found: ${userController.userModel!.email}");
-      // You can now safely proceed with logged-in user logic
     } else {
       logError("⚠️ User model is null — navigating to login screen.");
     }
