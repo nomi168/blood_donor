@@ -1,8 +1,8 @@
 // ignore_for_file: file_names, use_build_context_synchronously
 
-import 'package:blood_donor/constants.dart';
+import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/forgot_password_controller.dart';
-import 'package:blood_donor/features/dashboard/home/presentation/screens/Dashboatd.dart';
+import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboatd.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';

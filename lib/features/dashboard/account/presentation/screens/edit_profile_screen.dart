@@ -2,7 +2,7 @@ import 'package:blood_donor/core/validate_test_field.dart';
 import 'package:blood_donor/features/auth/data/models/user_model.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:blood_donor/features/dashboard/account/presentation/controllers/edit_profile_controller.dart';
-import 'package:blood_donor/features/dashboard/home/presentation/screens/Dashboatd.dart';
+import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboatd.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -20,213 +20,93 @@ class EditProfileScreen extends StatelessWidget {
           child: GetBuilder<EditProfileController>(
             init: EditProfileController(payload: model),
             builder: (controller) {
-              return Column(
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 20,
+                    ),
+
+                    /// Profile Image Section
+                    Center(
+                      child: Stack(
+                        alignment: Alignment.bottomRight,
                         children: [
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(10.w, 5.h, 0.w, 0.h),
-                            child: IconButton(
-                              icon: const Icon(
-                                Icons.camera,
-                                color: Colors.black45,
-                                size: 30,
-                              ),
-                              onPressed: () {
-                                controller.getImage(ImageSource.camera);
-                              },
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(10.w, 0.h, 0.w, 0),
-                            child: Text(
-                              'Camera',
-                              style: TextStyle(
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black45),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(10.w, 3.h, 0, 0),
-                        child: Center(
-                          child: CircleAvatar(
-                            radius: 50,
-                            // ignore: unnecessary_null_comparison
+                          /// Profile Picture
+                          CircleAvatar(
+                            radius: 60,
+                            backgroundColor: Colors.grey.shade200,
                             backgroundImage: controller.image != null
                                 ? FileImage(controller.image!)
                                 : NetworkImage(model.image)
                                     as ImageProvider<Object>?,
                           ),
-                        ),
-                      ),
-                      Column(
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(10.w, 5.h, 0.w, 0),
-                            child: IconButton(
-                              icon: const Icon(
-                                Icons.browse_gallery_sharp,
-                                color: Colors.black45,
-                                size: 30,
-                              ),
-                              onPressed: () {
-                                controller.getImage(ImageSource.gallery);
+
+                          /// + Icon Overlay
+                          Positioned(
+                            bottom: 0,
+                            right: 4,
+                            child: GestureDetector(
+                              onTap: () {
+                                _showImagePicker(context, controller);
                               },
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(10.w, 0.h, 0.w, 0),
-                            child: Text(
-                              'Gallery',
-                              style: TextStyle(
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black45),
+                              child: CircleAvatar(
+                                radius: 20,
+                                backgroundColor: Colors.red,
+                                child: Icon(Icons.add,
+                                    color: Colors.white, size: 22),
+                              ),
                             ),
                           ),
                         ],
-                      )
-                    ],
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
-                    child: Material(
-                      elevation: 2.5,
-                      borderRadius: BorderRadius.circular(10.0),
-                      color: Colors.white,
-                      child: TextFormField(
-                        controller: controller.fname,
-                        decoration: InputDecoration(
-                          label: const Text(
-                            'First Name',
-                            style:
-                                TextStyle(fontSize: 15, color: Colors.black45),
-                          ),
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 16.0),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                            borderSide: const BorderSide(color: Colors.black12),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                            borderSide: const BorderSide(color: Colors.white),
-                          ),
-                          // hintText: 'First Name',
-                        ),
-                        validator: validateFirstName,
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(5.w, 2.h, 5.w, 0),
-                    child: Material(
-                      color: Colors.white,
-                      elevation: 2.5, // Add shadow/elevation
-                      borderRadius:
-                          BorderRadius.circular(10.0), // Add border radius
-                      child: TextFormField(
-                        controller: controller.lname,
-                        decoration: InputDecoration(
-                          label: const Text(
-                            'Last Name',
-                            style:
-                                TextStyle(fontSize: 15, color: Colors.black45),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16.0), // Adjust padding
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                            borderSide: const BorderSide(
-                                color: Colors.grey), // Border color
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                            borderSide: const BorderSide(
-                                color:
-                                    Colors.white), // Border color when focused
-                          ),
-                          // hintText: 'Last Name',
-                        ),
-                        validator: validateLastName,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(5.w, 2.4.h, 5.w, 0),
-                    child: Material(
-                      color: Colors.white,
-                      elevation: 2.5, // Add shadow/elevation
-                      borderRadius:
-                          BorderRadius.circular(10.0), // Add border radius
-                      child: TextFormField(
-                        controller: controller.location,
-                        decoration: InputDecoration(
-                          label: const Text(
-                            'Location',
-                            style:
-                                TextStyle(fontSize: 15, color: Colors.black45),
-                          ),
 
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16.0), // Adjust padding
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                            borderSide: const BorderSide(
-                                color: Colors.grey), // Border color
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                            borderSide: const BorderSide(
-                                color:
-                                    Colors.white), // Border color when focused
-                          ),
-                          // hintText: 'Location',
-                        ),
-                        validator: validateLocation,
-                      ),
+                    SizedBox(height: 2.h),
+
+                    /// First Name
+                    _buildTextField(
+                      controller: controller.fname,
+                      label: "First Name",
+                      validator: validateFirstName,
                     ),
-                  ),
-                  Padding(
+
+                    /// Last Name
+                    _buildTextField(
+                      controller: controller.lname,
+                      label: "Last Name",
+                      validator: validateLastName,
+                    ),
+
+                    /// Location
+                    _buildTextField(
+                      controller: controller.location,
+                      label: "Location",
+                      validator: validateLocation,
+                    ),
+
+                    /// Blood Group Dropdown
+                    Padding(
                       padding: EdgeInsets.fromLTRB(5.w, 2.4.h, 5.w, 0),
                       child: Material(
-                        color: Colors.white,
                         elevation: 2.5,
-                        borderRadius: BorderRadius.circular(10.0),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
                         child: DropdownButtonFormField(
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             contentPadding: EdgeInsets.symmetric(
-                                horizontal: 16.0, vertical: 13.0),
+                                horizontal: 16.0, vertical: 14.0),
                             labelText: "Blood Group",
                             labelStyle:
-                                TextStyle(fontSize: 15, color: Colors.black45),
+                                TextStyle(fontSize: 15, color: Colors.black54),
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(10.0),
-                              ),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.white, width: 2.5),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(10.0),
-                              ),
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide.none,
                             ),
                           ),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(10.0)),
                           items: controller.bloodGroup
-                              .map((e) => DropdownMenuItem(
-                                    // ignore: sort_child_properties_last
-                                    child: Text(e),
-                                    value: e,
-                                  ))
+                              .map((e) =>
+                                  DropdownMenuItem(value: e, child: Text(e)))
                               .toList(),
                           validator: validateBlood,
                           onChanged: (v) {
@@ -234,138 +114,224 @@ class EditProfileScreen extends StatelessWidget {
                             controller.update();
                           },
                         ),
-                      )),
-                  Container(
-                    margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        if (controller.fname.text.isEmpty) {
-                          Get.snackbar(
-                            "Error",
-                            "please enter first name",
-                            snackPosition: SnackPosition.TOP,
-                            snackStyle: SnackStyle.FLOATING,
-                            backgroundColor: Colors.red.withValues(alpha: 0.9),
-                            colorText: Colors.white,
-                            margin: EdgeInsets.all(10),
-                            duration: Duration(seconds: 3),
-                            borderRadius: 8,
-                            icon: Icon(Icons.error, color: Colors.white),
-                          );
-
-                          return;
-                        }
-                        if (controller.lname.text.isEmpty) {
-                          Get.snackbar(
-                            "Error",
-                            "please enter last name",
-                            snackPosition: SnackPosition.TOP,
-                            snackStyle: SnackStyle.FLOATING,
-                            backgroundColor: Colors.red.withValues(alpha: 0.9),
-                            colorText: Colors.white,
-                            margin: EdgeInsets.all(10),
-                            duration: Duration(seconds: 3),
-                            borderRadius: 8,
-                            icon: Icon(Icons.error, color: Colors.white),
-                          );
-
-                          return;
-                        }
-                        if (controller.location.text.isEmpty) {
-                          Get.snackbar(
-                            "Error",
-                            "please enter location",
-                            snackPosition: SnackPosition.TOP,
-                            snackStyle: SnackStyle.FLOATING,
-                            backgroundColor: Colors.red.withValues(alpha: 0.9),
-                            colorText: Colors.white,
-                            margin: EdgeInsets.all(10),
-                            duration: Duration(seconds: 3),
-                            borderRadius: 8,
-                            icon: Icon(Icons.error, color: Colors.white),
-                          );
-
-                          return;
-                        }
-                        if (controller.selectedBloodGroup == "" ||
-                            controller.selectedBloodGroup.trim().isEmpty) {
-                          Get.snackbar(
-                            "Error",
-                            "Please select a blood group.",
-                            snackPosition: SnackPosition.TOP,
-                            snackStyle: SnackStyle.FLOATING,
-                            backgroundColor: Colors.red.withValues(alpha: 0.9),
-                            colorText: Colors.white,
-                            margin: EdgeInsets.all(10),
-                            duration: Duration(seconds: 3),
-                            borderRadius: 8,
-                            icon: Icon(Icons.error, color: Colors.white),
-                          );
-
-                          return;
-                        }
-
-                        Map<String, dynamic> payload = {
-                          'firstname': controller.fname.text.trim(),
-                          'lastname': controller.lname.text.trim(),
-                          'location': controller.location.text.trim(),
-                          'blood': controller.selectedBloodGroup,
-                          'image': controller.image == null ||
-                                  controller.image!.path.isEmpty
-                              ? model.image
-                              : controller.image!.path,
-                        };
-
-                        bool result = await controller.updateProfile(payload);
-                        if (result) {
-                          Get.snackbar(
-                            "Success",
-                            "update profile successfully",
-                            snackPosition: SnackPosition.TOP,
-                            snackStyle: SnackStyle.FLOATING,
-                            backgroundColor:
-                                Colors.green.withValues(alpha: 0.9),
-                            colorText: Colors.white,
-                            margin: EdgeInsets.all(10),
-                            duration: Duration(seconds: 3),
-                            borderRadius: 8,
-                            icon: Icon(Icons.check_circle, color: Colors.white),
-                          );
-
-                          UserController.to.userModel == null;
-                          UserController.to.update();
-                          UserController.to.onInit();
-
-                          Get.offAll(() => Dashboard());
-                        }
-                      },
-                      style: ButtonStyle(
-                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                        ),
-                        padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
-                          // ignore: prefer_const_constructors
-                          EdgeInsets.symmetric(vertical: 13.5, horizontal: 0),
-                        ),
-                        backgroundColor: WidgetStateProperty.all<Color>(
-                            const Color(0xFFDE0A1E)), // Change button color
                       ),
-                      child: Text(
-                        'Update',
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                    ),
+
+                    /// Update Button
+                    Container(
+                      width: double.infinity,
+                      margin:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 25),
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          if (controller.fname.text.isEmpty) {
+                            Get.snackbar(
+                              "Error",
+                              "please enter first name",
+                              snackPosition: SnackPosition.TOP,
+                              snackStyle: SnackStyle.FLOATING,
+                              backgroundColor:
+                                  Colors.red.withValues(alpha: 0.9),
+                              colorText: Colors.white,
+                              margin: EdgeInsets.all(10),
+                              duration: Duration(seconds: 3),
+                              borderRadius: 8,
+                              icon: Icon(Icons.error, color: Colors.white),
+                            );
+
+                            return;
+                          }
+                          if (controller.lname.text.isEmpty) {
+                            Get.snackbar(
+                              "Error",
+                              "please enter last name",
+                              snackPosition: SnackPosition.TOP,
+                              snackStyle: SnackStyle.FLOATING,
+                              backgroundColor:
+                                  Colors.red.withValues(alpha: 0.9),
+                              colorText: Colors.white,
+                              margin: EdgeInsets.all(10),
+                              duration: Duration(seconds: 3),
+                              borderRadius: 8,
+                              icon: Icon(Icons.error, color: Colors.white),
+                            );
+
+                            return;
+                          }
+                          if (controller.location.text.isEmpty) {
+                            Get.snackbar(
+                              "Error",
+                              "please enter location",
+                              snackPosition: SnackPosition.TOP,
+                              snackStyle: SnackStyle.FLOATING,
+                              backgroundColor:
+                                  Colors.red.withValues(alpha: 0.9),
+                              colorText: Colors.white,
+                              margin: EdgeInsets.all(10),
+                              duration: Duration(seconds: 3),
+                              borderRadius: 8,
+                              icon: Icon(Icons.error, color: Colors.white),
+                            );
+
+                            return;
+                          }
+                          if (controller.selectedBloodGroup == "" ||
+                              controller.selectedBloodGroup.trim().isEmpty) {
+                            Get.snackbar(
+                              "Error",
+                              "Please select a blood group.",
+                              snackPosition: SnackPosition.TOP,
+                              snackStyle: SnackStyle.FLOATING,
+                              backgroundColor:
+                                  Colors.red.withValues(alpha: 0.9),
+                              colorText: Colors.white,
+                              margin: EdgeInsets.all(10),
+                              duration: Duration(seconds: 3),
+                              borderRadius: 8,
+                              icon: Icon(Icons.error, color: Colors.white),
+                            );
+
+                            return;
+                          }
+
+                          Map<String, dynamic> payload = {
+                            'firstname': controller.fname.text.trim(),
+                            'lastname': controller.lname.text.trim(),
+                            'location': controller.location.text.trim(),
+                            'blood': controller.selectedBloodGroup,
+                            'image': controller.image == null ||
+                                    controller.image!.path.isEmpty
+                                ? model.image
+                                : controller.image!.path,
+                          };
+
+                          bool result = await controller.updateProfile(payload);
+                          if (result) {
+                            Get.snackbar(
+                              "Success",
+                              "update profile successfully",
+                              snackPosition: SnackPosition.TOP,
+                              snackStyle: SnackStyle.FLOATING,
+                              backgroundColor:
+                                  Colors.green.withValues(alpha: 0.9),
+                              colorText: Colors.white,
+                              margin: EdgeInsets.all(10),
+                              duration: Duration(seconds: 3),
+                              borderRadius: 8,
+                              icon:
+                                  Icon(Icons.check_circle, color: Colors.white),
+                            );
+
+                            UserController.to.userModel == null;
+                            UserController.to.update();
+                            UserController.to.onInit();
+
+                            Get.offAll(() => Dashboard());
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFDE0A1E),
+                          padding: EdgeInsets.symmetric(vertical: 15),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 4,
+                        ),
+                        child: Text(
+                          "Update Profile",
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
-                  )
-                ],
+                  ],
+                ),
               );
+
+              /// Reusable TextField Widget
             },
           ),
         ));
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    String? Function(String?)? validator,
+  }) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(5.w, 2.2.h, 5.w, 0),
+      child: Material(
+        elevation: 2.5,
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        child: TextFormField(
+          controller: controller,
+          validator: validator,
+          decoration: InputDecoration(
+            labelText: label,
+            labelStyle: TextStyle(fontSize: 15, color: Colors.black54),
+            contentPadding:
+                EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showImagePicker(BuildContext context, controller) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.camera_alt, size: 30, color: Colors.red),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      controller.getImage(ImageSource.camera);
+                    },
+                  ),
+                  Text("Camera",
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                ],
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.photo, size: 30, color: Colors.blue),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      controller.getImage(ImageSource.gallery);
+                    },
+                  ),
+                  Text("Gallery",
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

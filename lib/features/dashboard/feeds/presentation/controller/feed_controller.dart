@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:blood_donor/constants.dart';
+import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/core/utils/api_response.dart';
 import 'package:blood_donor/core/utils/console_logs.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
@@ -109,6 +109,18 @@ class FeedController extends GetxController {
       return await _feedRepository.deleteExpiredRequests();
     } catch (e) {
       Helper.handleError(e, 'Error while deleting exipry request!');
+    }
+  }
+
+  Future<bool> checkUserCnicVerification(String card) async {
+    try {
+      showLoader('checking...');
+      return await _feedRepository.checkUserCnicVerification(card);
+    } catch (e) {
+      Helper.handleError(e, 'Error while checking CNIC verification!');
+      return false;
+    } finally {
+      await EasyLoading.dismiss();
     }
   }
 }

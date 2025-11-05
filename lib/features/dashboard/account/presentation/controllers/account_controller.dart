@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:blood_donor/constants.dart';
+import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/core/utils/api_response.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:blood_donor/features/dashboard/account/domain/account_repository.dart';
@@ -20,7 +20,7 @@ class AccountController extends GetxController {
 
   @override
   void onInit() {
-    onInitData();
+    // onInitData();
     getDonorBackforDonation();
     checkingDonorAvailable();
     super.onInit();
@@ -85,6 +85,7 @@ class AccountController extends GetxController {
   Future<void> checkingDonorAvailable() async {
     availablility =
         await checkDonorAvailability(UserController.to.userModel!.email);
+        availablility;
     update();
   }
 
@@ -133,6 +134,18 @@ class AccountController extends GetxController {
       return await _accountRepository.updateUserType(userType, email);
     } catch (e) {
       Helper.handleError(e, 'Error while updating user type!');
+      return false;
+    } finally {
+      await EasyLoading.dismiss();
+    }
+  }
+
+  Future<bool> checkUserCnicVerification(String card) async {
+    try {
+      showLoader('checking...');
+      return await _accountRepository.checkUserCnicVerification(card);
+    } catch (e) {
+      Helper.handleError(e, 'Error while checking CNIC verification!');
       return false;
     } finally {
       await EasyLoading.dismiss();

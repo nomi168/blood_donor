@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:blood_donor/constants.dart';
+import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/core/utils/api_response.dart';
 import 'package:blood_donor/core/utils/console_logs.dart';
 import 'package:blood_donor/features/auth/data/models/user_model.dart';

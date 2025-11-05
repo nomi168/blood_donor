@@ -1,4 +1,4 @@
-import 'package:blood_donor/constants.dart';
+import 'package:blood_donor/core/constants.dart';
 import 'package:email_otp/email_otp.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';

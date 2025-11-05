@@ -2,10 +2,10 @@
 
 import 'dart:async';
 
-import 'package:blood_donor/constants.dart';
+import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/donor_accept_model.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/controllers/blood_journey_controller.dart';
-import 'package:blood_donor/features/dashboard/home/presentation/screens/Dashboatd.dart';
+import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboatd.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/screens/blood_journey/compete_journey_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';

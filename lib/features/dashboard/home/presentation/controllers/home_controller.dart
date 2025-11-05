@@ -1,16 +1,18 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:blood_donor/constants.dart';
+import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/core/utils/api_response.dart';
 import 'package:blood_donor/core/utils/console_logs.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
+import 'package:blood_donor/features/auth/presentation/screens/card_scanning_screen.dart';
 import 'package:blood_donor/features/dashboard/feeds/presentation/screens/notification.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/active_user_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/banner_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/donor_accept_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/taker_model.dart';
 import 'package:blood_donor/features/dashboard/home/domain/home_repository.dart';
+import 'package:blood_donor/main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -52,35 +54,116 @@ class HomeController extends GetxController {
   bool? isAvailability;
   bool isUrdu = false;
   @override
-  void onInit() {
+  Future<void> onInit() async {
     super.onInit();
     getBannersList();
-    Future.microtask(() async {
-      final user = UserController.to.userModel;
+    checkCNICVerification();
 
-      // If user is not immediately available, wait for it
-      if (user == null) {
-        waitForUser(); // You should implement this future
+    final updatedUser = UserController.to.userModel;
+
+    if (updatedUser != null) {
+      if (updatedUser.type == 'donor') {
+        await getInitDonorData();
+      } else {
+        await getInitTakerData();
       }
 
-      final updatedUser = UserController.to.userModel;
-
-      if (updatedUser != null) {
-        if (updatedUser.type == 'donor') {
-          await getInitDonorData();
-        } else {
-          await getInitTakerData();
-        }
-
-        await getNotificationToken();
-        await getTodayActiveUsersList();
-      }
-    });
+      await getNotificationToken();
+      await getTodayActiveUsersList();
+    }
   }
 
   Future<void> waitForUser() async {
     while (UserController.to.userModel == null) {
       await Future.delayed(Duration(milliseconds: 100));
+    }
+  }
+
+  Future<void> checkCNICVerification() async {
+    bool result = await checkUserCnicVerification();
+    if (!result) {
+      showDialog(
+        context: navigatorKey.currentContext!,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Row(
+              children: [
+                Icon(Icons.verified_user, color: Colors.redAccent),
+                SizedBox(width: 8),
+                Text(
+                  "CNIC Verification Required",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Please verify your CNIC before proceeding.",
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                ),
+                SizedBox(height: 12),
+                Text(
+                  "• If you are a Taker: You cannot request blood without CNIC verification.\n\n"
+                  "• If you are a Donor: You cannot donate blood without verifying your CNIC.\n\n"
+                  "👉 Go to your account section and verify your CNIC to continue.",
+                  style: TextStyle(fontSize: 14, color: Colors.black87),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text("Later", style: TextStyle(color: Colors.black)),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  showModalBottomSheet(
+                    context: context,
+                    isDismissible: false,
+                    enableDrag: false,
+                    isScrollControlled: true, 
+                    backgroundColor:
+                        Colors.transparent, 
+                    builder: (BuildContext context) {
+                      return Container(
+                        margin: EdgeInsets.only(top: 40), 
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(20)),
+                        ),
+                        child: ClipRRect(
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(20)),
+                          child: CardScanningScreen(), // 👈 your screen
+                        ),
+                      );
+                    },
+                  );
+                },
+                child: Text(
+                  "Verify Now",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -359,6 +442,15 @@ class HomeController extends GetxController {
     } catch (e) {
       Helper.handleError(e, 'Error while getting banners data!');
       return [];
+    }
+  }
+
+  Future<bool> checkUserCnicVerification() async {
+    try {
+      return await _homeRepository.checkUserCnicVerification();
+    } catch (e) {
+      Helper.handleError(e, 'Error while checking CNIC verification!');
+      return false;
     }
   }
 }

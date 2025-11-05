@@ -1,7 +1,8 @@
-import 'package:blood_donor/constants.dart';
+import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/core/utils/api_response.dart';
+import 'package:blood_donor/features/auth/data/models/user_model.dart';
 import 'package:blood_donor/features/auth/domain/auth_repository.dart';
-import 'package:blood_donor/features/dashboard/home/presentation/screens/Dashboatd.dart';
+import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboatd.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -15,6 +16,7 @@ class LoginController extends GetxController {
   LocalAuthentication authentication = LocalAuthentication();
   bool _isFingerprintAuthenticated = false;
   bool isPasswordVisible = false;
+ 
   Future<void> checkBio() async {
     try {
       _hasBioSensorr = await authentication.canCheckBiometrics;
@@ -54,13 +56,13 @@ class LoginController extends GetxController {
     }
   }
 
-  Future<bool> loginToFirebase(String email, String password) async {
+  Future<UserModel?> loginToFirebase(String email, String password) async {
     try {
       showLoader('loging user...');
       return await _authRepository.loginToFirestore(email, password);
     } catch (e) {
       Helper.handleError(e, 'Error while loging user!');
-      return false;
+      return null;
     } finally {
       await EasyLoading.dismiss();
     }

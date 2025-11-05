@@ -1,6 +1,6 @@
-import 'package:blood_donor/constants.dart';
+import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/card_scanning_controller.dart';
-import 'package:blood_donor/features/auth/presentation/screens/questions_screen.dart';
+import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -8,8 +8,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 class CardScanningScreen extends StatefulWidget {
-  final Map<String, dynamic> payload;
-  const CardScanningScreen({super.key, required this.payload});
+  const CardScanningScreen({super.key});
 
   @override
   State<CardScanningScreen> createState() => _CardScanningScreenState();
@@ -30,17 +29,32 @@ class _CardScanningScreenState extends State<CardScanningScreen> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Center(
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(0.w, 20.h, 0, 0),
-                        child: Text(
-                          'Verification Process',
-                          style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black54),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Back button
+                        IconButton(
+                          icon: Icon(Icons.arrow_back, color: Colors.black54),
+                          onPressed: () {
+                            Navigator.of(context).pop(); // Go back
+                          },
                         ),
-                      ),
+
+                        // Title in center
+                        Expanded(
+                          child: Text(
+                            'Verification Process',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+
+                        SizedBox(width: 48),
+                      ],
                     ),
                     SizedBox(
                       height: 1.h,
@@ -164,75 +178,50 @@ class _CardScanningScreenState extends State<CardScanningScreen> {
                                             .trim()
                                             .replaceAll('-', '');
 
-                                        bool? result = await controller
-                                            .checkingCNIC(cnicNumber);
-                                        if (result) {
-                                          controller.correctcnic = true;
-                                          controller.update();
-                                          dynamic payload = {
-                                            'email': widget.payload['email'],
-                                            'card_user_name': controller
-                                                .nameTEController.text
-                                                .trim(),
-                                            'card_number': cnicNumber,
-                                            'date_of_birth': controller
-                                                .dobTEController.text
-                                                .trim(),
-                                            'date_of_cardissue': controller
-                                                .doiTEController.text
-                                                .trim(),
-                                            'date_of_cardexpire': controller
-                                                .doeTEController.text
-                                                .trim(),
-                                            'card_image': "",
-                                          };
+                                        controller.correctcnic = true;
+                                        controller.update();
+                                        dynamic payload = {
+                                          'email': UserController
+                                              .to.userModel!.email,
+                                          'card_user_name': controller
+                                              .nameTEController.text
+                                              .trim(),
+                                          'card_number': cnicNumber,
+                                          'date_of_birth': controller
+                                              .dobTEController.text
+                                              .trim(),
+                                          'date_of_cardissue': controller
+                                              .doiTEController.text
+                                              .trim(),
+                                          'date_of_cardexpire': controller
+                                              .doeTEController.text
+                                              .trim(),
+                                          'card_image': "",
+                                        };
 
-                                          bool? response = await controller
-                                              .addCnicCardDetail(payload);
-                                          if (response == true) {
-                                            Navigator.push(
-                                              context,
-                                              PageRouteBuilder(
-                                                pageBuilder: (context,
-                                                    animation,
-                                                    secondaryAnimation) {
-                                                  return QuestionsScreen(
-                                                    payload: widget.payload,
-                                                  );
-                                                },
-                                                transitionDuration:
-                                                    const Duration(
-                                                        microseconds: 100),
-                                                transitionsBuilder: (context,
-                                                    animation,
-                                                    secondaryAnimation,
-                                                    child) {
-                                                  const begin = Offset(10.0,
-                                                      0.0); // slide in from the right
-                                                  const end = Offset.zero;
-                                                  const curve =
-                                                      Curves.easeInOutQuart;
+                                        bool? response = await controller
+                                            .addCnicCardDetail(payload);
+                                        if (response == true) {
+                                          Get.snackbar(
+                                            "Success",
+                                            "complete verification successfully",
+                                            snackPosition: SnackPosition.TOP,
+                                            snackStyle: SnackStyle.FLOATING,
+                                            backgroundColor: Colors.green
+                                                .withValues(alpha: 0.9),
+                                            colorText: Colors.white,
+                                            margin: EdgeInsets.all(10),
+                                            duration: Duration(seconds: 3),
+                                            borderRadius: 8,
+                                            icon: Icon(Icons.check_circle,
+                                                color: Colors.white),
+                                          );
 
-                                                  var tween = Tween(
-                                                          begin: begin,
-                                                          end: end)
-                                                      .chain(CurveTween(
-                                                          curve: curve));
-                                                  var offsetAnimation =
-                                                      animation.drive(tween);
-
-                                                  return SlideTransition(
-                                                    position: offsetAnimation,
-                                                    child: child,
-                                                  );
-                                                },
-                                              ),
-                                            );
-                                          }
+                                          Navigator.of(context).pop();
                                         } else {
                                           Get.snackbar(
                                             "Error",
-                                            "Card number already matched! please try another cnic card number",
+                                            "Error while adding CNIC",
                                             snackPosition: SnackPosition.TOP,
                                             snackStyle: SnackStyle.FLOATING,
                                             backgroundColor: Colors.red
@@ -363,8 +352,7 @@ class _CardScanningScreenState extends State<CardScanningScreen> {
             builder: (BuildContext context) {
               return CustomDialogBox(onCameraBTNPressed: () {
                 controller.scanCnic(ImageSource.camera);
-              }, 
-              onGalleryBTNPressed: () {
+              }, onGalleryBTNPressed: () {
                 controller.scanCnic(ImageSource.camera);
                 // Get.snackbar(
                 //   "Error",
@@ -380,8 +368,7 @@ class _CardScanningScreenState extends State<CardScanningScreen> {
                 // );
 
                 // scanCnic(ImageSource.gallery);
-              }
-              );
+              });
             });
       },
       // textColor: Colors.white,
@@ -446,9 +433,10 @@ class _CardScanningScreenState extends State<CardScanningScreen> {
                       //     width: 40, height: 30),
                       Expanded(
                         child: TextField(
+                          readOnly: true,
                           controller: textEditingController,
                           decoration: InputDecoration(
-                            hintText: '41000-0000000-0',
+                            hintText: '3700-0000000-0',
                             hintStyle: TextStyle(color: Color(kLightGreyColor)),
                             border: InputBorder.none,
                             isDense: true,
@@ -528,6 +516,7 @@ class _CardScanningScreenState extends State<CardScanningScreen> {
                   Padding(
                     padding: const EdgeInsets.only(left: 15.0, bottom: 5),
                     child: TextField(
+                      readOnly: true,
                       controller: textEditingController,
                       decoration: InputDecoration(
                         hintText: (text == "Name") ? "User Name" : 'DD/MM/YYYY',

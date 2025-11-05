@@ -1,8 +1,8 @@
 import 'dart:developer';
 
-import 'package:blood_donor/Services/notification_storage.dart';
-import 'package:blood_donor/features/dashboard/Main%20Screen/notifications/data/model/notificationModel.dart';
-import 'package:blood_donor/features/dashboard/Main%20Screen/notifications/presentation/constroller/notification_controller.dart';
+import 'package:blood_donor/core/utils/services/notification_storage.dart';
+import 'package:blood_donor/features/dashboard/notifications/data/model/notificationModel.dart';
+import 'package:blood_donor/features/dashboard/notifications/presentation/constroller/notification_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';

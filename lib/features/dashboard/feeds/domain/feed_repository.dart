@@ -98,4 +98,12 @@ class FeedRepository {
       rethrow;
     }
   }
+
+  Future<bool> checkUserCnicVerification(String card) async {
+    try {
+      return await _feedDatasource.checkUserCnicVerification(card);
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

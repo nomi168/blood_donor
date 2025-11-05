@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:blood_donor/core/utils/console_logs.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
-import 'package:blood_donor/features/dashboard/Main%20Screen/notifications/data/model/notificationModel.dart';
-import 'package:blood_donor/features/dashboard/Main%20Screen/notifications/presentation/constroller/notification_controller.dart';
+import 'package:blood_donor/features/dashboard/notifications/data/model/notificationModel.dart';
+import 'package:blood_donor/features/dashboard/notifications/presentation/constroller/notification_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationStorage {

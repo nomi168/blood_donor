@@ -1,8 +1,9 @@
-import 'package:blood_donor/constants.dart';
+import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:blood_donor/features/dashboard/feeds/data/models/feed_taker_model.dart';
 import 'package:blood_donor/features/dashboard/feeds/presentation/controller/feed_controller.dart';
 import 'package:blood_donor/features/dashboard/feeds/presentation/screens/map_on_screen.dart';
+import 'package:blood_donor/main.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -272,12 +273,16 @@ class FeedsScreen extends StatelessWidget {
                                                     color: Colors.black54),
                                               ),
                                               Text(
-                                                taker.location!,
+                                                taker.location != null &&
+                                                        taker.location!.length >
+                                                            20
+                                                    ? '${taker.location!.substring(0, 23)}...'
+                                                    : taker.location ?? '',
                                                 style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Colors.black54,
-                                                    fontWeight:
-                                                        FontWeight.w500),
+                                                  fontSize: 14,
+                                                  color: Colors.black54,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
                                               ),
                                               Text(
                                                 'blood-type: ${taker.blood}',
@@ -394,14 +399,122 @@ class FeedsScreen extends StatelessWidget {
                                       ),
                                       InkWell(
                                         onTap: () async {
-                                          if (UserController
-                                                  .to.userModel!.type ==
-                                              'donor') {
-                                            if (controller.isAvailability ==
-                                                true) {
+                                          bool result = await controller
+                                              .checkUserCnicVerification(
+                                                  UserController
+                                                      .to.userModel!.email);
+                                          if (result) {
+                                            if (UserController
+                                                    .to.userModel!.type ==
+                                                'donor') {
+                                              if (controller.isAvailability ==
+                                                  true) {
+                                                Get.snackbar(
+                                                  "Error",
+                                                  "You have already donated blood. Please wait 90 days before donating again.",
+                                                  snackPosition:
+                                                      SnackPosition.TOP,
+                                                  snackStyle:
+                                                      SnackStyle.FLOATING,
+                                                  backgroundColor: Colors.red
+                                                      .withValues(alpha: 0.9),
+                                                  colorText: Colors.white,
+                                                  margin: EdgeInsets.all(10),
+                                                  duration:
+                                                      Duration(seconds: 3),
+                                                  borderRadius: 8,
+                                                  icon: Icon(Icons.error,
+                                                      color: Colors.white),
+                                                );
+                                              } else {
+                                                final user = UserController
+                                                    .to.userModel!;
+
+                                                final feedController =
+                                                    FeedController.to;
+
+                                                dynamic payload = {
+                                                  'id': '',
+                                                  'takerid': taker.takerId,
+                                                  'fullname': taker.name,
+                                                  'image': taker.image,
+                                                  'email': taker.email,
+                                                  'hospitalname':
+                                                      taker.hospitalName,
+                                                  'date': taker.date,
+                                                  'time': taker.time,
+                                                  'location': taker.location,
+                                                  'note': taker.note,
+                                                  'blood': taker.blood,
+                                                  'blood_image':
+                                                      taker.bloodImage,
+                                                  'unit': taker.unit,
+                                                  'phone_number': taker.number,
+                                                  'situation': taker.situation,
+                                                  'bloodtype': taker.bloodType,
+                                                  'donor_name':
+                                                      '${user.firstname} ${user.lastname}',
+                                                  'donor_email': user.email,
+                                                  'donor_number':
+                                                      user.phonenumber,
+                                                  'donor_image': user.image,
+                                                  'donor_blood':
+                                                      user.bloodgroup,
+                                                  'received_status': false,
+                                                  'status': false,
+                                                  'taker_received_status': false
+                                                };
+                                                Navigator.of(context,
+                                                        rootNavigator: true)
+                                                    .push(
+                                                  PageRouteBuilder(
+                                                    pageBuilder: (context,
+                                                        animation,
+                                                        secondaryAnimation) {
+                                                      return MapOnDonator(
+                                                        payload: payload,
+                                                        mapController:
+                                                            feedController
+                                                                .controllers,
+                                                      );
+                                                    },
+                                                    transitionDuration:
+                                                        const Duration(
+                                                            microseconds: 100),
+                                                    transitionsBuilder:
+                                                        (context,
+                                                            animation,
+                                                            secondaryAnimation,
+                                                            child) {
+                                                      const begin = Offset(10.0,
+                                                          0.0); // slide in from the right
+                                                      const end = Offset.zero;
+                                                      const curve =
+                                                          Curves.easeInOutQuart;
+
+                                                      var tween = Tween(
+                                                              begin: begin,
+                                                              end: end)
+                                                          .chain(CurveTween(
+                                                              curve: curve));
+                                                      var offsetAnimation =
+                                                          animation
+                                                              .drive(tween);
+
+                                                      return SlideTransition(
+                                                        position:
+                                                            offsetAnimation,
+                                                        child: child,
+                                                      );
+                                                    },
+                                                  ),
+                                                );
+                                                // );
+                                              }
+                                            } else {
                                               Get.snackbar(
                                                 "Error",
-                                                "You have already donated blood. Please wait 90 days before donating again.",
+                                                "Takers are not blood donors.",
                                                 snackPosition:
                                                     SnackPosition.TOP,
                                                 snackStyle: SnackStyle.FLOATING,
@@ -414,100 +527,102 @@ class FeedsScreen extends StatelessWidget {
                                                 icon: Icon(Icons.error,
                                                     color: Colors.white),
                                               );
-                                            } else {
-                                              final user =
-                                                  UserController.to.userModel!;
-
-                                              final feedController =
-                                                  FeedController.to;
-
-                                              dynamic payload = {
-                                                'id': '',
-                                                'takerid': taker.takerId,
-                                                'fullname': taker.name,
-                                                'image': taker.image,
-                                                'email': taker.email,
-                                                'hospitalname':
-                                                    taker.hospitalName,
-                                                'date': taker.date,
-                                                'time': taker.time,
-                                                'location': taker.location,
-                                                'note': taker.note,
-                                                'blood': taker.blood,
-                                                'blood_image': taker.bloodImage,
-                                                'unit': taker.unit,
-                                                'phone_number': taker.number,
-                                                'situation': taker.situation,
-                                                'bloodtype': taker.bloodType,
-                                                'donor_name':
-                                                    '${user.firstname} ${user.lastname}',
-                                                'donor_email': user.email,
-                                                'donor_number':
-                                                    user.phonenumber,
-                                                'donor_image': user.image,
-                                                'donor_blood': user.bloodgroup,
-                                                'received_status': false,
-                                                'status': false,
-                                                'taker_received_status': false
-                                              };
-                                              Navigator.of(context,
-                                                      rootNavigator: true)
-                                                  .push(
-                                                PageRouteBuilder(
-                                                  pageBuilder: (context,
-                                                      animation,
-                                                      secondaryAnimation) {
-                                                    return MapOnDonator(
-                                                      payload: payload,
-                                                      mapController:
-                                                          feedController
-                                                              .controllers,
-                                                    );
-                                                  },
-                                                  transitionDuration:
-                                                      const Duration(
-                                                          microseconds: 100),
-                                                  transitionsBuilder: (context,
-                                                      animation,
-                                                      secondaryAnimation,
-                                                      child) {
-                                                    const begin = Offset(10.0,
-                                                        0.0); // slide in from the right
-                                                    const end = Offset.zero;
-                                                    const curve =
-                                                        Curves.easeInOutQuart;
-
-                                                    var tween = Tween(
-                                                            begin: begin,
-                                                            end: end)
-                                                        .chain(CurveTween(
-                                                            curve: curve));
-                                                    var offsetAnimation =
-                                                        animation.drive(tween);
-
-                                                    return SlideTransition(
-                                                      position: offsetAnimation,
-                                                      child: child,
-                                                    );
-                                                  },
-                                                ),
-                                              );
-                                              // );
                                             }
                                           } else {
-                                            Get.snackbar(
-                                              "Error",
-                                              "Takers are not blood donors.",
-                                              snackPosition: SnackPosition.TOP,
-                                              snackStyle: SnackStyle.FLOATING,
-                                              backgroundColor: Colors.red
-                                                  .withValues(alpha: 0.9),
-                                              colorText: Colors.white,
-                                              margin: EdgeInsets.all(10),
-                                              duration: Duration(seconds: 3),
-                                              borderRadius: 8,
-                                              icon: Icon(Icons.error,
-                                                  color: Colors.white),
+                                            showDialog(
+                                              context:
+                                                  navigatorKey.currentContext!,
+                                              barrierDismissible: false,
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            16),
+                                                  ),
+                                                  title: Row(
+                                                    children: [
+                                                      Icon(Icons.verified_user,
+                                                          color:
+                                                              Colors.redAccent),
+                                                      SizedBox(width: 8),
+                                                      Text(
+                                                        "CNIC Verification Required",
+                                                        style: TextStyle(
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w500),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  content: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        "Please verify your CNIC before proceeding.",
+                                                        style: TextStyle(
+                                                            fontSize: 15,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w500),
+                                                      ),
+                                                      SizedBox(height: 12),
+                                                      Text(
+                                                        "• If you are a Taker: You cannot request blood without CNIC verification.\n\n"
+                                                        "• If you are a Donor: You cannot donate blood without verifying your CNIC.\n\n"
+                                                        "👉 Go to your account section and verify your CNIC to continue.",
+                                                        style: TextStyle(
+                                                            fontSize: 14,
+                                                            color:
+                                                                Colors.black87),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () =>
+                                                          Navigator.of(context)
+                                                              .pop(),
+                                                      child: Text("Later",
+                                                          style: TextStyle(
+                                                              color: Colors
+                                                                  .black)),
+                                                    ),
+                                                    ElevatedButton(
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        backgroundColor:
+                                                            Colors.redAccent,
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8),
+                                                        ),
+                                                      ),
+                                                      onPressed: () {
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                        // Navigate to Account section
+                                                        Navigator.pushNamed(
+                                                            context,
+                                                            "/account");
+                                                      },
+                                                      child: Text(
+                                                        "Verify Now",
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
                                             );
                                           }
                                         },
@@ -520,12 +635,12 @@ class FeedsScreen extends StatelessWidget {
                                             borderRadius:
                                                 BorderRadius.circular(5),
                                             border: Border.all(
-                                              color: Colors.red,
+                                              color: Colors.green,
                                               width: 1.0,
                                             ),
                                           ),
                                           child: Text(
-                                            'Donate Now',
+                                            'Accept',
                                             style: TextStyle(
                                                 fontSize: 14,
                                                 color: Colors.white),

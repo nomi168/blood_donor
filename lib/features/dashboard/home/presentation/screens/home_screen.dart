@@ -1,20 +1,24 @@
 // ignore_for_file: file_names
 
 import 'package:badges/badges.dart' as badge;
-import 'package:blood_donor/Services/notification_storage.dart';
-import 'package:blood_donor/constants.dart';
+import 'package:blood_donor/core/utils/services/notification_storage.dart';
+import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/core/utils/console_logs.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
-import 'package:blood_donor/features/dashboard/Main%20Screen/notifications/presentation/constroller/notification_controller.dart';
-import 'package:blood_donor/features/dashboard/Main%20Screen/notifications/presentation/screens/notification_screen.dart';
+import 'package:blood_donor/features/auth/presentation/screens/card_scanning_screen.dart';
+import 'package:blood_donor/features/dashboard/home/presentation/screens/blood_banks_update/taker_blood_bank_screen.dart';
+import 'package:blood_donor/features/dashboard/notifications/presentation/constroller/notification_controller.dart';
+import 'package:blood_donor/features/dashboard/notifications/presentation/screens/notification_screen.dart';
 import 'package:blood_donor/features/dashboard/feeds/presentation/screens/feed_tab_screen.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/donor_accept_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/taker_model.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/controllers/home_controller.dart';
+import 'package:blood_donor/features/dashboard/home/presentation/screens/blood_banks_update/blood_bank_screen.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/screens/blood_journey/blood_journey_screen.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/screens/donate_blood/donate_bood_screen.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/screens/emergency_help/emergency_taker_screen.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/screens/see_more/taker_reach.dart';
+import 'package:blood_donor/main.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
@@ -26,7 +30,6 @@ import 'package:shimmer/shimmer.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../post_blood/presentation/screens/post_request_screen.dart';
-import 'Blood Bank/Blood_ank.dart';
 import 'emergency_help/emergency_donor_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -228,44 +231,62 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         splashColor: Colors.transparent,
                         splashFactory: NoSplash.splashFactory,
                         onTap: () async {
-                          Map<String, dynamic> payload = {
-                            'email': userController.userModel!.email
-                          };
-                          bool result = await homeController
-                              .checkTakerBloodRequest(payload);
+                          bool result =
+                              await homeController.checkUserCnicVerification();
                           if (result) {
-                            String blood = homeController.selectedBloodGroup;
-                            if (userController.userModel!.type == 'taker') {
-                              Navigator.push(
-                                context,
-                                PageRouteBuilder(
-                                  pageBuilder:
-                                      (context, animation, secondaryAnimation) {
-                                    return PostRequestScreen(blood: blood);
-                                  },
-                                  transitionsBuilder: (context, animation,
-                                      secondaryAnimation, child) {
-                                    const begin = Offset(
-                                        10.0, 0.0); // slide in from the right
-                                    const end = Offset.zero;
-                                    const curve = Curves.easeInOutQuart;
+                            Map<String, dynamic> payload = {
+                              'email': userController.userModel!.email
+                            };
+                            bool result = await homeController
+                                .checkTakerBloodRequest(payload);
+                            if (result) {
+                              String blood = homeController.selectedBloodGroup;
+                              if (userController.userModel!.type == 'taker') {
+                                Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder: (context, animation,
+                                        secondaryAnimation) {
+                                      return PostRequestScreen(blood: blood);
+                                    },
+                                    transitionsBuilder: (context, animation,
+                                        secondaryAnimation, child) {
+                                      const begin = Offset(
+                                          10.0, 0.0); // slide in from the right
+                                      const end = Offset.zero;
+                                      const curve = Curves.easeInOutQuart;
 
-                                    var tween = Tween(begin: begin, end: end)
-                                        .chain(CurveTween(curve: curve));
-                                    var offsetAnimation =
-                                        animation.drive(tween);
+                                      var tween = Tween(begin: begin, end: end)
+                                          .chain(CurveTween(curve: curve));
+                                      var offsetAnimation =
+                                          animation.drive(tween);
 
-                                    return SlideTransition(
-                                      position: offsetAnimation,
-                                      child: child,
-                                    );
-                                  },
-                                ),
-                              );
+                                      return SlideTransition(
+                                        position: offsetAnimation,
+                                        child: child,
+                                      );
+                                    },
+                                  ),
+                                );
+                              } else {
+                                Get.snackbar(
+                                  "Error",
+                                  "Please login using a taker account",
+                                  snackPosition: SnackPosition.TOP,
+                                  snackStyle: SnackStyle.FLOATING,
+                                  backgroundColor:
+                                      Colors.red.withValues(alpha: 0.9),
+                                  colorText: Colors.white,
+                                  margin: EdgeInsets.all(10),
+                                  duration: Duration(seconds: 3),
+                                  borderRadius: 8,
+                                  icon: Icon(Icons.error, color: Colors.white),
+                                );
+                              }
                             } else {
                               Get.snackbar(
                                 "Error",
-                                "Please login using a taker account",
+                                "Blood request is already posted",
                                 snackPosition: SnackPosition.TOP,
                                 snackStyle: SnackStyle.FLOATING,
                                 backgroundColor:
@@ -278,18 +299,103 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                               );
                             }
                           } else {
-                            Get.snackbar(
-                              "Error",
-                              "Blood request is already posted",
-                              snackPosition: SnackPosition.TOP,
-                              snackStyle: SnackStyle.FLOATING,
-                              backgroundColor:
-                                  Colors.red.withValues(alpha: 0.9),
-                              colorText: Colors.white,
-                              margin: EdgeInsets.all(10),
-                              duration: Duration(seconds: 3),
-                              borderRadius: 8,
-                              icon: Icon(Icons.error, color: Colors.white),
+                            showDialog(
+                              context: navigatorKey.currentContext!,
+                              barrierDismissible: false,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  title: Row(
+                                    children: [
+                                      Icon(Icons.verified_user,
+                                          color: Colors.redAccent),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        "CNIC Verification Required",
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                    ],
+                                  ),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Please verify your CNIC before proceeding.",
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                      SizedBox(height: 12),
+                                      Text(
+                                        "• If you are a Taker: You cannot request blood without CNIC verification.\n\n"
+                                        "• If you are a Donor: You cannot donate blood without verifying your CNIC.\n\n"
+                                        "👉 Go to your account section and verify your CNIC to continue.",
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.black87),
+                                      ),
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(),
+                                      child: Text("Later",
+                                          style:
+                                              TextStyle(color: Colors.black)),
+                                    ),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.redAccent,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                        showModalBottomSheet(
+                                          context: context,
+                                          isDismissible: false,
+                                          enableDrag: false,
+                                          isScrollControlled: true,
+                                          backgroundColor: Colors.transparent,
+                                          builder: (BuildContext context) {
+                                            return Container(
+                                              margin: EdgeInsets.only(top: 40),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.vertical(
+                                                        top: Radius.circular(
+                                                            20)),
+                                              ),
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.vertical(
+                                                        top: Radius.circular(
+                                                            20)),
+                                                child:
+                                                    CardScanningScreen(), // 👈 your screen
+                                              ),
+                                            );
+                                          },
+                                        );
+                                      },
+                                      child: Text(
+                                        "Verify Now",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
                             );
                           }
                         },
@@ -449,56 +555,82 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                         ))
                                     : GestureDetector(
                                         onTap: () async {
-                                          Map<String, dynamic> payload = {
-                                            'email':
-                                                userController.userModel!.email
-                                          };
                                           bool result = await homeController
-                                              .checkTakerBloodRequest(payload);
+                                              .checkUserCnicVerification();
                                           if (result) {
-                                            String blood = homeController
-                                                .selectedBloodGroup;
-                                            if (userController
-                                                    .userModel!.type ==
-                                                'taker') {
-                                              Navigator.push(
-                                                context,
-                                                PageRouteBuilder(
-                                                  pageBuilder: (context,
-                                                      animation,
-                                                      secondaryAnimation) {
-                                                    return PostRequestScreen(
-                                                        blood: blood);
-                                                  },
-                                                  transitionsBuilder: (context,
-                                                      animation,
-                                                      secondaryAnimation,
-                                                      child) {
-                                                    const begin = Offset(10.0,
-                                                        0.0); // slide in from the right
-                                                    const end = Offset.zero;
-                                                    const curve =
-                                                        Curves.easeInOutQuart;
+                                            Map<String, dynamic> payload = {
+                                              'email': userController
+                                                  .userModel!.email
+                                            };
+                                            bool result = await homeController
+                                                .checkTakerBloodRequest(
+                                                    payload);
+                                            if (result) {
+                                              String blood = homeController
+                                                  .selectedBloodGroup;
+                                              if (userController
+                                                      .userModel!.type ==
+                                                  'taker') {
+                                                Navigator.push(
+                                                  context,
+                                                  PageRouteBuilder(
+                                                    pageBuilder: (context,
+                                                        animation,
+                                                        secondaryAnimation) {
+                                                      return PostRequestScreen(
+                                                          blood: blood);
+                                                    },
+                                                    transitionsBuilder:
+                                                        (context,
+                                                            animation,
+                                                            secondaryAnimation,
+                                                            child) {
+                                                      const begin = Offset(10.0,
+                                                          0.0); // slide in from the right
+                                                      const end = Offset.zero;
+                                                      const curve =
+                                                          Curves.easeInOutQuart;
 
-                                                    var tween = Tween(
-                                                            begin: begin,
-                                                            end: end)
-                                                        .chain(CurveTween(
-                                                            curve: curve));
-                                                    var offsetAnimation =
-                                                        animation.drive(tween);
+                                                      var tween = Tween(
+                                                              begin: begin,
+                                                              end: end)
+                                                          .chain(CurveTween(
+                                                              curve: curve));
+                                                      var offsetAnimation =
+                                                          animation
+                                                              .drive(tween);
 
-                                                    return SlideTransition(
-                                                      position: offsetAnimation,
-                                                      child: child,
-                                                    );
-                                                  },
-                                                ),
-                                              );
+                                                      return SlideTransition(
+                                                        position:
+                                                            offsetAnimation,
+                                                        child: child,
+                                                      );
+                                                    },
+                                                  ),
+                                                );
+                                              } else {
+                                                Get.snackbar(
+                                                  "Error",
+                                                  "Please login using a taker account",
+                                                  snackPosition:
+                                                      SnackPosition.TOP,
+                                                  snackStyle:
+                                                      SnackStyle.FLOATING,
+                                                  backgroundColor: Colors.red
+                                                      .withValues(alpha: 0.9),
+                                                  colorText: Colors.white,
+                                                  margin: EdgeInsets.all(10),
+                                                  duration:
+                                                      Duration(seconds: 3),
+                                                  borderRadius: 8,
+                                                  icon: Icon(Icons.error,
+                                                      color: Colors.white),
+                                                );
+                                              }
                                             } else {
                                               Get.snackbar(
                                                 "Error",
-                                                "Please login using a taker account",
+                                                "Blood request is already posted",
                                                 snackPosition:
                                                     SnackPosition.TOP,
                                                 snackStyle: SnackStyle.FLOATING,
@@ -513,19 +645,133 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                               );
                                             }
                                           } else {
-                                            Get.snackbar(
-                                              "Error",
-                                              "Blood request is already posted",
-                                              snackPosition: SnackPosition.TOP,
-                                              snackStyle: SnackStyle.FLOATING,
-                                              backgroundColor: Colors.red
-                                                  .withValues(alpha: 0.9),
-                                              colorText: Colors.white,
-                                              margin: EdgeInsets.all(10),
-                                              duration: Duration(seconds: 3),
-                                              borderRadius: 8,
-                                              icon: Icon(Icons.error,
-                                                  color: Colors.white),
+                                            showDialog(
+                                              context:
+                                                  navigatorKey.currentContext!,
+                                              barrierDismissible: false,
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            16),
+                                                  ),
+                                                  title: Row(
+                                                    children: [
+                                                      Icon(Icons.verified_user,
+                                                          color:
+                                                              Colors.redAccent),
+                                                      SizedBox(width: 8),
+                                                      Text(
+                                                        "CNIC Verification Required",
+                                                        style: TextStyle(
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w500),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  content: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        "Please verify your CNIC before proceeding.",
+                                                        style: TextStyle(
+                                                            fontSize: 15,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w500),
+                                                      ),
+                                                      SizedBox(height: 12),
+                                                      Text(
+                                                        "• If you are a Taker: You cannot request blood without CNIC verification.\n\n"
+                                                        "• If you are a Donor: You cannot donate blood without verifying your CNIC.\n\n"
+                                                        "👉 Go to your account section and verify your CNIC to continue.",
+                                                        style: TextStyle(
+                                                            fontSize: 14,
+                                                            color:
+                                                                Colors.black87),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () =>
+                                                          Navigator.of(context)
+                                                              .pop(),
+                                                      child: Text("Later",
+                                                          style: TextStyle(
+                                                              color: Colors
+                                                                  .black)),
+                                                    ),
+                                                    ElevatedButton(
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        backgroundColor:
+                                                            Colors.redAccent,
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8),
+                                                        ),
+                                                      ),
+                                                      onPressed: () {
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                        showModalBottomSheet(
+                                                          context: context,
+                                                          isDismissible: false,
+                                                          enableDrag: false,
+                                                          isScrollControlled:
+                                                              true,
+                                                          backgroundColor:
+                                                              Colors
+                                                                  .transparent,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return Container(
+                                                              margin: EdgeInsets
+                                                                  .only(
+                                                                      top: 40),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: Colors
+                                                                    .white,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .vertical(
+                                                                            top:
+                                                                                Radius.circular(20)),
+                                                              ),
+                                                              child: ClipRRect(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .vertical(
+                                                                            top:
+                                                                                Radius.circular(20)),
+                                                                child:
+                                                                    CardScanningScreen(),
+                                                              ),
+                                                            );
+                                                          },
+                                                        );
+                                                      },
+                                                      child: Text(
+                                                        "Verify Now",
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
                                             );
                                           }
                                         },
@@ -574,36 +820,187 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                           ),
                                         )),
                             GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    PageRouteBuilder(
-                                      pageBuilder: (context, animation,
-                                          secondaryAnimation) {
-                                        return const Blood_B();
-                                      },
-                                      transitionDuration:
-                                          const Duration(microseconds: 100),
-                                      transitionsBuilder: (context, animation,
-                                          secondaryAnimation, child) {
-                                        const begin = Offset(10.0,
-                                            0.0); // slide in from the right
-                                        const end = Offset.zero;
-                                        const curve = Curves.easeInOutQuart;
+                                onTap: () async {
+                                  if (UserController.to.userModel!.type ==
+                                      'taker') {
+                                    Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        pageBuilder: (context, animation,
+                                            secondaryAnimation) {
+                                          return const TakerBloodBankScreen();
+                                        },
+                                        transitionDuration:
+                                            const Duration(microseconds: 100),
+                                        transitionsBuilder: (context, animation,
+                                            secondaryAnimation, child) {
+                                          const begin = Offset(10.0,
+                                              0.0); // slide in from the right
+                                          const end = Offset.zero;
+                                          const curve = Curves.easeInOutQuart;
 
-                                        var tween = Tween(
-                                                begin: begin, end: end)
-                                            .chain(CurveTween(curve: curve));
-                                        var offsetAnimation =
-                                            animation.drive(tween);
+                                          var tween = Tween(
+                                                  begin: begin, end: end)
+                                              .chain(CurveTween(curve: curve));
+                                          var offsetAnimation =
+                                              animation.drive(tween);
 
-                                        return SlideTransition(
-                                          position: offsetAnimation,
-                                          child: child,
-                                        );
-                                      },
-                                    ),
-                                  );
+                                          return SlideTransition(
+                                            position: offsetAnimation,
+                                            child: child,
+                                          );
+                                        },
+                                      ),
+                                    );
+                                  } else {
+                                    bool result = await homeController
+                                        .checkUserCnicVerification();
+                                    if (result) {
+                                      Navigator.push(
+                                        context,
+                                        PageRouteBuilder(
+                                          pageBuilder: (context, animation,
+                                              secondaryAnimation) {
+                                            return const BloodBankScreen();
+                                          },
+                                          transitionDuration:
+                                              const Duration(microseconds: 100),
+                                          transitionsBuilder: (context,
+                                              animation,
+                                              secondaryAnimation,
+                                              child) {
+                                            const begin = Offset(10.0,
+                                                0.0); // slide in from the right
+                                            const end = Offset.zero;
+                                            const curve = Curves.easeInOutQuart;
+
+                                            var tween = Tween(
+                                                    begin: begin, end: end)
+                                                .chain(
+                                                    CurveTween(curve: curve));
+                                            var offsetAnimation =
+                                                animation.drive(tween);
+
+                                            return SlideTransition(
+                                              position: offsetAnimation,
+                                              child: child,
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    } else {
+                                      showDialog(
+                                        context: navigatorKey.currentContext!,
+                                        barrierDismissible: false,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                            ),
+                                            title: Row(
+                                              children: [
+                                                Icon(Icons.verified_user,
+                                                    color: Colors.redAccent),
+                                                SizedBox(width: 8),
+                                                Text(
+                                                  "CNIC Verification Required",
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w500),
+                                                ),
+                                              ],
+                                            ),
+                                            content: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "Please verify your CNIC before proceeding.",
+                                                  style: TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.w500),
+                                                ),
+                                                SizedBox(height: 12),
+                                                Text(
+                                                  "• If you are a Taker: You cannot request blood without CNIC verification.\n\n"
+                                                  "• If you are a Donor: You cannot donate blood without verifying your CNIC.\n\n"
+                                                  "👉 Go to your account section and verify your CNIC to continue.",
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.black87),
+                                                ),
+                                              ],
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () =>
+                                                    Navigator.of(context).pop(),
+                                                child: Text("Later",
+                                                    style: TextStyle(
+                                                        color: Colors.black)),
+                                              ),
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      Colors.redAccent,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
+                                                  ),
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                  showModalBottomSheet(
+                                                    context: context,
+                                                    isDismissible: false,
+                                                    enableDrag: false,
+                                                    isScrollControlled: true,
+                                                    backgroundColor:
+                                                        Colors.transparent,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return Container(
+                                                        margin: EdgeInsets.only(
+                                                            top: 40),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: Colors.white,
+                                                          borderRadius:
+                                                              BorderRadius.vertical(
+                                                                  top: Radius
+                                                                      .circular(
+                                                                          20)),
+                                                        ),
+                                                        child: ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius.vertical(
+                                                                  top: Radius
+                                                                      .circular(
+                                                                          20)),
+                                                          child:
+                                                              CardScanningScreen(),
+                                                        ),
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                                child: Text(
+                                                  "Verify Now",
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    }
+                                  }
                                 },
                                 child: Container(
                                   height: 120,
@@ -646,74 +1043,189 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                   ),
                                 )),
                             GestureDetector(
-                                onTap: () {
-                                  userController.userModel!.type == 'donor'
-                                      ? Navigator.push(
-                                          context,
-                                          PageRouteBuilder(
-                                            pageBuilder: (context, animation,
-                                                secondaryAnimation) {
-                                              return const EmergencyDonorScreen();
-                                            },
-                                            transitionDuration: const Duration(
-                                                microseconds: 100),
-                                            transitionsBuilder: (context,
-                                                animation,
-                                                secondaryAnimation,
-                                                child) {
-                                              const begin = Offset(10.0,
-                                                  0.0); // slide in from the right
-                                              const end = Offset.zero;
-                                              const curve =
-                                                  Curves.easeInOutQuart;
+                                onTap: () async {
+                                  bool result = await homeController
+                                      .checkUserCnicVerification();
+                                  if (result) {
+                                    userController.userModel!.type == 'donor'
+                                        ? Navigator.push(
+                                            context,
+                                            PageRouteBuilder(
+                                              pageBuilder: (context, animation,
+                                                  secondaryAnimation) {
+                                                return const EmergencyDonorScreen();
+                                              },
+                                              transitionDuration:
+                                                  const Duration(
+                                                      microseconds: 100),
+                                              transitionsBuilder: (context,
+                                                  animation,
+                                                  secondaryAnimation,
+                                                  child) {
+                                                const begin = Offset(10.0,
+                                                    0.0); // slide in from the right
+                                                const end = Offset.zero;
+                                                const curve =
+                                                    Curves.easeInOutQuart;
 
-                                              var tween = Tween(
-                                                      begin: begin, end: end)
-                                                  .chain(
-                                                      CurveTween(curve: curve));
-                                              var offsetAnimation =
-                                                  animation.drive(tween);
+                                                var tween = Tween(
+                                                        begin: begin, end: end)
+                                                    .chain(CurveTween(
+                                                        curve: curve));
+                                                var offsetAnimation =
+                                                    animation.drive(tween);
 
-                                              return SlideTransition(
-                                                position: offsetAnimation,
-                                                child: child,
-                                              );
-                                            },
+                                                return SlideTransition(
+                                                  position: offsetAnimation,
+                                                  child: child,
+                                                );
+                                              },
+                                            ),
+                                          )
+                                        : Navigator.push(
+                                            context,
+                                            PageRouteBuilder(
+                                              pageBuilder: (context, animation,
+                                                  secondaryAnimation) {
+                                                return const EmergencyTakerScreen();
+                                              },
+                                              transitionDuration:
+                                                  const Duration(
+                                                      microseconds: 100),
+                                              transitionsBuilder: (context,
+                                                  animation,
+                                                  secondaryAnimation,
+                                                  child) {
+                                                const begin = Offset(10.0,
+                                                    0.0); // slide in from the right
+                                                const end = Offset.zero;
+                                                const curve =
+                                                    Curves.easeInOutQuart;
+
+                                                var tween = Tween(
+                                                        begin: begin, end: end)
+                                                    .chain(CurveTween(
+                                                        curve: curve));
+                                                var offsetAnimation =
+                                                    animation.drive(tween);
+
+                                                return SlideTransition(
+                                                  position: offsetAnimation,
+                                                  child: child,
+                                                );
+                                              },
+                                            ),
+                                          );
+                                  } else {
+                                    showDialog(
+                                      context: navigatorKey.currentContext!,
+                                      barrierDismissible: false,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(16),
                                           ),
-                                        )
-                                      : Navigator.push(
-                                          context,
-                                          PageRouteBuilder(
-                                            pageBuilder: (context, animation,
-                                                secondaryAnimation) {
-                                              return const EmergencyTakerScreen();
-                                            },
-                                            transitionDuration: const Duration(
-                                                microseconds: 100),
-                                            transitionsBuilder: (context,
-                                                animation,
-                                                secondaryAnimation,
-                                                child) {
-                                              const begin = Offset(10.0,
-                                                  0.0); // slide in from the right
-                                              const end = Offset.zero;
-                                              const curve =
-                                                  Curves.easeInOutQuart;
-
-                                              var tween = Tween(
-                                                      begin: begin, end: end)
-                                                  .chain(
-                                                      CurveTween(curve: curve));
-                                              var offsetAnimation =
-                                                  animation.drive(tween);
-
-                                              return SlideTransition(
-                                                position: offsetAnimation,
-                                                child: child,
-                                              );
-                                            },
+                                          title: Row(
+                                            children: [
+                                              Icon(Icons.verified_user,
+                                                  color: Colors.redAccent),
+                                              SizedBox(width: 8),
+                                              Text(
+                                                "CNIC Verification Required",
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight:
+                                                        FontWeight.w500),
+                                              ),
+                                            ],
                                           ),
+                                          content: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "Please verify your CNIC before proceeding.",
+                                                style: TextStyle(
+                                                    fontSize: 15,
+                                                    fontWeight:
+                                                        FontWeight.w500),
+                                              ),
+                                              SizedBox(height: 12),
+                                              Text(
+                                                "• If you are a Taker: You cannot request blood without CNIC verification.\n\n"
+                                                "• If you are a Donor: You cannot donate blood without verifying your CNIC.\n\n"
+                                                "👉 Go to your account section and verify your CNIC to continue.",
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.black87),
+                                              ),
+                                            ],
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.of(context).pop(),
+                                              child: Text("Later",
+                                                  style: TextStyle(
+                                                      color: Colors.black)),
+                                            ),
+                                            ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    Colors.redAccent,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                              ),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                                showModalBottomSheet(
+                                                  context: context,
+                                                  isDismissible: false,
+                                                  enableDrag: false,
+                                                  isScrollControlled: true,
+                                                  backgroundColor:
+                                                      Colors.transparent,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return Container(
+                                                      margin: EdgeInsets.only(
+                                                          top: 40),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius.vertical(
+                                                                top: Radius
+                                                                    .circular(
+                                                                        20)),
+                                                      ),
+                                                      child: ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius.vertical(
+                                                                top: Radius
+                                                                    .circular(
+                                                                        20)),
+                                                        child:
+                                                            CardScanningScreen(),
+                                                      ),
+                                                    );
+                                                  },
+                                                );
+                                              },
+                                              child: Text(
+                                                "Verify Now",
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                            ),
+                                          ],
                                         );
+                                      },
+                                    );
+                                  }
                                 },
                                 child: Container(
                                   height: 120,
@@ -1606,14 +2118,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                                                           .center,
                                                                   decoration:
                                                                       BoxDecoration(
-                                                                    color:
-                                                                        PRIMARY_COLOR,
+                                                                    color: Colors
+                                                                        .green,
                                                                     borderRadius:
                                                                         BorderRadius
                                                                             .circular(5),
                                                                   ),
                                                                   child: Text(
-                                                                    'Donate Now',
+                                                                    'Accept',
                                                                     style: TextStyle(
                                                                         fontSize:
                                                                             14,
@@ -1671,440 +2183,195 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                       ),
                                     )
                                   : ListView.builder(
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 5),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 8, horizontal: 12),
                                       itemCount: homeController.seeList.length,
-                                      physics: NeverScrollableScrollPhysics(),
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
                                       shrinkWrap: true,
                                       itemBuilder: (context, index) {
                                         DonateAcceptModel donor =
                                             homeController.seeList[index];
-                                        return Container(
-                                          margin: EdgeInsets.symmetric(
-                                              horizontal: 10, vertical: 5),
-                                          padding: EdgeInsets.all(10),
-                                          decoration: BoxDecoration(
+
+                                        return Card(
+                                          color: Colors.white,
+                                          elevation: 3,
+                                          margin: const EdgeInsets.symmetric(
+                                              vertical: 8),
+                                          shape: RoundedRectangleBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(05),
-                                              border: Border.all(
-                                                  color: Colors.black26)),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Container(
-                                                child: Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Container(
-                                                      width: 70,
-                                                      height: 70,
-                                                      child: ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(40),
-                                                        child:
-                                                            CachedNetworkImage(
-                                                          fit: BoxFit.cover,
-                                                          imageUrl: donor
-                                                                  .donorImage
-                                                                  .isNotEmpty
-                                                              ? donor.donorImage
-                                                              : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
-                                                          placeholder: (context,
-                                                                  url) =>
-                                                              const CupertinoActivityIndicator(
-                                                            color: Colors.white,
-                                                          ),
-                                                          errorWidget: (context,
-                                                                  url, error) =>
-                                                              Icon(Icons.error),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    const SizedBox(width: 5),
-                                                    Container(
-                                                      child: Column(
-                                                        mainAxisSize:
-                                                            MainAxisSize.max,
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .start,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
+                                                  BorderRadius.circular(12)),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(12),
+                                            child: Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                // Avatar
+                                                ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(40),
+                                                  child: CachedNetworkImage(
+                                                    width: 70,
+                                                    height: 70,
+                                                    fit: BoxFit.cover,
+                                                    imageUrl: donor.donorImage
+                                                            .isNotEmpty
+                                                        ? donor.donorImage
+                                                        : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
+                                                    placeholder: (context,
+                                                            url) =>
+                                                        const CupertinoActivityIndicator(),
+                                                    errorWidget: (context, url,
+                                                            error) =>
+                                                        const Icon(Icons.error),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 12),
+
+                                                // Info Column
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      // Name + Blood type
+                                                      Row(
                                                         children: [
-                                                          Row(
-                                                            children: [
-                                                              Text(
-                                                                donor.donorName,
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .black,
-                                                                  fontSize: 18,
-                                                                  fontFamily:
-                                                                      'Montserrat',
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  height: 0,
-                                                                ),
+                                                          Expanded(
+                                                            child: Text(
+                                                              donor.donorName,
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontSize: 18,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                color: Colors
+                                                                    .black,
                                                               ),
-                                                              Container(
-                                                                margin: EdgeInsets
-                                                                    .only(
-                                                                        left: 10
-                                                                            .w),
-                                                                child:
-                                                                    CustomPaint(
-                                                                  size: Size(
-                                                                      45, 30),
-                                                                  painter: BloodDropPainter(
-                                                                      blood: donor
-                                                                          .blood),
-                                                                ),
-                                                              )
-                                                            ],
-                                                          ),
-                                                          const SizedBox(
-                                                              height: 12),
-                                                          Container(
-                                                            child: Column(
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .min,
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .start,
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Container(
-                                                                  width: 210,
-                                                                  child: Row(
-                                                                    mainAxisSize:
-                                                                        MainAxisSize
-                                                                            .min,
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .start,
-                                                                    crossAxisAlignment:
-                                                                        CrossAxisAlignment
-                                                                            .start,
-                                                                    children: [
-                                                                      Text(
-                                                                        'Hospital :',
-                                                                        style:
-                                                                            TextStyle(
-                                                                          color:
-                                                                              Color(0xFF5A5A5A),
-                                                                          fontSize:
-                                                                              12,
-                                                                          fontFamily:
-                                                                              'Montserrat',
-                                                                          fontWeight:
-                                                                              FontWeight.w500,
-                                                                          height:
-                                                                              0.13,
-                                                                        ),
-                                                                      ),
-                                                                      const SizedBox(
-                                                                          width:
-                                                                              5),
-                                                                      Expanded(
-                                                                        child:
-                                                                            SizedBox(
-                                                                          child:
-                                                                              Text(
-                                                                            donor.hospitalName,
-                                                                            style:
-                                                                                TextStyle(
-                                                                              color: Color(0xFF5A5A5A),
-                                                                              fontSize: 12,
-                                                                              fontFamily: 'Montserrat',
-                                                                              fontWeight: FontWeight.w500,
-                                                                              height: 0.13,
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                      )
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                                const SizedBox(
-                                                                    height: 15),
-                                                                Container(
-                                                                  child: Row(
-                                                                    mainAxisSize:
-                                                                        MainAxisSize
-                                                                            .min,
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .start,
-                                                                    crossAxisAlignment:
-                                                                        CrossAxisAlignment
-                                                                            .start,
-                                                                    children: [
-                                                                      Text(
-                                                                        'Location :',
-                                                                        style:
-                                                                            TextStyle(
-                                                                          color:
-                                                                              Color(0xFF5A5A5A),
-                                                                          fontSize:
-                                                                              12,
-                                                                          fontFamily:
-                                                                              'Montserrat',
-                                                                          fontWeight:
-                                                                              FontWeight.w500,
-                                                                          height:
-                                                                              0.13,
-                                                                        ),
-                                                                      ),
-                                                                      const SizedBox(
-                                                                          width:
-                                                                              5),
-                                                                      Text(
-                                                                        donor
-                                                                            .location,
-                                                                        maxLines:
-                                                                            2,
-                                                                        overflow:
-                                                                            TextOverflow.ellipsis,
-                                                                        style:
-                                                                            TextStyle(
-                                                                          color:
-                                                                              Color(0xFF5A5A5A),
-                                                                          fontSize:
-                                                                              12,
-                                                                          fontFamily:
-                                                                              'Montserrat',
-                                                                          fontWeight:
-                                                                              FontWeight.w500,
-                                                                          height:
-                                                                              0.13,
-                                                                        ),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                                const SizedBox(
-                                                                    height: 15),
-                                                                Container(
-                                                                  child: Row(
-                                                                    mainAxisSize:
-                                                                        MainAxisSize
-                                                                            .min,
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .start,
-                                                                    crossAxisAlignment:
-                                                                        CrossAxisAlignment
-                                                                            .start,
-                                                                    children: [
-                                                                      Text(
-                                                                        'Date :',
-                                                                        style:
-                                                                            TextStyle(
-                                                                          color:
-                                                                              Color(0xFF5A5A5A),
-                                                                          fontSize:
-                                                                              12,
-                                                                          fontFamily:
-                                                                              'Montserrat',
-                                                                          fontWeight:
-                                                                              FontWeight.w500,
-                                                                          height:
-                                                                              0.13,
-                                                                        ),
-                                                                      ),
-                                                                      const SizedBox(
-                                                                          width:
-                                                                              5),
-                                                                      Text(
-                                                                        donor
-                                                                            .date,
-                                                                        style:
-                                                                            TextStyle(
-                                                                          color:
-                                                                              Color(0xFF5A5A5A),
-                                                                          fontSize:
-                                                                              12,
-                                                                          fontFamily:
-                                                                              'Montserrat',
-                                                                          fontWeight:
-                                                                              FontWeight.w500,
-                                                                          height:
-                                                                              0.13,
-                                                                        ),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                                const SizedBox(
-                                                                    height: 15),
-                                                                Container(
-                                                                  child: Row(
-                                                                    mainAxisSize:
-                                                                        MainAxisSize
-                                                                            .min,
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .start,
-                                                                    crossAxisAlignment:
-                                                                        CrossAxisAlignment
-                                                                            .start,
-                                                                    children: [
-                                                                      Text(
-                                                                        'Time :',
-                                                                        style:
-                                                                            TextStyle(
-                                                                          color:
-                                                                              Color(0xFF5A5A5A),
-                                                                          fontSize:
-                                                                              12,
-                                                                          fontFamily:
-                                                                              'Montserrat',
-                                                                          fontWeight:
-                                                                              FontWeight.w500,
-                                                                          height:
-                                                                              0.13,
-                                                                        ),
-                                                                      ),
-                                                                      const SizedBox(
-                                                                          width:
-                                                                              5),
-                                                                      Text(
-                                                                        donor
-                                                                            .time,
-                                                                        style:
-                                                                            TextStyle(
-                                                                          color:
-                                                                              Color(0xFF5A5A5A),
-                                                                          fontSize:
-                                                                              12,
-                                                                          fontFamily:
-                                                                              'Montserrat',
-                                                                          fontWeight:
-                                                                              FontWeight.w500,
-                                                                          height:
-                                                                              0.13,
-                                                                        ),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                              ],
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
                                                             ),
                                                           ),
-                                                          const SizedBox(
-                                                              height: 15),
-                                                          InkWell(
-                                                            onTap: () {
-                                                              Navigator.push(
-                                                                context,
-                                                                PageRouteBuilder(
-                                                                  pageBuilder: (context,
-                                                                      animation,
-                                                                      secondaryAnimation) {
-                                                                    return TakerReachScreen(
-                                                                      acceptModel:
-                                                                          donor,
-                                                                      mapController:
-                                                                          homeController
-                                                                              .controllers,
-                                                                    );
-                                                                  },
-                                                                  transitionDuration:
-                                                                      const Duration(
-                                                                          microseconds:
-                                                                              100),
-                                                                  transitionsBuilder: (context,
-                                                                      animation,
-                                                                      secondaryAnimation,
-                                                                      child) {
-                                                                    const begin =
-                                                                        Offset(
-                                                                            10.0,
-                                                                            0.0); // slide in from the right
-                                                                    const end =
-                                                                        Offset
-                                                                            .zero;
-                                                                    const curve =
-                                                                        Curves
-                                                                            .easeInOutQuart;
-
-                                                                    var tween = Tween(
-                                                                            begin:
-                                                                                begin,
-                                                                            end:
-                                                                                end)
-                                                                        .chain(CurveTween(
-                                                                            curve:
-                                                                                curve));
-                                                                    var offsetAnimation =
-                                                                        animation
-                                                                            .drive(tween);
-
-                                                                    return SlideTransition(
-                                                                      position:
-                                                                          offsetAnimation,
-                                                                      child:
-                                                                          child,
-                                                                    );
-                                                                  },
-                                                                ),
-                                                              );
-                                                            },
-                                                            child: Container(
-                                                              width: 100,
-                                                              height: 30,
-                                                              padding: EdgeInsets
-                                                                  .symmetric(
-                                                                      horizontal:
-                                                                          15),
-                                                              alignment:
-                                                                  Alignment
-                                                                      .center,
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color:
-                                                                    PRIMARY_COLOR,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            5),
-                                                              ),
-                                                              child: Text(
-                                                                'see more',
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        14,
-                                                                    color: Colors
-                                                                        .white),
-                                                              ),
-                                                            ),
-                                                          )
+                                                          CustomPaint(
+                                                            size: const Size(
+                                                                45, 30),
+                                                            painter:
+                                                                BloodDropPainter(
+                                                                    blood: donor
+                                                                        .blood),
+                                                          ),
                                                         ],
                                                       ),
-                                                    ),
-                                                  ],
+                                                      const SizedBox(
+                                                          height: 10),
+
+                                                      // Details with icons
+                                                      _infoRow(
+                                                          Icons.local_hospital,
+                                                          donor.hospitalName),
+                                                      const SizedBox(height: 6),
+                                                      _infoRow(
+                                                          Icons.location_on,
+                                                          donor.location),
+                                                      const SizedBox(height: 6),
+                                                      _infoRow(Icons.date_range,
+                                                          donor.date),
+                                                      const SizedBox(height: 6),
+                                                      _infoRow(
+                                                          Icons.access_time,
+                                                          donor.time),
+
+                                                      const SizedBox(
+                                                          height: 12),
+
+                                                      // See more button
+                                                      Align(
+                                                        alignment: Alignment
+                                                            .centerLeft,
+                                                        child: ElevatedButton(
+                                                          onPressed: () {
+                                                            Navigator.push(
+                                                              context,
+                                                              PageRouteBuilder(
+                                                                pageBuilder: (context,
+                                                                    animation,
+                                                                    secondaryAnimation) {
+                                                                  return TakerReachScreen(
+                                                                    acceptModel:
+                                                                        donor,
+                                                                    mapController:
+                                                                        homeController
+                                                                            .controllers,
+                                                                  );
+                                                                },
+                                                                transitionsBuilder:
+                                                                    (context,
+                                                                        animation,
+                                                                        secondaryAnimation,
+                                                                        child) {
+                                                                  var tween = Tween(
+                                                                          begin: const Offset(
+                                                                              1.0,
+                                                                              0.0),
+                                                                          end: Offset
+                                                                              .zero)
+                                                                      .chain(CurveTween(
+                                                                          curve:
+                                                                              Curves.easeInOut));
+                                                                  return SlideTransition(
+                                                                    position: animation
+                                                                        .drive(
+                                                                            tween),
+                                                                    child:
+                                                                        child,
+                                                                  );
+                                                                },
+                                                              ),
+                                                            );
+                                                          },
+                                                          style: ElevatedButton
+                                                              .styleFrom(
+                                                            backgroundColor:
+                                                                PRIMARY_COLOR,
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          8),
+                                                            ),
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal:
+                                                                        20,
+                                                                    vertical:
+                                                                        8),
+                                                          ),
+                                                          child: const Text(
+                                                            "See More",
+                                                            style: TextStyle(
+                                                                fontSize: 14,
+                                                                color: Colors
+                                                                    .white),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                         );
-                                      })
+                                      },
+                                    )
+// Reusable info row widget
+
                               : SizedBox(),
 
                       userController.userModel == null
@@ -2124,381 +2391,560 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                       ),
                                     ),
                                     ListView.builder(
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 5),
-                                        itemCount:
-                                            homeController.donorList.length,
-                                        physics: NeverScrollableScrollPhysics(),
-                                        shrinkWrap: true,
-                                        itemBuilder: (context, index) {
-                                          if (homeController
-                                              .donorList.isEmpty) {
-                                            return Center(
-                                              child: Text(
-                                                'no data found',
-                                                style: TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 5),
+                                      itemCount:
+                                          homeController.donorList.length,
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      shrinkWrap: true,
+                                      itemBuilder: (context, index) {
+                                        if (homeController.donorList.isEmpty) {
+                                          return const Center(
+                                            child: Text(
+                                              'No data found',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black54,
                                               ),
-                                            );
-                                          } else {
-                                            DonateAcceptModel list =
-                                                homeController.donorList[index];
-                                            return Container(
-                                              width: double.infinity,
-                                              margin: EdgeInsets.symmetric(
-                                                  horizontal: 5.w, vertical: 5),
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 10, vertical: 20),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                color: Color(0xFF3F3F3)
-                                                    .withValues(alpha: 0.2),
-                                                border: Border.all(
-                                                    width: 1,
-                                                    color: Colors.grey
-                                                        .withValues(
-                                                            alpha: 0.5)),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.grey.shade200,
-                                                    blurRadius: 10,
-                                                    offset: Offset(0, 4),
-                                                    spreadRadius: 1,
-                                                  ),
-                                                ],
+                                            ),
+                                          );
+                                        } else {
+                                          DonateAcceptModel list =
+                                              homeController.donorList[index];
+                                          return Container(
+                                            width: double.infinity,
+                                            margin: EdgeInsets.symmetric(
+                                                horizontal: 5.w, vertical: 6),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 14, vertical: 16),
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              color: Colors.white,
+                                              border: Border.all(
+                                                width: 1,
+                                                color: Colors.grey
+                                                    .withValues(alpha: .2),
                                               ),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                children: [
-                                                  Row(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    children: [
-                                                      Container(
-                                                        width: 70,
-                                                        height: 70,
-                                                        child: ClipRRect(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      100),
-                                                          child:
-                                                              CachedNetworkImage(
-                                                            fit: BoxFit.cover,
-                                                            imageUrl: list.image
-                                                                    .isNotEmpty
-                                                                ? list.image
-                                                                : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
-                                                            placeholder: (context,
-                                                                    url) =>
-                                                                const CupertinoActivityIndicator(
-                                                              color:
-                                                                  Colors.white,
-                                                            ),
-                                                            errorWidget:
-                                                                (context, url,
-                                                                        error) =>
-                                                                    Icon(Icons
-                                                                        .error),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.grey
+                                                      .withValues(alpha: 0.15),
+                                                  blurRadius: 8,
+                                                  offset: const Offset(0, 4),
+                                                  spreadRadius: 2,
+                                                ),
+                                              ],
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                /// TOP ROW: Profile + Info
+                                                Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    /// Profile Image
+                                                    Container(
+                                                      width: 70,
+                                                      height: 70,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(100),
+                                                        border: Border.all(
+                                                            color: Colors
+                                                                .blueAccent,
+                                                            width: 2),
+                                                      ),
+                                                      child: ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(100),
+                                                        child:
+                                                            CachedNetworkImage(
+                                                          fit: BoxFit.cover,
+                                                          imageUrl: list.image
+                                                                  .isNotEmpty
+                                                              ? list.image
+                                                              : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
+                                                          placeholder:
+                                                              (context, url) =>
+                                                                  const Center(
+                                                            child:
+                                                                CupertinoActivityIndicator(),
                                                           ),
+                                                          errorWidget: (context,
+                                                                  url, error) =>
+                                                              const Icon(
+                                                                  Icons.error,
+                                                                  color: Colors
+                                                                      .redAccent),
                                                         ),
                                                       ),
-                                                      const SizedBox(width: 10),
-                                                      Container(
-                                                        child: Expanded(
-                                                          child: Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .max,
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .start,
+                                                    ),
+                                                    const SizedBox(width: 12),
+
+                                                    /// Donor Info
+                                                    Expanded(
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          /// Full name
+                                                          Text(
+                                                            list.fullname,
+                                                            style:
+                                                                const TextStyle(
+                                                              fontSize: 16,
+                                                              color: Colors
+                                                                  .black87,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              height: 8),
+
+                                                          /// Location
+                                                          Row(
                                                             crossAxisAlignment:
                                                                 CrossAxisAlignment
                                                                     .start,
                                                             children: [
-                                                              Text(
-                                                                list.fullname,
-                                                                style: TextStyle(
+                                                              const Text(
+                                                                'Location: ',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize: 14,
+                                                                  color: Colors
+                                                                      .black87,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                ),
+                                                              ),
+                                                              Expanded(
+                                                                child: Text(
+                                                                  list.location,
+                                                                  style:
+                                                                      TextStyle(
                                                                     fontSize:
-                                                                        15,
+                                                                        14,
                                                                     color: Colors
-                                                                        .black,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold),
-                                                              ),
-                                                              SizedBox(
-                                                                height: 7,
-                                                              ),
-                                                              Row(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Text(
-                                                                    'Location : ',
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            14,
-                                                                        color: Colors
-                                                                            .black,
-                                                                        fontWeight:
-                                                                            FontWeight.w500),
+                                                                        .grey
+                                                                        .shade700,
                                                                   ),
-                                                                  Expanded(
-                                                                    child: Text(
-                                                                      list.location,
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              14,
-                                                                          color: Colors
-                                                                              .black
-                                                                              .withValues(alpha: 0.7)),
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              SizedBox(
-                                                                height: 7,
-                                                              ),
-                                                              Row(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Text(
-                                                                    'Hospital Name : ',
-                                                                    style: TextStyle(
-                                                                        fontSize: 16
-                                                                            .sp,
-                                                                        color: Colors
-                                                                            .black,
-                                                                        fontWeight:
-                                                                            FontWeight.w500),
-                                                                  ),
-                                                                  Expanded(
-                                                                    child: Text(
-                                                                      list.hospitalName,
-                                                                      style: TextStyle(
-                                                                          fontSize: 16
-                                                                              .sp,
-                                                                          color: Colors
-                                                                              .black
-                                                                              .withValues(alpha: 0.7)),
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              SizedBox(
-                                                                height: 7,
-                                                              ),
-                                                              Row(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Text(
-                                                                    'Blood Group : ',
-                                                                    style: TextStyle(
-                                                                        fontSize: 16
-                                                                            .sp,
-                                                                        color: Colors
-                                                                            .black,
-                                                                        fontWeight:
-                                                                            FontWeight.w500),
-                                                                  ),
-                                                                  Expanded(
-                                                                    child: Text(
-                                                                      list.blood,
-                                                                      style: TextStyle(
-                                                                          fontSize: 16
-                                                                              .sp,
-                                                                          color: Colors
-                                                                              .black
-                                                                              .withValues(alpha: 0.7)),
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              SizedBox(
-                                                                height: 10,
-                                                              ),
-                                                              Row(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Text(
-                                                                    'Date : ',
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            14,
-                                                                        color: Colors
-                                                                            .black,
-                                                                        fontWeight:
-                                                                            FontWeight.w500),
-                                                                  ),
-                                                                  Expanded(
-                                                                    child: Text(
-                                                                      list.date,
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              14,
-                                                                          color: Colors
-                                                                              .black
-                                                                              .withValues(alpha: 0.7)),
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              SizedBox(
-                                                                height: 10,
-                                                              ),
-                                                              Row(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Text(
-                                                                    'Time : ',
-                                                                    style: TextStyle(
-                                                                        fontSize: 16
-                                                                            .sp,
-                                                                        color: Colors
-                                                                            .black,
-                                                                        fontWeight:
-                                                                            FontWeight.w500),
-                                                                  ),
-                                                                  Expanded(
-                                                                    child: Text(
-                                                                      list.time,
-                                                                      style: TextStyle(
-                                                                          fontSize: 16
-                                                                              .sp,
-                                                                          color: Colors
-                                                                              .black
-                                                                              .withValues(alpha: 0.7)),
-                                                                    ),
-                                                                  ),
-                                                                ],
+                                                                ),
                                                               ),
                                                             ],
                                                           ),
+                                                          const SizedBox(
+                                                              height: 6),
+
+                                                          /// Hospital Name
+                                                          Row(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              const Text(
+                                                                'Hospital: ',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize: 14,
+                                                                  color: Colors
+                                                                      .black87,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                ),
+                                                              ),
+                                                              Expanded(
+                                                                child: Text(
+                                                                  list.hospitalName,
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        14,
+                                                                    color: Colors
+                                                                        .grey
+                                                                        .shade700,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          const SizedBox(
+                                                              height: 6),
+
+                                                          /// Blood Group
+                                                          Row(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              const Text(
+                                                                'Blood Group: ',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize: 14,
+                                                                  color: Colors
+                                                                      .black87,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                ),
+                                                              ),
+                                                              Expanded(
+                                                                child: Text(
+                                                                  list.blood,
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        14,
+                                                                    color: Colors
+                                                                        .redAccent,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          const SizedBox(
+                                                              height: 6),
+
+                                                          /// Date
+                                                          Row(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              const Text(
+                                                                'Date: ',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize: 14,
+                                                                  color: Colors
+                                                                      .black87,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                ),
+                                                              ),
+                                                              Expanded(
+                                                                child: Text(
+                                                                  list.date,
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        14,
+                                                                    color: Colors
+                                                                        .grey
+                                                                        .shade700,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          const SizedBox(
+                                                              height: 6),
+
+                                                          /// Time
+                                                          Row(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              const Text(
+                                                                'Time: ',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize: 14,
+                                                                  color: Colors
+                                                                      .black87,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                ),
+                                                              ),
+                                                              Expanded(
+                                                                child: Text(
+                                                                  list.time,
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        14,
+                                                                    color: Colors
+                                                                        .grey
+                                                                        .shade700,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+
+                                                const SizedBox(height: 14),
+
+                                                /// ACTION BUTTON
+                                                Align(
+                                                  alignment:
+                                                      Alignment.centerRight,
+                                                  child: InkWell(
+                                                    onTap: () async {
+                                                      bool result =
+                                                          await homeController
+                                                              .checkUserCnicVerification();
+                                                      if (result) {
+                                                        Navigator.push(
+                                                          context,
+                                                          PageRouteBuilder(
+                                                            pageBuilder: (context,
+                                                                animation,
+                                                                secondaryAnimation) {
+                                                              return BloodJourneyScreen(
+                                                                donateModel:
+                                                                    list,
+                                                                mapController:
+                                                                    homeController
+                                                                        .controllers,
+                                                              );
+                                                            },
+                                                            transitionDuration:
+                                                                const Duration(
+                                                                    milliseconds:
+                                                                        300),
+                                                            transitionsBuilder:
+                                                                (context,
+                                                                    animation,
+                                                                    secondaryAnimation,
+                                                                    child) {
+                                                              const begin =
+                                                                  Offset(
+                                                                      1.0, 0.0);
+                                                              const end =
+                                                                  Offset.zero;
+                                                              const curve = Curves
+                                                                  .easeInOutCubic;
+
+                                                              var tween = Tween(
+                                                                      begin:
+                                                                          begin,
+                                                                      end: end)
+                                                                  .chain(CurveTween(
+                                                                      curve:
+                                                                          curve));
+                                                              var offsetAnimation =
+                                                                  animation
+                                                                      .drive(
+                                                                          tween);
+
+                                                              return SlideTransition(
+                                                                position:
+                                                                    offsetAnimation,
+                                                                child: child,
+                                                              );
+                                                            },
+                                                          ),
+                                                        );
+                                                      } else {
+                                                        showDialog(
+                                                          context: navigatorKey
+                                                              .currentContext!,
+                                                          barrierDismissible:
+                                                              false,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return AlertDialog(
+                                                              shape:
+                                                                  RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            16),
+                                                              ),
+                                                              title: Row(
+                                                                children: [
+                                                                  Icon(
+                                                                      Icons
+                                                                          .verified_user,
+                                                                      color: Colors
+                                                                          .redAccent),
+                                                                  SizedBox(
+                                                                      width: 8),
+                                                                  Text(
+                                                                    "CNIC Verification Required",
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            16,
+                                                                        fontWeight:
+                                                                            FontWeight.w500),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              content: Column(
+                                                                mainAxisSize:
+                                                                    MainAxisSize
+                                                                        .min,
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Text(
+                                                                    "Please verify your CNIC before proceeding.",
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight.w500),
+                                                                  ),
+                                                                  SizedBox(
+                                                                      height:
+                                                                          12),
+                                                                  Text(
+                                                                    "• If you are a Taker: You cannot request blood without CNIC verification.\n\n"
+                                                                    "• If you are a Donor: You cannot donate blood without verifying your CNIC.\n\n"
+                                                                    "👉 Go to your account section and verify your CNIC to continue.",
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            14,
+                                                                        color: Colors
+                                                                            .black87),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              actions: [
+                                                                TextButton(
+                                                                  onPressed: () =>
+                                                                      Navigator.of(
+                                                                              context)
+                                                                          .pop(),
+                                                                  child: Text(
+                                                                      "Later",
+                                                                      style: TextStyle(
+                                                                          color:
+                                                                              Colors.black)),
+                                                                ),
+                                                                ElevatedButton(
+                                                                  style: ElevatedButton
+                                                                      .styleFrom(
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .redAccent,
+                                                                    shape:
+                                                                        RoundedRectangleBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              8),
+                                                                    ),
+                                                                  ),
+                                                                  onPressed:
+                                                                      () {
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop();
+                                                                    showModalBottomSheet(
+                                                                      context:
+                                                                          context,
+                                                                      isDismissible:
+                                                                          false,
+                                                                      enableDrag:
+                                                                          false,
+                                                                      isScrollControlled:
+                                                                          true,
+                                                                      backgroundColor:
+                                                                          Colors
+                                                                              .transparent,
+                                                                      builder:
+                                                                          (BuildContext
+                                                                              context) {
+                                                                        return Container(
+                                                                          margin:
+                                                                              EdgeInsets.only(top: 40),
+                                                                          decoration:
+                                                                              BoxDecoration(
+                                                                            color:
+                                                                                Colors.white,
+                                                                            borderRadius:
+                                                                                BorderRadius.vertical(top: Radius.circular(20)),
+                                                                          ),
+                                                                          child:
+                                                                              ClipRRect(
+                                                                            borderRadius:
+                                                                                BorderRadius.vertical(top: Radius.circular(20)),
+                                                                            child:
+                                                                                CardScanningScreen(),
+                                                                          ),
+                                                                        );
+                                                                      },
+                                                                    );
+                                                                  },
+                                                                  child: Text(
+                                                                    "Verify Now",
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .white),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            );
+                                                          },
+                                                        );
+                                                      }
+                                                    },
+                                                    child: Container(
+                                                      height: 40,
+                                                      width: 140,
+                                                      alignment:
+                                                          Alignment.center,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors
+                                                            .green.shade600,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8),
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: Colors.green
+                                                                .withValues(
+                                                                    alpha: 0.2),
+                                                            blurRadius: 6,
+                                                            offset:
+                                                                const Offset(
+                                                                    0, 3),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      child: Text(
+                                                        'Accepted',
+                                                        style: TextStyle(
+                                                          fontSize: 15.sp,
+                                                          color: Colors.white,
+                                                          fontWeight:
+                                                              FontWeight.w600,
                                                         ),
                                                       ),
-                                                    ],
+                                                    ),
                                                   ),
-                                                  SizedBox(
-                                                    height: 10,
-                                                  ),
-                                                  Row(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment.end,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.end,
-                                                    children: [
-                                                      SizedBox(
-                                                        width: 10,
-                                                      ),
-                                                      InkWell(
-                                                        onTap: () {
-                                                          Navigator.push(
-                                                            context,
-                                                            PageRouteBuilder(
-                                                              pageBuilder: (context,
-                                                                  animation,
-                                                                  secondaryAnimation) {
-                                                                return BloodJourneyScreen(
-                                                                  donateModel:
-                                                                      list,
-                                                                  mapController:
-                                                                      homeController
-                                                                          .controllers,
-                                                                );
-                                                              },
-                                                              transitionDuration:
-                                                                  const Duration(
-                                                                      microseconds:
-                                                                          100),
-                                                              transitionsBuilder:
-                                                                  (context,
-                                                                      animation,
-                                                                      secondaryAnimation,
-                                                                      child) {
-                                                                const begin =
-                                                                    Offset(10.0,
-                                                                        0.0); // slide in from the right
-                                                                const end =
-                                                                    Offset.zero;
-                                                                const curve = Curves
-                                                                    .easeInOutQuart;
-
-                                                                var tween = Tween(
-                                                                        begin:
-                                                                            begin,
-                                                                        end:
-                                                                            end)
-                                                                    .chain(CurveTween(
-                                                                        curve:
-                                                                            curve));
-                                                                var offsetAnimation =
-                                                                    animation
-                                                                        .drive(
-                                                                            tween);
-
-                                                                return SlideTransition(
-                                                                  position:
-                                                                      offsetAnimation,
-                                                                  child: child,
-                                                                );
-                                                              },
-                                                            ),
-                                                          );
-                                                        },
-                                                        child: Container(
-                                                          height: 38,
-                                                          width: 220,
-                                                          alignment:
-                                                              Alignment.center,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color:
-                                                                PRIMARY_COLOR,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        5),
-                                                            border: Border.all(
-                                                              color: Colors.red,
-                                                              width: 1.0,
-                                                            ),
-                                                          ),
-                                                          child: Text(
-                                                            'Donate',
-                                                            style: TextStyle(
-                                                                fontSize: 16.sp,
-                                                                color: Colors
-                                                                    .white),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  )
-                                                ],
-                                              ),
-                                            );
-                                          }
-                                        }),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        }
+                                      },
+                                    )
                                   ],
                                 )
                               : SizedBox(),
@@ -2513,6 +2959,26 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           );
         },
       ),
+    );
+  }
+
+  Widget _infoRow(IconData icon, String text) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 16, color: Colors.grey[600]),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey[700],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

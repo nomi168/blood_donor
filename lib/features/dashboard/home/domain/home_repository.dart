@@ -1,6 +1,7 @@
 import 'package:blood_donor/features/dashboard/home/data/datasource/remote_home_datasource.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/active_user_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/banner_model.dart';
+import 'package:blood_donor/features/dashboard/home/data/models/blood_bank_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/donor_accept_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/taker_model.dart';
 
@@ -252,6 +253,30 @@ class HomeRepository {
   Future<FeedTakerModel?> checkTakerCondition() async {
     try {
       return await _datasource.checkTakerCondition();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<BloodBank>> getBloodBanks() async {
+    try {
+      return await _datasource.getBloodBanks();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> addBloodBankDonor(dynamic payload) async {
+    try {
+      return await _datasource.addBloodBankDonor(payload);
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  Future<bool> checkUserCnicVerification() async {
+    try {
+      return await _datasource.checkUserCnicVerification();
     } catch (e) {
       rethrow;
     }

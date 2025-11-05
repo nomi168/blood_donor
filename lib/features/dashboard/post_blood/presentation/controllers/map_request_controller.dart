@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:blood_donor/constants.dart';
+import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/core/utils/api_response.dart';
 import 'package:blood_donor/core/utils/console_logs.dart';
 import 'package:blood_donor/features/auth/data/models/user_model.dart';
-import 'package:blood_donor/features/dashboard/home/presentation/screens/Dashboatd.dart';
+import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboatd.dart';
 import 'package:blood_donor/features/dashboard/post_blood/data/models/user_location_model.dart';
 import 'package:blood_donor/features/dashboard/post_blood/domain/repository_post_request.dart';
 import 'package:blood_donor/main.dart';

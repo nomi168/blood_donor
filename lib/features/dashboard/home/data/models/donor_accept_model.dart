@@ -64,7 +64,7 @@ class DonateAcceptModel {
         location: json['location'] ?? '',
         note: json['note'] ?? '',
         blood: json['blood'] ?? '',
-        bloodImage: json['blood_image'],
+        bloodImage: json['blood_image']?? '',
         unit: json['unit'] ?? '',
         phoneNumber: json['phone_number'] ?? '',
         situation: json['situation'] ?? '',

@@ -1,13 +1,16 @@
 // ignore_for_file: file_names, use_build_context_synchronously
-import 'package:blood_donor/constants.dart';
+import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/core/validate_test_field.dart';
+import 'package:blood_donor/features/auth/data/models/user_model.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/login_controller.dart';
+import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:blood_donor/features/auth/presentation/screens/forgot_screen.dart';
 import 'package:blood_donor/features/auth/presentation/screens/signup_screen.dart';
-import 'package:blood_donor/features/dashboard/home/presentation/screens/Dashboatd.dart';
+import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboatd.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -217,10 +220,22 @@ class LoginScreen extends StatelessWidget {
 
                               return;
                             }
-                            bool? result = await controller.loginToFirebase(
-                                controller.email.text.trim(),
-                                controller.password.text.trim());
-                            if (result) {
+                            UserModel? result =
+                                await controller.loginToFirebase(
+                                    controller.email.text.trim(),
+                                    controller.password.text.trim());
+                            if (result != null) {
+                              await Get.put(UserController(), permanent: true);
+                              UserController.to.userModel = result;
+                              UserController.to.isUserData = true;
+                              controller.update();
+                              SharedPreferences prefs =
+                                  await SharedPreferences.getInstance();
+
+                              result.email;
+                              prefs.setString('user_email', result.email);
+
+                              prefs.setString('user_uid', result.id);
                               Get.snackbar(
                                 "Success",
                                 "login successfully",

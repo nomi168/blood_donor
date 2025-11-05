@@ -1,6 +1,6 @@
-import 'package:blood_donor/constants.dart';
+import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/otp_controller.dart';
-import 'package:blood_donor/features/auth/presentation/screens/card_scanning_screen.dart';
+import 'package:blood_donor/features/auth/presentation/screens/questions_screen.dart';
 import 'package:email_otp/email_otp.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -313,7 +313,7 @@ class OtpScreen extends StatelessWidget {
                         PageRouteBuilder(
                           pageBuilder:
                               (context, animation, secondaryAnimation) {
-                            return CardScanningScreen(
+                            return QuestionsScreen(
                               payload: payload,
                             );
                           },

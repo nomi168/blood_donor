@@ -1,6 +1,6 @@
 // ignore_for_file: file_names
 
-import 'package:blood_donor/constants.dart';
+import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:blood_donor/features/dashboard/account/data/models/history_model.dart';
 import 'package:blood_donor/features/dashboard/account/presentation/controllers/history_controller.dart';
@@ -100,102 +100,139 @@ class HistoryScreen extends StatelessWidget {
                             )
                           : Expanded(
                               child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 15),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 15),
                                 child: ListView.builder(
                                   itemCount: controller.historyList.length,
                                   itemBuilder: (context, index) {
                                     BloodHistoryModel his =
                                         controller.historyList[index];
-                                    return Container(
-                                      margin: EdgeInsets.symmetric(vertical: 5),
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 10, vertical: 10),
-                                      decoration: BoxDecoration(
-                                          color: Colors.grey.shade300,
+
+                                    // Pick data depending on user type
+                                    final isDonor =
+                                        UserController.to.userModel!.type ==
+                                            'donor';
+                                    final name =
+                                        isDonor ? his.takername : his.donorname;
+                                    final email = isDonor
+                                        ? his.takeremail
+                                        : his.donoremail;
+                                    final blood = isDonor
+                                        ? his.takerblood
+                                        : his.donorblood;
+                                    final image = isDonor
+                                        ? his.takerimage
+                                        : his.donorimage;
+
+                                    return TweenAnimationBuilder(
+                                      duration: Duration(milliseconds: 400),
+                                      curve: Curves.easeOut,
+                                      tween: Tween<double>(begin: 0, end: 1),
+                                      builder: (context, value, child) {
+                                        return Transform.translate(
+                                          offset: Offset(0, (1 - value) * 20),
+                                          child: Opacity(
+                                              opacity: value, child: child),
+                                        );
+                                      },
+                                      child: Container(
+                                        margin: const EdgeInsets.symmetric(
+                                            vertical: 8),
+                                        padding: const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
                                           borderRadius:
-                                              BorderRadius.circular(06)),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            width: 70,
-                                            height: 70,
-                                            child: ClipRRect(
+                                              BorderRadius.circular(12),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black12,
+                                              blurRadius: 6,
+                                              offset: Offset(0, 3),
+                                            )
+                                          ],
+                                        ),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            // Profile image
+                                            ClipRRect(
                                               borderRadius:
                                                   BorderRadius.circular(10),
                                               child: CachedNetworkImage(
                                                 fit: BoxFit.cover,
-                                                imageUrl: UserController.to
-                                                            .userModel!.type ==
-                                                        'donor'
-                                                    ? his.takerimage
-                                                    : his.donorimage,
+                                                width: 70,
+                                                height: 70,
+                                                imageUrl: image,
                                                 placeholder: (context, url) =>
-                                                    const CupertinoActivityIndicator(
-                                                  color: Colors.white,
-                                                ),
-                                                errorWidget:
-                                                    (context, url, error) =>
-                                                        Icon(Icons.error),
+                                                    const CupertinoActivityIndicator(),
+                                                errorWidget: (context, url,
+                                                        error) =>
+                                                    Icon(Icons.person,
+                                                        size: 40,
+                                                        color: Colors.grey),
                                               ),
                                             ),
-                                          ),
-                                          SizedBox(
-                                            width: 10,
-                                          ),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Container(
-                                                child: Text(
-                                                  UserController.to.userModel!
-                                                              .type ==
-                                                          'donor'
-                                                      ? his.takername
-                                                      : his.donorname,
-                                                  style: TextStyle(
+                                            const SizedBox(width: 12),
+                                      
+                                            // Text info
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    name,
+                                                    style: TextStyle(
                                                       fontSize: 17,
                                                       fontWeight:
-                                                          FontWeight.w500),
-                                                ),
-                                              ),
-                                              Container(
-                                                child: Text(
-                                                  UserController.to.userModel!
-                                                              .type ==
-                                                          'donor'
-                                                      ? his.takeremail
-                                                      : his.donoremail,
-                                                  style: TextStyle(
+                                                          FontWeight.bold,
+                                                      color: Colors.black87,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    email,
+                                                    style: TextStyle(
                                                       fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500),
-                                                ),
+                                                      color: Colors.black54,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 6),
+                                                  Container(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 10,
+                                                        vertical: 4),
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          Colors.red.shade50,
+                                                      borderRadius:
+                                                          BorderRadius
+                                                              .circular(20),
+                                                    ),
+                                                    child: Text(
+                                                      "Blood Type: $blood",
+                                                      style: TextStyle(
+                                                        fontSize: 13,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color: Colors
+                                                            .red.shade700,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                              Container(
-                                                child: Text(
-                                                  UserController.to.userModel!
-                                                              .type ==
-                                                          'donor'
-                                                      ? 'blood-type: ${his.takerblood}'
-                                                      : 'blood-type: ${his.donorblood}',
-                                                  style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500),
-                                                ),
-                                              ),
-                                            ],
-                                          )
-                                        ],
+                                            )
+                                          ],
+                                        ),
                                       ),
                                     );
                                   },
                                 ),
                               ),
-                            ),
+                            )
                 ]);
           },
         ),

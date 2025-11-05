@@ -57,7 +57,7 @@ class AuthRepository {
     }
   }
 
-  Future<bool> loginToFirestore(String email, String password) async {
+  Future<UserModel?> loginToFirestore(String email, String password) async {
     try {
       return await _authDataSource.loginToFirestore(email, password);
     } catch (e) {

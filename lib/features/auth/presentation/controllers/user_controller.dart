@@ -8,15 +8,22 @@ class UserController extends GetxController {
   static UserController get to => Get.find();
 
   UserModel? userModel;
+  bool isUserData = false;
 
   @override
   void onInit() {
-    getUserData();
+    if (!isUserData) {
+      getUserData();
+    }
+
     super.onInit();
   }
 
   Future<void> getUserData() async {
-    userModel = await getUserDataByEmail();
+    if (userModel == null) {
+      userModel = await getUserDataByEmail();
+    }
+
     update();
   }
 

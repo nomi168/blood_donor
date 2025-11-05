@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:blood_donor/core/utils/console_logs.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:blood_donor/features/dashboard/account/data/models/history_model.dart';
+import 'package:blood_donor/features/dashboard/account/data/models/voucher_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +26,8 @@ class RemoteAccountDatasource {
         DocumentSnapshot userDoc = querySnapshot.docs.first;
 
         return userDoc['status'];
+      } else if (querySnapshot.docs.isEmpty) {
+        return true;
       } else {
         return false;
       }
@@ -209,6 +213,44 @@ class RemoteAccountDatasource {
       }
     } catch (e) {
       debugPrint("❌ Update Profile Error: $e");
+      rethrow;
+    }
+  }
+
+  Future<List<VoucherModel>> getVoucherHistory() async {
+    try {
+      List<VoucherModel> voucherList = [];
+      QuerySnapshot voucherQuerySnapshot = await FirebaseFirestore.instance
+          .collection('vouchers')
+          .where('email', isEqualTo: UserController.to.userModel!.email)
+          .get();
+
+      if (voucherQuerySnapshot.docs.isNotEmpty) {
+        for (var doc in voucherQuerySnapshot.docs) {
+          voucherList
+              .add(VoucherModel.fromMap((doc.data() as Map<String, dynamic>)));
+        }
+      } else {
+        logError('data not found!');
+      }
+      return voucherList;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> checkUserCnicVerification(String card) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('card_scanning_users')
+          .where('email', isEqualTo: card)
+          .get();
+      if (querySnapshot.docs.isNotEmpty) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
       rethrow;
     }
   }

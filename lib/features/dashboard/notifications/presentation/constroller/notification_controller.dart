@@ -1,5 +1,5 @@
-import 'package:blood_donor/Services/notification_storage.dart';
-import 'package:blood_donor/features/dashboard/Main%20Screen/notifications/data/model/notificationModel.dart';
+import 'package:blood_donor/core/utils/services/notification_storage.dart';
+import 'package:blood_donor/features/dashboard/notifications/data/model/notificationModel.dart';
 import 'package:get/get.dart';
 
 class NotificationsProvider extends GetxController {

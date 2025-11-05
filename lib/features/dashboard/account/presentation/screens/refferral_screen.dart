@@ -1,7 +1,5 @@
 // ignore_for_file: file_names
 
-import 'package:blood_donor/constants.dart';
-import 'package:blood_donor/features/dashboard/account/presentation/screens/account_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
@@ -43,77 +41,83 @@ class _RefferalInvitationScreenState extends State<RefferalInvitationScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Column(children: [
+          child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Top Bar with back + title
           Row(
             children: [
-              Padding(
-                  padding: EdgeInsets.fromLTRB(2.w, 0.h, 0, 0),
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.arrow_back_ios_new,
-                      size: 30,
-                    ),
-                    onPressed: () {
-                      Navigator.pop(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) {
-                            return const AccountScreen();
-                          },
-                          transitionDuration: const Duration(microseconds: 100),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            const begin =
-                                Offset(-10.0, 0.0); // slide in from the left
-                            const end = Offset.zero;
-                            const curve = Curves.easeInOutQuart;
-
-                            var tween = Tween(begin: begin, end: end)
-                                .chain(CurveTween(curve: curve));
-                            var offsetAnimation = animation.drive(tween);
-
-                            return SlideTransition(
-                              position: offsetAnimation,
-                              child: child,
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  )),
-              Padding(
-                padding: EdgeInsets.fromLTRB(20.w, 0.h, 0, 0),
-                child: Text(
-                  'Refferal Iniviation',
-                  style: TextStyle(
-                      fontSize: 17.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black54),
+              IconButton(
+                icon: const Icon(
+                  Icons.arrow_back_ios_new,
+                  size: 26,
+                  color: Colors.black87,
                 ),
-              )
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              Expanded(
+                child: Center(
+                  child: Text(
+                    'Referral Invitation',
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: 48), // balance with back button
             ],
           ),
-          SizedBox(
-            height: 20,
+
+          const SizedBox(height: 20),
+
+          // Image Banner
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.asset(
+              'images/image1.jpeg',
+              fit: BoxFit.cover,
+              height: 250,
+              width: double.infinity,
+            ),
           ),
-          Image.asset('images/image1.jpeg'),
+
+          const SizedBox(height: 20),
+
+          // App Link Card
           Container(
-            margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 8,
+                  offset: Offset(0, 3),
+                ),
+              ],
+            ),
             child: TextField(
               controller: TextEditingController(text: appLink),
               readOnly: true,
               decoration: InputDecoration(
-                border: OutlineInputBorder(),
+                border: InputBorder.none,
                 labelText: 'App Link',
                 suffixIcon: IconButton(
-                  icon: Icon(Icons.copy),
+                  icon: const Icon(Icons.copy, color: Colors.blue),
                   onPressed: () {
-                    // Copy app link to clipboard
                     Clipboard.setData(ClipboardData(text: appLink));
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('App link copied to clipboard!'),
+                        backgroundColor: Colors.green,
+                        content: Text('App link copied to clipboard!',
+                            style: TextStyle(color: Colors.white)),
                       ),
                     );
                   },
@@ -121,67 +125,99 @@ class _RefferalInvitationScreenState extends State<RefferalInvitationScreen> {
               ),
             ),
           ),
+
+          const SizedBox(height: 30),
+
+          // Share Buttons
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // WhatsApp Button
               InkWell(
-                onTap: () {
-                  _launchWhatsApp();
-                },
+                onTap: _launchWhatsApp,
+                borderRadius: BorderRadius.circular(12),
                 child: Container(
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(08),
-                      color: Colors.grey.withValues(alpha: 0.3)),
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 6,
+                        offset: Offset(0, 2),
+                      )
+                    ],
+                  ),
                   child: Column(
                     children: [
-                      Image.network(
-                          height: 40,
-                          width: 40,
-                          'https://cdn-icons-png.freepik.com/256/15707/15707917.png?semt=ais_hybrid'),
+                      CircleAvatar(
+                        radius: 28,
+                        backgroundColor: Colors.green.withValues(alpha: .1),
+                        child: Image.network(
+                          'https://cdn-icons-png.freepik.com/256/15707/15707917.png',
+                          height: 34,
+                          width: 34,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
                       Text(
-                        'Whatsapp',
+                        'WhatsApp',
                         style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.bold,
-                            color: PRIMARY_COLOR),
-                      )
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.green.shade700,
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ),
-              SizedBox(width: 20),
+
+              const SizedBox(width: 30),
+
+              // Email Button
               InkWell(
-                onTap: () {
-                  _launchEmail();
-                },
+                onTap: _launchEmail,
+                borderRadius: BorderRadius.circular(12),
                 child: Container(
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(08),
-                      color: Colors.grey.withValues(alpha: 0.3)),
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 6,
+                        offset: Offset(0, 2),
+                      )
+                    ],
+                  ),
                   child: Column(
                     children: [
-                      Icon(
-                        Icons.email,
-                        size: 40,
-                        color: Colors.blue,
+                      CircleAvatar(
+                        radius: 28,
+                        backgroundColor: Colors.blue.withValues(alpha: .1),
+                        child: const Icon(Icons.email,
+                            size: 30, color: Colors.blue),
                       ),
+                      const SizedBox(height: 8),
                       Text(
                         'Email',
                         style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.bold,
-                            color: PRIMARY_COLOR),
-                      )
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.blue,
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ),
             ],
           ),
-        ]),
-      ),
+        ],
+      )),
     );
   }
 }

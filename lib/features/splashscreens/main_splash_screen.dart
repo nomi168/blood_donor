@@ -4,7 +4,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 // import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sizer/sizer.dart';
 
-import '../dashboard/home/presentation/screens/Dashboatd.dart';
+import '../dashboard/home/presentation/screens/dashboatd.dart';
 
 class MainSplash extends StatefulWidget {
   const MainSplash({super.key});

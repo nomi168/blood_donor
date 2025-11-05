@@ -1,4 +1,4 @@
-import 'package:blood_donor/constants.dart';
+import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:blood_donor/features/dashboard/chat/data/models/chat_accept_model.dart';
 import 'package:blood_donor/features/dashboard/chat/presentation/controllers/chat_controller.dart';
@@ -35,25 +35,35 @@ class ChatScreen extends StatelessWidget {
                       )),
                   chatController.chatList.isEmpty &&
                           chatController.isLoading == true
-                      ? SizedBox(
-                          // height: 60.h,
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              color: PRIMARY_COLOR,
-                              strokeWidth: 4,
-                            ),
-                          ),
-                        )
-                      : chatController.chatList.isEmpty
-                          ? Center(
-                              child: Text(
-                                'No Person Inbox',
-                                style: TextStyle(
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black54),
+                      ? Column(
+                        children: [
+                          SizedBox(height: 40.h,),
+                          SizedBox(
+                              // height: 60.h,
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  color: PRIMARY_COLOR,
+                                  strokeWidth: 4,
+                                ),
                               ),
-                            )
+                            ),
+                        ],
+                      )
+                      : chatController.chatList.isEmpty
+                          ? Column(
+                            children: [
+                              SizedBox(height: 40.h,),
+                              Center(
+                                  child: Text(
+                                    'No Person in Inbox',
+                                    style: TextStyle(
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black54),
+                                  ),
+                                ),
+                            ],
+                          )
                           : Expanded(
                               child: UserController.to.userModel!.type ==
                                       'donor'

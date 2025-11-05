@@ -1,4 +1,4 @@
-import 'package:blood_donor/constants.dart';
+import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/features/dashboard/menus/presentation/controllers/privacy_policy_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

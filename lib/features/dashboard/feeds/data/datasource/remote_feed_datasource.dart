@@ -532,6 +532,22 @@ class RemoteFeedDatasource {
     }
   }
 
+  Future<bool> checkUserCnicVerification(String card) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('card_scanning_users')
+          .where('email', isEqualTo: card)
+          .get();
+      if (querySnapshot.docs.isNotEmpty) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   //   Future<void> checkAvailabilityDonor() async {
   //   final firestore = FirebaseFirestore.instance;
 

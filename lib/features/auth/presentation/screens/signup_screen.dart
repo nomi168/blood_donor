@@ -1,4 +1,4 @@
-import 'package:blood_donor/constants.dart';
+import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/core/validate_test_field.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/signup_controller.dart';
 import 'package:blood_donor/features/auth/presentation/screens/login_screen.dart';

@@ -1,4 +1,4 @@
-import 'package:blood_donor/constants.dart';
+
 import 'package:blood_donor/core/utils/api_response.dart';
 import 'package:blood_donor/features/dashboard/menus/data/models/faqs_model.dart';
 import 'package:blood_donor/features/dashboard/menus/domain/term_condition_repository.dart';
@@ -160,84 +160,126 @@ class _FAQsScreenState extends State<FAQsScreen>
                   itemBuilder: (BuildContext context, int index) {
                     var faq = filteredFaqsList[index];
                     bool isExpanded = expandedItems.contains(index);
+
                     return Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 20.0, vertical: 8.0),
-                      child: Container(
+                          horizontal: 16, vertical: 6),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 5, vertical: 5),
-                        width: double.infinity,
+                            horizontal: 14, vertical: 12),
                         decoration: BoxDecoration(
-                          color:
-                              Colors.blueGrey.shade100.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(6.0),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
-                              spreadRadius: 0.5,
-                              blurRadius: 1,
-                              offset: const Offset(0, 0),
+                              color: Colors.black.withValues(alpha: .08),
+                              blurRadius: 12,
+                              spreadRadius: 2,
+                              offset: const Offset(0, 4),
                             ),
                           ],
+                          border: Border.all(
+                            color: Colors.grey.shade200,
+                            width: 1,
+                          ),
                         ),
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // FAQ question
-                            Text(
-                              faq.question,
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w500,
-                              ),
+                            // Question with expand arrow
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    faq.question,
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      if (isExpanded) {
+                                        expandedItems.remove(index);
+                                      } else {
+                                        expandedItems.add(index);
+                                      }
+                                    });
+                                  },
+                                  child: AnimatedRotation(
+                                    duration: const Duration(milliseconds: 300),
+                                    turns: isExpanded ? 0.5 : 0,
+                                    child: Icon(
+                                      Icons.keyboard_arrow_down_rounded,
+                                      color: Colors.blueGrey.shade700,
+                                      size: 24,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 5),
 
-                            Text(
-                              faq.answer,
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12,
+                            const SizedBox(height: 8),
+
+                            // Answer text with animation
+                            AnimatedCrossFade(
+                              duration: const Duration(milliseconds: 300),
+                              crossFadeState: isExpanded
+                                  ? CrossFadeState.showFirst
+                                  : CrossFadeState.showSecond,
+                              firstChild: Text(
+                                faq.answer,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.black87,
+                                  height: 1.4,
+                                ),
                               ),
-                              maxLines: isExpanded ? null : 2,
-                              overflow: isExpanded
-                                  ? TextOverflow.visible
-                                  : TextOverflow.ellipsis,
+                              secondChild: Text(
+                                faq.answer,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.black54,
+                                  height: 1.4,
+                                ),
+                              ),
                             ),
+
+                            // Read more / less (only when long answer)
                             if (faq.answer.length > 110)
-                              Center(
-                                  child: GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          if (isExpanded) {
-                                            expandedItems.remove(index);
-                                          } else {
-                                            expandedItems.add(index);
-                                          }
-                                        });
-                                      },
-                                      child: ColorFiltered(
-                                          colorFilter: const ColorFilter.mode(
-                                            PRIMARY_COLOR,
-                                            BlendMode.srcIn,
-                                          ),
-                                          child: isExpanded
-                                              ? Text(
-                                                  'Read less',
-                                                  style: TextStyle(
-                                                      fontSize: 10,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                )
-                                              : Text(
-                                                  'Read more',
-                                                  style: TextStyle(
-                                                      fontSize: 10,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ))))
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      if (isExpanded) {
+                                        expandedItems.remove(index);
+                                      } else {
+                                        expandedItems.add(index);
+                                      }
+                                    });
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 6),
+                                    child: Text(
+                                      isExpanded ? "Read less" : "Read more",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.red.shade600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
                           ],
                         ),
                       ),
@@ -246,7 +288,7 @@ class _FAQsScreenState extends State<FAQsScreen>
                 ),
               ),
             ),
-          ),
+          )
         ],
       ),
     );

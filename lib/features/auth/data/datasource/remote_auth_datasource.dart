@@ -249,7 +249,10 @@ class RemoteAuthDataSource {
           icon: Icon(Icons.check_circle, color: Colors.white),
         );
 
-        Get.put(UserController(), permanent: true);
+        await Get.put(UserController(), permanent: true);
+        // UserController.to.userModel = result;
+        // UserController.to.isUserData = true;
+        // controller.update();
 
         return true;
       }
@@ -287,7 +290,7 @@ class RemoteAuthDataSource {
     }
   }
 
-  Future<bool> loginToFirestore(String email, String password) async {
+  Future<UserModel?> loginToFirestore(String email, String password) async {
     try {
       final querySnapshot = await FirebaseFirestore.instance
           .collection('users')
@@ -296,14 +299,10 @@ class RemoteAuthDataSource {
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        final userDoc = querySnapshot.docs.first;
-
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('user_email', email);
-        await Get.put(UserController(), permanent: true);
-        prefs.setString('user_uid', userDoc.id);
-
-        return true;
+        final user = UserModel.fromJson(
+          querySnapshot.docs.first.data(),
+        );
+        return user;
       } else {
         Get.snackbar(
           "Error",
@@ -318,7 +317,7 @@ class RemoteAuthDataSource {
           icon: Icon(Icons.error, color: Colors.white),
         );
 
-        return false;
+        return null;
       }
     } catch (e) {
       rethrow;
@@ -388,22 +387,23 @@ class RemoteAuthDataSource {
 
   Future<UserModel?> getUserDataByEmail() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final userEmail = prefs.getString('user_email');
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? userEmail = prefs.getString('user_email');
+      
 
       if (userEmail == null || userEmail.isEmpty) {
-        Get.snackbar(
-          "Error",
-          "User email not found in local storage.",
-          snackPosition: SnackPosition.TOP,
-          snackStyle: SnackStyle.FLOATING,
-          backgroundColor: Colors.red.withValues(alpha: 0.9),
-          colorText: Colors.white,
-          margin: EdgeInsets.all(10),
-          duration: Duration(seconds: 3),
-          borderRadius: 8,
-          icon: Icon(Icons.error, color: Colors.white),
-        );
+        // Get.snackbar(
+        //   "Error",
+        //   "User email not found in local storage.",
+        //   snackPosition: SnackPosition.TOP,
+        //   snackStyle: SnackStyle.FLOATING,
+        //   backgroundColor: Colors.red.withValues(alpha: 0.9),
+        //   colorText: Colors.white,
+        //   margin: EdgeInsets.all(10),
+        //   duration: Duration(seconds: 3),
+        //   borderRadius: 8,
+        //   icon: Icon(Icons.error, color: Colors.white),
+        // );
 
         return null;
       }

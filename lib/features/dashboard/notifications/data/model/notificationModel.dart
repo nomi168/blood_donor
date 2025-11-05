@@ -1,4 +1,4 @@
-import 'package:blood_donor/features/dashboard/Main%20Screen/notifications/presentation/enum/notification_enum.dart';
+import 'package:blood_donor/features/dashboard/notifications/presentation/enum/notification_enum.dart';
 
 class NotificationModel {
   late int id = 0;

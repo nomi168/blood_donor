@@ -2,6 +2,7 @@ import 'package:blood_donor/core/utils/console_logs.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/active_user_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/banner_model.dart';
+import 'package:blood_donor/features/dashboard/home/data/models/blood_bank_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/donor_accept_model.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/taker_model.dart';
 
@@ -95,20 +96,38 @@ class RemoteHomeDatasource {
     try {
       final firestore = FirebaseFirestore.instance;
 
-      DateTime ninetyDaysAgo = DateTime.now().subtract(Duration(days: 90));
+      DateTime ninetyDaysAgo =
+          DateTime.now().subtract(const Duration(days: 90));
       Timestamp ninetyDaysAgoTimestamp = Timestamp.fromDate(ninetyDaysAgo);
 
       // Get all donors added more than 90 days ago
       QuerySnapshot querySnapshot = await firestore
           .collection('available_donor')
-          .where('createdAt', isLessThanOrEqualTo: ninetyDaysAgoTimestamp)
+          .where('email', isEqualTo: UserController.to.userModel!.email)
           .get();
 
-      // Update the status of each expired document to 'false'
-      for (var doc in querySnapshot.docs) {
-        await firestore.collection('available_donor').doc(doc.id).update({
-          'status': false,
-        });
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot userDoc = querySnapshot.docs.first;
+
+        if (userDoc.data() != null && userDoc['createdAt'] != null) {
+          Timestamp createdAt = userDoc['createdAt'];
+
+          // Compare only the date (ignoring time part)
+          DateTime createdDate = createdAt.toDate();
+          DateTime checkDate = ninetyDaysAgoTimestamp.toDate();
+
+          if (createdDate.year == checkDate.year &&
+              createdDate.month == checkDate.month &&
+              createdDate.day == checkDate.day) {
+            // ✅ Update status
+            await firestore
+                .collection('available_donor')
+                .doc(userDoc.id)
+                .update({
+              'status': true,
+            });
+          }
+        }
       }
     } catch (e) {
       rethrow;
@@ -437,7 +456,7 @@ class RemoteHomeDatasource {
             .collection('available_donor')
             .doc(docSnapshot.id)
             .update({
-          'status': true,
+          'status': false,
           'createdAt': FieldValue.serverTimestamp(),
         });
 
@@ -718,6 +737,58 @@ class RemoteHomeDatasource {
             querySnapshot.docs.first.data() as Map<String, dynamic>);
       } else {
         return null;
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<BloodBank>> getBloodBanks() async {
+    try {
+      List<BloodBank> userList = [];
+      QuerySnapshot chatQuerySnapshot = await FirebaseFirestore.instance
+          .collection('blood_bank')
+          .where('availability', isEqualTo: true)
+          .get();
+
+      if (chatQuerySnapshot.docs.isNotEmpty) {
+        for (var doc in chatQuerySnapshot.docs) {
+          userList.add(BloodBank.fromMap((doc.data() as Map<String, dynamic>)));
+        }
+      } else {
+        logError('data not found!');
+      }
+      return userList;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> addBloodBankDonor(dynamic payload) async {
+    try {
+      final data = await FirebaseFirestore.instance
+          .collection('blood_bank_donation')
+          .add(payload);
+
+      await data.update({'id': data.id});
+
+      return true;
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  Future<bool> checkUserCnicVerification() async {
+    try {
+      String userEmail = UserController.to.userModel!.email;
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('card_scanning_users')
+          .where('email', isEqualTo: userEmail)
+          .get();
+      if (querySnapshot.docs.isNotEmpty) {
+        return true;
+      } else {
+        return false;
       }
     } catch (e) {
       rethrow;

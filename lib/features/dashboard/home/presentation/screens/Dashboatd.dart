@@ -1,9 +1,9 @@
-import 'package:blood_donor/constants.dart';
+import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/features/dashboard/account/presentation/screens/account_screen.dart';
+import 'package:blood_donor/features/dashboard/account/presentation/screens/user_swticher.dart';
 import 'package:blood_donor/features/dashboard/chat/presentation/screens/chat_screen.dart';
 import 'package:blood_donor/features/dashboard/feeds/presentation/screens/feed_tab_screen.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/screens/home_screen.dart';
-import 'package:blood_donor/features/dashboard/menus/presentation/screens/menu_setting_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -24,7 +24,7 @@ class _DashboardState extends State<Dashboard> {
     const ChatScreen(),
     const HomeScreen(),
     const AccountScreen(),
-    const MenuSettingScreen(),
+    const UserSwitcherScreen(),
   ];
 
   @override
@@ -99,8 +99,8 @@ class _DashboardState extends State<Dashboard> {
               label: 'Account',
             ),
             BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.settings_solid),
-              label: 'Menu',
+              icon: Icon(Icons.history_toggle_off),
+              label: 'Swtich',
             ),
           ],
         ),
