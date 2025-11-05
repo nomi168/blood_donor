@@ -92,9 +92,13 @@ class HomeController extends GetxController {
   Future<void> refreshData() async {
     isRefreshHome = true;
     update();
-    await getAcceptanceDonorList();
-    await getTakerListByBlood();
-    await seeTakerAcceptanceList();
+    if (UserController.to.userModel!.type == 'donor') {
+      await getAcceptanceDonorList();
+      await getTakerListByBlood();
+    } else {
+      await seeTakerAcceptanceList();
+    }
+
     isRefreshHome = false;
     update(); // refresh UI
   }

@@ -1,4 +1,4 @@
-// ignore_for_file: use_key_in_widget_constructors
+// ignore_for_file: use_key_in_widget_constructors, unused_local_variable
 
 import 'dart:developer';
 
@@ -184,16 +184,27 @@ class MyApp extends StatelessWidget {
       designSize: const Size(360, 690),
       minTextAdapt: true,
       splitScreenMode: true,
+
       // Use builder only if you need to use library outside ScreenUtilInit context
       builder: (_, child) {
+        // configEasyLoading();
         return GetMaterialApp(
-          navigatorKey: navigatorKey,
-          debugShowCheckedModeBanner: false,
-          home: child,
-          // home: userUid != null ? const MainSplash() : SplashScreen(),
-          builder: EasyLoading.init(),
-        );
+            navigatorKey: navigatorKey,
+            debugShowCheckedModeBanner: false,
+            home: child,
+            // home: userUid != null ? const MainSplash() : SplashScreen(),
+            builder: EasyLoading.init());
       },
     );
   }
 }
+
+// void configEasyLoading() {
+//   EasyLoading.instance
+//     ..backgroundColor = Colors.transparent // remove black box behind indicator
+//     ..indicatorColor = Colors.red
+//     ..textColor = Colors.white
+//     ..maskColor = Colors.transparent // remove dark overlay
+//     ..userInteractions = false
+//     ..dismissOnTap = false;
+// }

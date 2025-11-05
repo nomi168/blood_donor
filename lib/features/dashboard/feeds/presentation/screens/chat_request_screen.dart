@@ -180,8 +180,7 @@ class ChatRequestScreen extends StatelessWidget {
                                                     ),
                                                     backgroundColor:
                                                         WidgetStateProperty
-                                                            .all<Color>(const Color(
-                                                                0xFFDE0A1E)),
+                                                            .all<Color>(Colors.green),
                                                   ),
                                                   child: Text(
                                                     'Accept',
@@ -244,7 +243,7 @@ class ChatRequestScreen extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                SizedBox(height: 10,),
+                                SizedBox(height: 0,),
                               ],
                             );
                           }
@@ -255,7 +254,7 @@ class ChatRequestScreen extends StatelessWidget {
                           childAspectRatio: 1.0,
                           crossAxisSpacing: 5.0,
                           mainAxisSpacing: 5,
-                          mainAxisExtent: 120,
+                          mainAxisExtent: 150,
                         ),
                       ),
                     ),
