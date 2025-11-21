@@ -17,6 +17,7 @@ import 'package:blood_donor/main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -265,6 +266,45 @@ class HomeController extends GetxController {
         allTakers.where((taker) => taker.bloodType != userBloodGroup).toList();
 
     takerList = [...matchingBlood, ...otherBlood];
+
+     try {
+
+      Position donorPosition = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      List<FeedTakerModel> nearbyTakers = [];
+
+      for (var taker in takerList) {
+        if (taker.location == null || taker.location!.isEmpty) continue;
+
+        try {
+
+          List<Location> takerLocations =
+              await locationFromAddress(taker.location!);
+
+          if (takerLocations.isNotEmpty) {
+            double distanceInMeters = Geolocator.distanceBetween(
+              donorPosition.latitude,
+              donorPosition.longitude,
+              takerLocations.first.latitude,
+              takerLocations.first.longitude,
+            );
+
+            // ✅ Only add if within 50km
+            if (distanceInMeters <= 50000) {
+              nearbyTakers.add(taker);
+            }
+          }
+        } catch (e) {
+          debugPrint("Error converting taker location: $e");
+        }
+      }
+      takerList.clear();
+      takerList = nearbyTakers;
+    } catch (e) {
+      debugPrint("Error in getTakerData: $e");
+    }
 
     isLoading = false;
     update();
