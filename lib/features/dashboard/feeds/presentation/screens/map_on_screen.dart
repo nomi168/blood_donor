@@ -165,6 +165,7 @@ class _MapOnDonatorState extends State<MapOnDonator> {
                           height: 5,
                         ),
                         Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
                               child: Text(

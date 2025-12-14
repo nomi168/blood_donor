@@ -286,7 +286,7 @@ class PostRequestScreen extends StatelessWidget {
                     ),
                     Container(
                       height: 100,
-                      margin: EdgeInsets.symmetric(horizontal: 10),
+                      margin: EdgeInsets.symmetric(horizontal: 5),
                       padding: EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.black38),
@@ -330,41 +330,41 @@ class PostRequestScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Container(
-                      margin: EdgeInsets.symmetric(horizontal: 5),
-                      child: Material(
-                        color: Colors.white,
-                        elevation: 7.0, // Add shadow/elevation
-                        borderRadius:
-                            BorderRadius.circular(10.0), // Add border radius
-                        child: TextFormField(
-                          keyboardType: TextInputType.number,
-                          controller: controller.unit,
-                          decoration: InputDecoration(
-                            label: const Text('Units'),
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16.0), // Adjust padding
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              borderSide: const BorderSide(
-                                  color: Colors.grey), // Border color
-                            ),
-                            suffixIcon: const Icon(Icons.bloodtype_sharp),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              borderSide: const BorderSide(
-                                  color:
-                                      Colors.blue), // Border color when focused
-                            ),
-                            hintText: 'Unit',
-                          ),
-                          validator: validateAddress,
-                        ),
-                      ),
-                    ),
+                    // SizedBox(
+                    //   height: 10,
+                    // ),
+                    // Container(
+                    //   margin: EdgeInsets.symmetric(horizontal: 5),
+                    //   child: Material(
+                    //     color: Colors.white,
+                    //     elevation: 7.0, // Add shadow/elevation
+                    //     borderRadius:
+                    //         BorderRadius.circular(10.0), // Add border radius
+                    //     child: TextFormField(
+                    //       keyboardType: TextInputType.number,
+                    //       controller: controller.unit,
+                    //       decoration: InputDecoration(
+                    //         label: const Text('Units'),
+                    //         contentPadding: const EdgeInsets.symmetric(
+                    //             horizontal: 16.0), // Adjust padding
+                    //         border: OutlineInputBorder(
+                    //           borderRadius: BorderRadius.circular(8.0),
+                    //           borderSide: const BorderSide(
+                    //               color: Colors.grey), // Border color
+                    //         ),
+                    //         suffixIcon: const Icon(Icons.bloodtype_sharp),
+                    //         focusedBorder: OutlineInputBorder(
+                    //           borderRadius: BorderRadius.circular(8.0),
+                    //           borderSide: const BorderSide(
+                    //               color:
+                    //                   Colors.blue), // Border color when focused
+                    //         ),
+                    //         hintText: 'Unit',
+                    //       ),
+                    //       validator: validateAddress,
+                    //     ),
+                    //   ),
+                    // ),
 
                     SizedBox(
                       height: 10,
@@ -610,22 +610,22 @@ class PostRequestScreen extends StatelessWidget {
                           return;
                         }
 
-                        if (controller.unit.text.isEmpty) {
-                          Get.snackbar(
-                            "Error",
-                            "please enter the unit",
-                            snackPosition: SnackPosition.TOP,
-                            snackStyle: SnackStyle.FLOATING,
-                            backgroundColor: Colors.red.withValues(alpha: 0.9),
-                            colorText: Colors.white,
-                            margin: EdgeInsets.all(10),
-                            duration: Duration(seconds: 3),
-                            borderRadius: 8,
-                            icon: Icon(Icons.error, color: Colors.white),
-                          );
+                        // if (controller.unit.text.isEmpty) {
+                        //   Get.snackbar(
+                        //     "Error",
+                        //     "please enter the unit",
+                        //     snackPosition: SnackPosition.TOP,
+                        //     snackStyle: SnackStyle.FLOATING,
+                        //     backgroundColor: Colors.red.withValues(alpha: 0.9),
+                        //     colorText: Colors.white,
+                        //     margin: EdgeInsets.all(10),
+                        //     duration: Duration(seconds: 3),
+                        //     borderRadius: 8,
+                        //     icon: Icon(Icons.error, color: Colors.white),
+                        //   );
 
-                          return;
-                        }
+                        //   return;
+                        // }
                         if (controller.note.text.isEmpty) {
                           Get.snackbar(
                             "Error",
@@ -679,7 +679,7 @@ class PostRequestScreen extends StatelessWidget {
                             .getUserList(controller.blood.text.trim());
                         await controller.getUserLocationList();
 
-                        Map<String,dynamic> payload = {
+                        Map<String, dynamic> payload = {
                           'taker_id': UserController.to.userModel!.id,
                           'email': UserController.to.userModel!.email,
                           'name':
@@ -694,7 +694,7 @@ class PostRequestScreen extends StatelessWidget {
                               .split(' ')[0],
                           'time': controller.selectedTime.format(context),
                           'location': controller.location.text.trim(),
-                          'unit': controller.unit.text.trim(),
+                          'unit': "1",
                           'note': controller.note.text.trim(),
                           'blood': controller.blood.text.trim(),
                           'situation': controller.selectedValue,

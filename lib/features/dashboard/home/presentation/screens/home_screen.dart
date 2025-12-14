@@ -2235,331 +2235,263 @@ class _HomeScreenState extends State<HomeScreen>
                                                     return Column(
                                                       children: [
                                                         Container(
-                                                          margin: EdgeInsets
-                                                              .symmetric(
-                                                                  horizontal:
-                                                                      20),
-                                                          width: 90.w,
-                                                          padding:
+                                                          margin:
                                                               const EdgeInsets
                                                                   .symmetric(
                                                                   horizontal:
-                                                                      10,
-                                                                  vertical: 12),
-                                                          clipBehavior:
-                                                              Clip.antiAlias,
+                                                                      16),
+                                                          width:
+                                                              double.infinity,
                                                           decoration:
-                                                              ShapeDecoration(
-                                                            shape:
-                                                                RoundedRectangleBorder(
-                                                              side: BorderSide(
-                                                                  width: 2,
-                                                                  color: Color(
-                                                                      0xFFDDDDDD)),
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10),
-                                                            ),
+                                                              BoxDecoration(
+                                                            border: Border.all(
+                                                                color: const Color(
+                                                                    0xFFDDDDDD),
+                                                                width: 1.5),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        12),
+                                                            color: Colors.white,
                                                           ),
                                                           child: Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .start,
                                                             crossAxisAlignment:
                                                                 CrossAxisAlignment
                                                                     .start,
                                                             children: [
+                                                              /// TOP IMAGE
                                                               Container(
+                                                                margin: EdgeInsets.symmetric(horizontal: 20,vertical: 10),
                                                                 child: Row(
-                                                                  mainAxisSize:
-                                                                      MainAxisSize
-                                                                          .min,
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .center,
+                                                                  children: [
+                                                                    ClipRRect(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              40),
+                                                                      child:
+                                                                          CachedNetworkImage(
+                                                                        width: 65,
+                                                                        height:
+                                                                            65,
+                                                                        fit: BoxFit
+                                                                            .cover,
+                                                                        imageUrl: takerFeed
+                                                                                .image!
+                                                                                .isNotEmpty
+                                                                            ? takerFeed
+                                                                                .image!
+                                                                            : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
+                                                                        placeholder:
+                                                                            (context, url) =>
+                                                                                const CupertinoActivityIndicator(),
+                                                                        errorWidget: (context,
+                                                                                url,
+                                                                                error) =>
+                                                                            const Icon(
+                                                                                Icons.error),
+                                                                      ),
+                                                                    ),
+                                                                    SizedBox(width: 20,),
+                                                                    Text(
+                                                                      takerFeed
+                                                                          .name!,
+                                                                      style:
+                                                                          const TextStyle(
+                                                                        fontSize:
+                                                                            16,
+                                                                        fontWeight:
+                                                                            FontWeight.w600,
+                                                                        color: Colors
+                                                                            .black,
+                                                                      ),
+                                                                      maxLines:
+                                                                          1,
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                    ),
+                                                                    Spacer(),
+                                                                    CustomPaint(
+                                                                      size:
+                                                                          const Size(
+                                                                              40,
+                                                                              30),
+                                                                      painter:
+                                                                          BloodDropPainter(
+                                                                        blood: takerFeed
+                                                                            .blood!,
+                                                                      ),
+                                                                    ),
+                                                                   
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                              Container(
+                                                                margin: EdgeInsets.symmetric(horizontal: 10),
+                                                                child: Column(
                                                                   crossAxisAlignment:
                                                                       CrossAxisAlignment
                                                                           .start,
                                                                   children: [
-                                                                    Container(
-                                                                      width: 70,
-                                                                      height:
-                                                                          70,
-                                                                      child:
-                                                                          ClipRRect(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(40),
-                                                                        child:
-                                                                            CachedNetworkImage(
-                                                                          fit: BoxFit
-                                                                              .cover,
-                                                                          imageUrl: takerFeed.image!.isNotEmpty
-                                                                              ? takerFeed.image!
-                                                                              : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
-                                                                          placeholder: (context, url) =>
-                                                                              const CupertinoActivityIndicator(
-                                                                            color:
-                                                                                Colors.white,
+                                                                    /// NAME + BLOOD GROUP
+                                                                
+                                                                    const SizedBox(
+                                                                        height:
+                                                                            12),
+                                                                
+                                                                    /// HOSPITAL
+                                                                    _iconInfoRow(
+                                                                      icon: Icons
+                                                                          .local_hospital,
+                                                                      title:
+                                                                          "Hospital",
+                                                                      value: takerFeed
+                                                                          .hospitalName!,
+                                                                    ),
+                                                                
+                                                                    /// LOCATION
+                                                                    _iconInfoRowWidget(
+                                                                      icon: Icons
+                                                                          .location_on,
+                                                                      title:
+                                                                          "Location",
+                                                                      valueWidget: buildLocationText(
+                                                                          context,
+                                                                          takerFeed
+                                                                              .location!),
+                                                                    ),
+                                                                
+                                                                    const SizedBox(
+                                                                        height:
+                                                                            6),
+                                                                
+                                                                    /// DATE & TIME
+                                                                    Row(
+                                                                      children: [
+                                                                        Expanded(
+                                                                          child:
+                                                                              _iconInfoRow(
+                                                                            icon:
+                                                                                Icons.calendar_today,
+                                                                            title:
+                                                                                "Date",
+                                                                            value:
+                                                                                takerFeed.date!,
                                                                           ),
-                                                                          errorWidget: (context, url, error) =>
-                                                                              Icon(Icons.error),
+                                                                        ),
+                                                                        Expanded(
+                                                                          child:
+                                                                              _iconInfoRow(
+                                                                            icon:
+                                                                                Icons.access_time,
+                                                                            title:
+                                                                                "Time",
+                                                                            value:
+                                                                                takerFeed.time!,
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                
+                                                                    
+                                                                
+                                                                    /// ACTION BUTTON
+                                                                    Align(
+                                                                      alignment:
+                                                                          Alignment
+                                                                              .centerRight,
+                                                                      child:
+                                                                          InkWell(
+                                                                        onTap:
+                                                                            () {
+                                                                          if (UserController.to.userModel!.bloodgroup !=
+                                                                              takerFeed.blood) {
+                                                                            Get.snackbar(
+                                                                              "Info",
+                                                                              "You cannot donate blood because your blood group is ${UserController.to.userModel!.bloodgroup} while the blood request requires ${takerFeed.blood}.",
+                                                                              snackPosition: SnackPosition.TOP,
+                                                                              snackStyle: SnackStyle.FLOATING,
+                                                                              backgroundColor: Colors.blue.withValues(alpha: 0.9),
+                                                                              colorText: Colors.white,
+                                                                              margin: const EdgeInsets.all(10),
+                                                                              duration: const Duration(seconds: 3),
+                                                                              borderRadius: 8,
+                                                                              icon: const Icon(Icons.info, color: Colors.white),
+                                                                            );
+                                                                          } else {
+                                                                            if (homeController.isAvailability ==
+                                                                                true) {
+                                                                              Get.snackbar(
+                                                                                "Error",
+                                                                                "You have already donated blood. If you want to donate again, please wait for 90 days.",
+                                                                                snackPosition: SnackPosition.TOP,
+                                                                                snackStyle: SnackStyle.FLOATING,
+                                                                                backgroundColor: Colors.red.withValues(alpha: 0.9),
+                                                                                colorText: Colors.white,
+                                                                                margin: const EdgeInsets.all(10),
+                                                                                duration: const Duration(seconds: 3),
+                                                                                borderRadius: 8,
+                                                                                icon: const Icon(Icons.error, color: Colors.white),
+                                                                              );
+                                                                            } else {
+                                                                              Navigator.push(
+                                                                                context,
+                                                                                PageRouteBuilder(
+                                                                                  pageBuilder: (_, animation, __) => DonateBoodScreen(
+                                                                                    payload: takerFeed,
+                                                                                    mapController: homeController.controllers,
+                                                                                  ),
+                                                                                  transitionDuration: const Duration(milliseconds: 200),
+                                                                                  transitionsBuilder: (_, animation, __, child) {
+                                                                                    final tween = Tween(
+                                                                                      begin: const Offset(1, 0),
+                                                                                      end: Offset.zero,
+                                                                                    ).chain(CurveTween(curve: Curves.easeOut));
+                                                                                    return SlideTransition(
+                                                                                      position: animation.drive(tween),
+                                                                                      child: child,
+                                                                                    );
+                                                                                  },
+                                                                                ),
+                                                                              );
+                                                                            }
+                                                                          }
+                                                                        },
+                                                                        child:
+                                                                            Container(
+                                                                          padding: const EdgeInsets
+                                                                              .symmetric(
+                                                                              horizontal: 28,
+                                                                              vertical: 10),
+                                                                          decoration:
+                                                                              BoxDecoration(
+                                                                            color:
+                                                                                Colors.green,
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(6),
+                                                                          ),
+                                                                          child:
+                                                                              const Text(
+                                                                            "Accept",
+                                                                            style:
+                                                                                TextStyle(
+                                                                              color: Colors.white,
+                                                                              fontSize: 14,
+                                                                              fontWeight: FontWeight.w500,
+                                                                            ),
+                                                                          ),
                                                                         ),
                                                                       ),
                                                                     ),
-                                                                    const SizedBox(
-                                                                        width:
-                                                                            5),
-                                                                    Container(
-                                                                      child:
-                                                                          Column(
-                                                                        mainAxisSize:
-                                                                            MainAxisSize.max,
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment.start,
-                                                                        crossAxisAlignment:
-                                                                            CrossAxisAlignment.start,
-                                                                        children: [
-                                                                          Row(
-                                                                            children: [
-                                                                              Text(
-                                                                                takerFeed.name!,
-                                                                                style: TextStyle(
-                                                                                  color: Colors.black,
-                                                                                  fontSize: 14,
-                                                                                  fontFamily: 'Montserrat',
-                                                                                  fontWeight: FontWeight.w500,
-                                                                                  height: 0,
-                                                                                ),
-                                                                              ),
-                                                                              SizedBox(
-                                                                                width: 10,
-                                                                              ),
-                                                                              Container(
-                                                                                margin: EdgeInsets.only(left: 5),
-                                                                                child: CustomPaint(
-                                                                                  size: Size(40, 30),
-                                                                                  painter: BloodDropPainter(blood: takerFeed.blood!),
-                                                                                ),
-                                                                              )
-                                                                            ],
-                                                                          ),
-                                                                          const SizedBox(
-                                                                              height: 12),
-                                                                          Container(
-                                                                            child:
-                                                                                Column(
-                                                                              mainAxisSize: MainAxisSize.min,
-                                                                              mainAxisAlignment: MainAxisAlignment.start,
-                                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                                              children: [
-                                                                                Container(
-                                                                                  width: 220,
-                                                                                  child: Row(
-                                                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                    children: [
-                                                                                      const Text(
-                                                                                        'Hosiptal: ',
-                                                                                        style: TextStyle(
-                                                                                          fontSize: 14,
-                                                                                          color: Colors.black87,
-                                                                                          fontWeight: FontWeight.w500,
-                                                                                        ),
-                                                                                      ),
-                                                                                      Expanded(
-                                                                                        child: Text(
-                                                                                          takerFeed.hospitalName!,
-                                                                                          style: TextStyle(
-                                                                                            fontSize: 14,
-                                                                                            color: Colors.grey.shade700,
-                                                                                          ),
-                                                                                        ),
-                                                                                      ),
-                                                                                    ],
-                                                                                  ),
-                                                                                ),
-                                                                                const SizedBox(height: 15),
-                                                                                Row(
-                                                                                  children: [
-                                                                                    Text(
-                                                                                      'Location:',
-                                                                                      style: TextStyle(
-                                                                                        color: Color(0xFF5A5A5A),
-                                                                                        fontSize: 12,
-                                                                                        fontFamily: 'Montserrat',
-                                                                                        fontWeight: FontWeight.w500,
-                                                                                      ),
-                                                                                    ),
-                                                                                    const SizedBox(width: 5),
-                                                                                    buildLocationText(context, takerFeed.location!),
-                                                                                  ],
-                                                                                ),
-                                                                                const SizedBox(height: 15),
-                                                                                Container(
-                                                                                  child: Row(
-                                                                                    mainAxisSize: MainAxisSize.min,
-                                                                                    mainAxisAlignment: MainAxisAlignment.start,
-                                                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                    children: [
-                                                                                      Text(
-                                                                                        'Date :',
-                                                                                        style: TextStyle(
-                                                                                          color: Color(0xFF5A5A5A),
-                                                                                          fontSize: 12,
-                                                                                          fontFamily: 'Montserrat',
-                                                                                          fontWeight: FontWeight.w500,
-                                                                                          height: 0.13,
-                                                                                        ),
-                                                                                      ),
-                                                                                      const SizedBox(width: 5),
-                                                                                      Text(
-                                                                                        takerFeed.date!,
-                                                                                        style: TextStyle(
-                                                                                          color: Color(0xFF5A5A5A),
-                                                                                          fontSize: 13,
-                                                                                          fontFamily: 'Montserrat',
-                                                                                          fontWeight: FontWeight.w500,
-                                                                                          height: 0.13,
-                                                                                        ),
-                                                                                      ),
-                                                                                    ],
-                                                                                  ),
-                                                                                ),
-                                                                                const SizedBox(height: 15),
-                                                                                Container(
-                                                                                  child: Row(
-                                                                                    mainAxisSize: MainAxisSize.min,
-                                                                                    mainAxisAlignment: MainAxisAlignment.start,
-                                                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                    children: [
-                                                                                      Text(
-                                                                                        'Time :',
-                                                                                        style: TextStyle(
-                                                                                          color: Color(0xFF5A5A5A),
-                                                                                          fontSize: 12,
-                                                                                          fontFamily: 'Montserrat',
-                                                                                          fontWeight: FontWeight.w500,
-                                                                                          height: 0.13,
-                                                                                        ),
-                                                                                      ),
-                                                                                      const SizedBox(width: 5),
-                                                                                      Text(
-                                                                                        takerFeed.time!,
-                                                                                        style: TextStyle(
-                                                                                          color: Color(0xFF5A5A5A),
-                                                                                          fontSize: 13,
-                                                                                          fontFamily: 'Montserrat',
-                                                                                          fontWeight: FontWeight.w500,
-                                                                                          height: 0.13,
-                                                                                        ),
-                                                                                      ),
-                                                                                    ],
-                                                                                  ),
-                                                                                ),
-                                                                              ],
-                                                                            ),
-                                                                          ),
-                                                                          const SizedBox(
-                                                                              height: 15),
-                                                                          Row(
-                                                                            mainAxisAlignment:
-                                                                                MainAxisAlignment.end,
-                                                                            children: [
-                                                                              SizedBox(
-                                                                                width: 25.w,
-                                                                              ),
-                                                                              Align(
-                                                                                alignment: Alignment.centerRight,
-                                                                                child: InkWell(
-                                                                                  onTap: () {
-                                                                                    if (UserController.to.userModel!.bloodgroup != takerFeed.blood) {
-                                                                                      Get.snackbar(
-                                                                                        "Info",
-                                                                                        "You cannot donate blood because your blood group is ${UserController.to.userModel!.bloodgroup} while the blood request requires ${takerFeed.blood}.",
-                                                                                        snackPosition: SnackPosition.TOP,
-                                                                                        snackStyle: SnackStyle.FLOATING,
-                                                                                        backgroundColor: Colors.blue.withValues(alpha: 0.9),
-                                                                                        colorText: Colors.white,
-                                                                                        margin: EdgeInsets.all(10),
-                                                                                        duration: Duration(seconds: 3),
-                                                                                        borderRadius: 8,
-                                                                                        icon: Icon(Icons.info, color: Colors.white),
-                                                                                      );
-                                                                                    } else {
-                                                                                      if (homeController.isAvailability == true) {
-                                                                                        Get.snackbar(
-                                                                                          "Error",
-                                                                                          "You have already donated blood. If you want to donate again, please wait for 90 days.",
-                                                                                          snackPosition: SnackPosition.TOP,
-                                                                                          snackStyle: SnackStyle.FLOATING,
-                                                                                          backgroundColor: Colors.red.withValues(alpha: 0.9),
-                                                                                          colorText: Colors.white,
-                                                                                          margin: EdgeInsets.all(10),
-                                                                                          duration: Duration(seconds: 3),
-                                                                                          borderRadius: 8,
-                                                                                          icon: Icon(Icons.error, color: Colors.white),
-                                                                                        );
-                                                                                      } else {
-                                                                                        Navigator.push(
-                                                                                          context,
-                                                                                          PageRouteBuilder(
-                                                                                            pageBuilder: (context, animation, secondaryAnimation) {
-                                                                                              return DonateBoodScreen(
-                                                                                                payload: takerFeed,
-                                                                                                mapController: homeController.controllers,
-                                                                                              );
-                                                                                            },
-                                                                                            transitionDuration: const Duration(microseconds: 100),
-                                                                                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                                                                              const begin = Offset(10.0, 0.0); // slide in from the right
-                                                                                              const end = Offset.zero;
-                                                                                              const curve = Curves.easeInOutQuart;
-
-                                                                                              var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-                                                                                              var offsetAnimation = animation.drive(tween);
-
-                                                                                              return SlideTransition(
-                                                                                                position: offsetAnimation,
-                                                                                                child: child,
-                                                                                              );
-                                                                                            },
-                                                                                          ),
-                                                                                        );
-                                                                                      }
-                                                                                    }
-                                                                                  },
-                                                                                  child: Container(
-                                                                                    height: 30,
-                                                                                    padding: EdgeInsets.symmetric(horizontal: 25),
-                                                                                    alignment: Alignment.center,
-                                                                                    decoration: BoxDecoration(
-                                                                                      color: Colors.green,
-                                                                                      borderRadius: BorderRadius.circular(5),
-                                                                                    ),
-                                                                                    child: Text(
-                                                                                      'Accept',
-                                                                                      style: TextStyle(fontSize: 14, color: Colors.white),
-                                                                                    ),
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                            ],
-                                                                          )
-                                                                        ],
-                                                                      ),
-                                                                    ),
+                                                                    SizedBox(height: 10,)
                                                                   ],
                                                                 ),
                                                               ),
                                                             ],
                                                           ),
                                                         ),
-                                                        SizedBox(
-                                                          height: 10,
-                                                        ),
+                                                        const SizedBox(
+                                                            height: 12),
                                                       ],
                                                     );
                                                   }
@@ -2797,6 +2729,66 @@ class _HomeScreenState extends State<HomeScreen>
             },
           );
         },
+      ),
+    );
+  }
+
+  Widget _iconInfoRow({
+    required IconData icon,
+    required String title,
+    required String value,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: Colors.redAccent),
+          const SizedBox(width: 8),
+          Text(
+            "$title: ",
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF5A5A5A),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey.shade700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _iconInfoRowWidget({
+    required IconData icon,
+    required String title,
+    required Widget valueWidget,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: Colors.redAccent),
+          const SizedBox(width: 8),
+          Text(
+            "$title: ",
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF5A5A5A),
+            ),
+          ),
+          Expanded(child: valueWidget),
+        ],
       ),
     );
   }

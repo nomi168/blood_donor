@@ -27,6 +27,7 @@ class DonateBoodScreen extends StatelessWidget {
           DonateBloodController(payload: payload, mapController: mapController),
       builder: (controller) {
         return Scaffold(
+          backgroundColor: Colors.white,
           appBar: AppBar(
             actions: [
               // IconButton to show path
@@ -155,6 +156,7 @@ class DonateBoodScreen extends StatelessWidget {
                           height: 5,
                         ),
                         Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
                               child: Text(
