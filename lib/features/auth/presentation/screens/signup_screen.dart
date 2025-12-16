@@ -2,7 +2,7 @@ import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/core/validate_test_field.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/signup_controller.dart';
 import 'package:blood_donor/features/auth/presentation/screens/login_screen.dart';
-import 'package:blood_donor/features/auth/presentation/screens/otp_screen.dart';
+import 'package:blood_donor/features/auth/presentation/screens/questions_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -621,7 +621,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           PageRouteBuilder(
                             pageBuilder:
                                 (context, animation, secondaryAnimation) {
-                              return OtpScreen(
+                              return QuestionsScreen(
                                 payload: payload,
                               );
                             },
