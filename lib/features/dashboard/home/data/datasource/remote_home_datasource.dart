@@ -577,7 +577,8 @@ class RemoteHomeDatasource {
           .get();
 
       // Delete each expired document
-      for (var doc in querySnapshot.docs) {
+      for (var doc in querySnapshot.docs) 
+      {
         await firestore.collection('taker').doc(doc.id).update(payload);
       }
     } catch (e) {

@@ -10,6 +10,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 
 // ignore: must_be_immutable
@@ -263,7 +264,9 @@ class _MapOnDonatorState extends State<MapOnDonator> {
                                           width: 5,
                                         ),
                                         Text(
-                                          widget.payload['date'],
+                                          DateFormat('dd-MM-yyyy').format(
+                                              DateTime.parse(
+                                                  widget.payload['date'])),
                                           style: TextStyle(
                                               fontSize: 13,
                                               fontWeight: FontWeight.w500,

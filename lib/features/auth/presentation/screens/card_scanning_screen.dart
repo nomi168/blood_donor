@@ -198,40 +198,54 @@ class _CardScanningScreenState extends State<CardScanningScreen> {
                                               .trim(),
                                           'card_image': "",
                                         };
+                                        bool result = controller.isEligible(
+                                            dob:
+                                                controller.dobTEController.text,
+                                            doi:
+                                                controller.doiTEController.text,
+                                            );
+                                        if (result == true) {
+                                          bool? response = await controller
+                                              .addCnicCardDetail(payload);
+                                          if (response == true) {
+                                            Get.snackbar(
+                                              "Success",
+                                              "complete verification successfully",
+                                              snackPosition: SnackPosition.TOP,
+                                              snackStyle: SnackStyle.FLOATING,
+                                              backgroundColor: Colors.green
+                                                  .withValues(alpha: 0.9),
+                                              colorText: Colors.white,
+                                              margin: EdgeInsets.all(10),
+                                              duration: Duration(seconds: 3),
+                                              borderRadius: 8,
+                                              icon: Icon(Icons.check_circle,
+                                                  color: Colors.white),
+                                            );
 
-                                        bool? response = await controller
-                                            .addCnicCardDetail(payload);
-                                        if (response == true) {
-                                          Get.snackbar(
-                                            "Success",
-                                            "complete verification successfully",
-                                            snackPosition: SnackPosition.TOP,
-                                            snackStyle: SnackStyle.FLOATING,
-                                            backgroundColor: Colors.green
-                                                .withValues(alpha: 0.9),
-                                            colorText: Colors.white,
-                                            margin: EdgeInsets.all(10),
-                                            duration: Duration(seconds: 3),
-                                            borderRadius: 8,
-                                            icon: Icon(Icons.check_circle,
-                                                color: Colors.white),
-                                          );
-
-                                          Navigator.of(context).pop();
+                                            Navigator.of(context).pop();
+                                          } else {
+                                            Get.snackbar(
+                                              "Error",
+                                              "Error while adding CNIC",
+                                              snackPosition: SnackPosition.TOP,
+                                              snackStyle: SnackStyle.FLOATING,
+                                              backgroundColor: Colors.red
+                                                  .withValues(alpha: 0.9),
+                                              colorText: Colors.white,
+                                              margin: EdgeInsets.all(10),
+                                              duration: Duration(seconds: 3),
+                                              borderRadius: 8,
+                                              icon: Icon(Icons.error,
+                                                  color: Colors.white),
+                                            );
+                                          }
                                         } else {
-                                          Get.snackbar(
-                                            "Error",
-                                            "Error while adding CNIC",
-                                            snackPosition: SnackPosition.TOP,
-                                            snackStyle: SnackStyle.FLOATING,
-                                            backgroundColor: Colors.red
-                                                .withValues(alpha: 0.9),
-                                            colorText: Colors.white,
-                                            margin: EdgeInsets.all(10),
-                                            duration: Duration(seconds: 3),
-                                            borderRadius: 8,
-                                            icon: Icon(Icons.error,
-                                                color: Colors.white),
+                                          controller.showNotEligibleDialog(
+                                            userType: UserController
+                                                .to
+                                                .userModel!
+                                                .type, 
                                           );
                                         }
                                       },

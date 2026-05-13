@@ -1860,9 +1860,14 @@ class _HomeScreenState extends State<HomeScreen>
                                                                     Expanded(
                                                                       child:
                                                                           Text(
-                                                                        homeController
-                                                                            .donorData!
-                                                                            .date,
+                                                                        () {
+                                                                          final d = DateTime.parse(homeController
+                                                                              .donorData!
+                                                                              .date);
+                                                                          return '${d.day.toString().padLeft(2, '0')}-'
+                                                                              '${d.month.toString().padLeft(2, '0')}-'
+                                                                              '${d.year}';
+                                                                        }(),
                                                                         style:
                                                                             TextStyle(
                                                                           fontSize:
@@ -2261,7 +2266,12 @@ class _HomeScreenState extends State<HomeScreen>
                                                             children: [
                                                               /// TOP IMAGE
                                                               Container(
-                                                                margin: EdgeInsets.symmetric(horizontal: 20,vertical: 10),
+                                                                margin: EdgeInsets
+                                                                    .symmetric(
+                                                                        horizontal:
+                                                                            20,
+                                                                        vertical:
+                                                                            10),
                                                                 child: Row(
                                                                   children: [
                                                                     ClipRRect(
@@ -2270,16 +2280,14 @@ class _HomeScreenState extends State<HomeScreen>
                                                                               40),
                                                                       child:
                                                                           CachedNetworkImage(
-                                                                        width: 65,
+                                                                        width:
+                                                                            65,
                                                                         height:
                                                                             65,
                                                                         fit: BoxFit
                                                                             .cover,
-                                                                        imageUrl: takerFeed
-                                                                                .image!
-                                                                                .isNotEmpty
-                                                                            ? takerFeed
-                                                                                .image!
+                                                                        imageUrl: takerFeed.image!.isNotEmpty
+                                                                            ? takerFeed.image!
                                                                             : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
                                                                         placeholder:
                                                                             (context, url) =>
@@ -2287,11 +2295,12 @@ class _HomeScreenState extends State<HomeScreen>
                                                                         errorWidget: (context,
                                                                                 url,
                                                                                 error) =>
-                                                                            const Icon(
-                                                                                Icons.error),
+                                                                            const Icon(Icons.error),
                                                                       ),
                                                                     ),
-                                                                    SizedBox(width: 20,),
+                                                                    SizedBox(
+                                                                      width: 20,
+                                                                    ),
                                                                     Text(
                                                                       takerFeed
                                                                           .name!,
@@ -2312,33 +2321,34 @@ class _HomeScreenState extends State<HomeScreen>
                                                                     ),
                                                                     Spacer(),
                                                                     CustomPaint(
-                                                                      size:
-                                                                          const Size(
-                                                                              40,
-                                                                              30),
+                                                                      size: const Size(
+                                                                          40,
+                                                                          30),
                                                                       painter:
                                                                           BloodDropPainter(
                                                                         blood: takerFeed
                                                                             .blood!,
                                                                       ),
                                                                     ),
-                                                                   
                                                                   ],
                                                                 ),
                                                               ),
                                                               Container(
-                                                                margin: EdgeInsets.symmetric(horizontal: 10),
+                                                                margin: EdgeInsets
+                                                                    .symmetric(
+                                                                        horizontal:
+                                                                            10),
                                                                 child: Column(
                                                                   crossAxisAlignment:
                                                                       CrossAxisAlignment
                                                                           .start,
                                                                   children: [
                                                                     /// NAME + BLOOD GROUP
-                                                                
+
                                                                     const SizedBox(
                                                                         height:
                                                                             12),
-                                                                
+
                                                                     /// HOSPITAL
                                                                     _iconInfoRow(
                                                                       icon: Icons
@@ -2348,7 +2358,7 @@ class _HomeScreenState extends State<HomeScreen>
                                                                       value: takerFeed
                                                                           .hospitalName!,
                                                                     ),
-                                                                
+
                                                                     /// LOCATION
                                                                     _iconInfoRowWidget(
                                                                       icon: Icons
@@ -2360,11 +2370,11 @@ class _HomeScreenState extends State<HomeScreen>
                                                                           takerFeed
                                                                               .location!),
                                                                     ),
-                                                                
+
                                                                     const SizedBox(
                                                                         height:
                                                                             6),
-                                                                
+
                                                                     /// DATE & TIME
                                                                     Row(
                                                                       children: [
@@ -2376,7 +2386,12 @@ class _HomeScreenState extends State<HomeScreen>
                                                                             title:
                                                                                 "Date",
                                                                             value:
-                                                                                takerFeed.date!,
+                                                                                () {
+                                                                              final d = DateTime.parse(takerFeed.date!);
+                                                                              return '${d.day.toString().padLeft(2, '0')}:'
+                                                                                  '${d.month.toString().padLeft(2, '0')}:'
+                                                                                  '${d.year}';
+                                                                            }(),
                                                                           ),
                                                                         ),
                                                                         Expanded(
@@ -2392,9 +2407,7 @@ class _HomeScreenState extends State<HomeScreen>
                                                                         ),
                                                                       ],
                                                                     ),
-                                                                
-                                                                    
-                                                                
+
                                                                     /// ACTION BUTTON
                                                                     Align(
                                                                       alignment:
@@ -2483,7 +2496,10 @@ class _HomeScreenState extends State<HomeScreen>
                                                                         ),
                                                                       ),
                                                                     ),
-                                                                    SizedBox(height: 10,)
+                                                                    SizedBox(
+                                                                      height:
+                                                                          10,
+                                                                    )
                                                                   ],
                                                                 ),
                                                               ),
@@ -2624,9 +2640,18 @@ class _HomeScreenState extends State<HomeScreen>
                                                             .seeList!.location),
                                                     const SizedBox(height: 6),
                                                     _infoRow(
-                                                        Icons.date_range,
-                                                        homeController
-                                                            .seeList!.date),
+                                                      Icons.date_range,
+                                                      () {
+                                                        final d =
+                                                            DateTime.parse(
+                                                                homeController
+                                                                    .seeList!
+                                                                    .date);
+                                                        return '${d.day.toString().padLeft(2, '0')}-'
+                                                            '${d.month.toString().padLeft(2, '0')}-'
+                                                            '${d.year}';
+                                                      }(),
+                                                    ),
                                                     const SizedBox(height: 6),
                                                     _infoRow(
                                                         Icons.access_time,

@@ -12,6 +12,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:sizer/sizer.dart';
 
@@ -226,7 +227,10 @@ class FeedsScreen extends StatelessWidget {
                                                                     width: 5,
                                                                   ),
                                                                   Text(
-                                                                    taker.date!,
+                                                                    DateFormat(
+                                                                            'dd-MM-yyyy')
+                                                                        .format(
+                                                                            DateTime.parse(taker.date!)),
                                                                     style: TextStyle(
                                                                         fontSize:
                                                                             13,

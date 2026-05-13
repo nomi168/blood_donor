@@ -34,14 +34,29 @@ class DashboardState extends State<Dashboard> {
     const ChatScreen(),
     const HomeScreen(),
     const AccountScreen(),
-    const UserSwitcherScreen(),
+    const UserSwitcherScreen()
   ];
 
   @override
   void initState() {
     super.initState();
-    getLocationPermission();
+    justOnlyFindTaker();
+
     //  onInitData();
+  }
+
+  Future<void> justOnlyFindTaker() async {
+    bool result =
+        await checkingDonorSwitcher(UserController.to.userModel!.email);
+    if (result == true) {
+      checkExistDonor = true;
+    }
+    if (UserController.to.userModel!.type == 'taker' &&
+        checkExistDonor == false) {
+      selectedOption = 'taker';
+      setState(() {});
+    }
+    getLocationPermission();
   }
 
   Future<void> onInitData() async {
@@ -163,10 +178,11 @@ class DashboardState extends State<Dashboard> {
               icon: Icon(CupertinoIcons.person),
               label: 'Account',
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.history_toggle_off),
-              label: 'Swtich',
-            ),
+            if (selectedOption != "taker")
+              BottomNavigationBarItem(
+                icon: Icon(Icons.switch_account),
+                label: 'Swtich',
+              )
           ],
         ),
       ),

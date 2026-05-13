@@ -6,7 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/src/simple/get_state.dart';
+import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:sizer/sizer.dart';
 
@@ -239,8 +239,10 @@ class BloodRequestScreen extends StatelessWidget {
                                                                         width:
                                                                             5),
                                                                     Text(
-                                                                      taker.date ??
-                                                                          '',
+                                                                      DateFormat(
+                                                                              'dd-MM-yyyy')
+                                                                          .format(
+                                                                              DateTime.parse(taker.date!)),
                                                                       style: const TextStyle(
                                                                           fontSize:
                                                                               13,
@@ -622,8 +624,10 @@ class BloodRequestScreen extends StatelessWidget {
                                                                           color:
                                                                               Colors.white),
                                                                     );
-                                                                    controller.getTakerData();
-                                                                    controller.update();
+                                                                    controller
+                                                                        .getTakerData();
+                                                                    controller
+                                                                        .update();
                                                                   } else {
                                                                     Get.snackbar(
                                                                       "Error",

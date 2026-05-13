@@ -505,6 +505,7 @@ class RemoteFeedDatasource {
       rethrow;
     }
   }
+  
 
   Future<void> updateAppStatus(bool isActive) async {
     try {

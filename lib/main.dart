@@ -24,7 +24,7 @@ import 'package:get/get.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'features/splashscreens/main_splash_screen.dart';
+import 'features/splashscreens/presentation/screens/main_splash_screen.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 

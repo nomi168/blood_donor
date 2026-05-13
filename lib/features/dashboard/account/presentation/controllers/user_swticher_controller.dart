@@ -2,7 +2,6 @@ import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/core/utils/api_response.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:blood_donor/features/dashboard/account/domain/account_repository.dart';
-import 'package:blood_donor/main.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -13,6 +12,7 @@ class UserSwticherController extends GetxController {
   final AccountRepository _accountRepository = AccountRepository();
   String selectedOption = '';
   bool checkExistDonor = false;
+
 
   @override
   void onInit() {
@@ -53,9 +53,9 @@ class UserSwticherController extends GetxController {
     }
     update();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      showPopup(navigatorKey.currentContext!);
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   showPopup(navigatorKey.currentContext!);
+    // });
   }
 
   void showPopup(BuildContext context) {
@@ -188,7 +188,6 @@ class UserSwticherController extends GetxController {
                           ),
                           const SizedBox(width: 10),
 
-                          
                           GestureDetector(
                             onTap: () async {
                               if (selectedOption == 'donor') {

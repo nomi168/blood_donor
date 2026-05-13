@@ -12,6 +12,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 
 class DonateBoodScreen extends StatelessWidget {
@@ -74,260 +75,261 @@ class DonateBoodScreen extends StatelessWidget {
                       }
                     },
                   )),
-               SizedBox(
-                  height: 5,
+              SizedBox(
+                height: 5,
+              ),
+              Text(
+                'Confirm your Donor',
+                style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black),
+              ),
+              Container(
+                padding: EdgeInsets.all(10),
+                margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white, // Optional: Background color
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(width: 0.5, color: Color(0xFFDDDDDD)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 10,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
                 ),
-                Text(
-                  'Confirm your Donor',
-                  style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black),
-                ),
-                Container(
-                  padding: EdgeInsets.all(10),
-                  margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.white, // Optional: Background color
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(width: 0.5, color: Color(0xFFDDDDDD)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 10,
-                        offset: Offset(0, 4),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Blood Group ',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black54),
+                            ),
+                          ),
+                          // Spacer(),
+                          Expanded(
+                            child: Text(payload.blood!,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black54)),
+                          ),
+                          SizedBox(
+                            width: 5,
+                          )
+                        ],
                       ),
-                    ],
-                  ),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                'Blood Group ',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black54),
-                              ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Address ',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black54),
                             ),
-                            // Spacer(),
-                            Expanded(
-                              child: Text(payload.blood!,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.black54)),
+                          ),
+                          // Spacer(),
+                          Expanded(
+                            child: Text(
+                              payload.location!,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black54),
                             ),
-                            SizedBox(
-                              width: 5,
-                            )
-                          ],
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                'Address ',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black54),
-                              ),
+                          ),
+                          SizedBox(
+                            width: 5,
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Hospital Name ',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black54),
                             ),
-                            // Spacer(),
-                            Expanded(
-                              child: Text(
-                                payload.location!,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black54),
-                              ),
+                          ),
+                          // Spacer(),
+                          Expanded(
+                            child: Text(
+                              payload.hospitalName!,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black54),
                             ),
-                            SizedBox(
-                              width: 5,
-                            )
-                          ],
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Row(
+                          ),
+                          SizedBox(
+                            width: 5,
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                    ]),
+              ),
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(10),
+                margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white, // Optional: Background color
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(width: 0.5, color: Color(0xFFDDDDDD)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 10,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                          mainAxisSize: MainAxisSize.min,
+                          // mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                              child: Text(
-                                'Hospital Name ',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black54),
-                              ),
-                            ),
-                            // Spacer(),
-                            Expanded(
-                              child: Text(
-                                payload.hospitalName!,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black54),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 5,
-                            )
-                          ],
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                      ]),
-                ),
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(10),
-                  margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.white, // Optional: Background color
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(width: 0.5, color: Color(0xFFDDDDDD)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 10,
-                        offset: Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                            mainAxisSize: MainAxisSize.min,
-                            // mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                width: 70,
-                                height: 70,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: CachedNetworkImage(
-                                    fit: BoxFit.cover,
-                                    imageUrl: payload.image!.isNotEmpty
-                                        ? payload.image!
-                                        : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
-                                    placeholder: (context, url) =>
-                                        const CupertinoActivityIndicator(
-                                      color: Colors.white,
-                                    ),
-                                    errorWidget: (context, url, error) =>
-                                        Icon(Icons.error),
+                            Container(
+                              width: 70,
+                              height: 70,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: CachedNetworkImage(
+                                  fit: BoxFit.cover,
+                                  imageUrl: payload.image!.isNotEmpty
+                                      ? payload.image!
+                                      : "https://www.lscthub.co.uk/wp-content/themes/u-design/assets/images/placeholders/event-placeholder.jpg",
+                                  placeholder: (context, url) =>
+                                      const CupertinoActivityIndicator(
+                                    color: Colors.white,
                                   ),
+                                  errorWidget: (context, url, error) =>
+                                      Icon(Icons.error),
                                 ),
                               ),
-                              const SizedBox(width: 10),
-                              Container(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                     payload.name!,
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.black54,
-                                          fontWeight: FontWeight.w500),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Row(
-                                      children: [
-                                        Icon(
-                                          CupertinoIcons.calendar,
-                                          size: 15,
-                                          color: Colors.black45,
-                                        ),
-                                        SizedBox(
-                                          width: 5,
-                                        ),
-                                        Text(
-                                          payload.date!,
-                                          style: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w500,
-                                              color: Colors.black45),
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        Icon(
-                                          CupertinoIcons.clock,
-                                          size: 15,
-                                          color: Colors.black45,
-                                        ),
-                                        SizedBox(
-                                          width: 5,
-                                        ),
-                                        Text(
+                            ),
+                            const SizedBox(width: 10),
+                            Container(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    payload.name!,
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.black54,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        CupertinoIcons.calendar,
+                                        size: 15,
+                                        color: Colors.black45,
+                                      ),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      Text(
+                                        DateFormat('dd-MM-yyyy').format(
+                                            DateTime.parse(payload.date!)),
+                                        style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.black45),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        CupertinoIcons.clock,
+                                        size: 15,
+                                        color: Colors.black45,
+                                      ),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      Text(
                                         payload.time!,
-                                          style: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w500,
-                                              color: Colors.black45),
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        Icon(
-                                          Icons.social_distance,
-                                          color: Colors.black54,
-                                        ),
-                                        SizedBox(
-                                          width: 5,
-                                        ),
-                                        Text(
-                                          '${controller.distance.toStringAsFixed(2)} km Away',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w500,
-                                              color: Colors.black54),
-                                        )
-                                      ],
-                                    )
-                                  ],
+                                        style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.black45),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.social_distance,
+                                        color: Colors.black54,
+                                      ),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      Text(
+                                        '${controller.distance.toStringAsFixed(2)} km Away',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.black54),
+                                      )
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                            Spacer(),
+                            InkWell(
+                              splashFactory: NoSplash.splashFactory,
+                              splashColor: Colors.transparent,
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) =>
+                                      _buildAnimatedPopup(
+                                          context, payload.note!),
+                                );
+                              },
+                              child: Container(
+                                margin: EdgeInsets.only(top: 30),
+                                padding: EdgeInsets.all(1),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(100),
+                                    border: Border.all(color: PRIMARY_COLOR)),
+                                child: Icon(
+                                  Icons.info,
+                                  color: Colors.red,
                                 ),
                               ),
-                              Spacer(),
-                              InkWell(
-                                splashFactory: NoSplash.splashFactory,
-                                splashColor: Colors.transparent,
-                                onTap: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) =>
-                                        _buildAnimatedPopup(
-                                            context, payload.note!),
-                                  );
-                                },
-                                child: Container(
-                                  margin: EdgeInsets.only(top: 30),
-                                  padding: EdgeInsets.all(1),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(100),
-                                      border: Border.all(color: PRIMARY_COLOR)),
-                                  child: Icon(
-                                    Icons.info,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              )
-                            ]),
-                      ]),
-                ),
+                            )
+                          ]),
+                    ]),
+              ),
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                 width: double.infinity,
@@ -359,7 +361,7 @@ class DonateBoodScreen extends StatelessWidget {
 
                       String timeOnly =
                           "${hour.toString().padLeft(2, '0')}:${dates.minute.toString().padLeft(2, '0')} $period";
-                      Map<String,dynamic> payload1 = {
+                      Map<String, dynamic> payload1 = {
                         'id': '',
                         'takerid': payload.takerId,
                         'fullname': payload.name,
@@ -554,7 +556,8 @@ class DonateBoodScreen extends StatelessWidget {
       },
     );
   }
-   Widget _buildAnimatedPopup(BuildContext context, String note) {
+
+  Widget _buildAnimatedPopup(BuildContext context, String note) {
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),

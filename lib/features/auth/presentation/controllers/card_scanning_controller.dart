@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 
 class CardScanningController extends GetxController {
   final AuthRepository _authRepository = AuthRepository();
@@ -32,6 +33,75 @@ class CardScanningController extends GetxController {
     doeTEController.text = _cnicModel.cnicExpiryDate;
 
     update();
+  }
+
+  bool isEligible({
+    required String dob,
+    required String doi,
+  }) {
+    final DateFormat formatter = DateFormat("dd/MM/yyyy");
+
+    DateTime dateOfBirth = formatter.parse(dob);
+    DateTime dateOfIssue = formatter.parse(doi);
+
+    int age = dateOfIssue.year - dateOfBirth.year;
+
+    if (dateOfIssue.month < dateOfBirth.month ||
+        (dateOfIssue.month == dateOfBirth.month &&
+            dateOfIssue.day < dateOfBirth.day)) {
+      age--;
+    }
+
+    return age >= 18;
+  }
+
+  void showNotEligibleDialog({
+    required String userType,
+  }) {
+    Get.defaultDialog(
+      title: "Not Eligible",
+      titleStyle: const TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+      content: Column(
+        children: [
+          const Icon(
+            Icons.warning_amber_rounded,
+            color: Colors.red,
+            size: 60,
+          ),
+          const SizedBox(height: 15),
+          Text(
+            userType == "donor"
+                ? "You are not eligible to donate blood"
+                : "You are not eligible to take blood",
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 16,
+              height: 1.4,
+            ),
+          ),
+        ],
+      ),
+      confirm: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.red,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        onPressed: () {
+          Get.back();
+          Get.back();
+        },
+        child: const Text(
+          "OK",
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+      barrierDismissible: false,
+    );
   }
 
   Future<bool> checkingCNIC(String cnic) async {

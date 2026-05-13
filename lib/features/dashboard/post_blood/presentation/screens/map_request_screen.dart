@@ -13,12 +13,14 @@ class MapRequestScreen extends StatelessWidget {
   final Completer<GoogleMapController> controller;
   final List<UserModel> userList;
   final List<UserLocationModel> userLocationList;
+  final List<Map<String,dynamic>> imageList;
   const MapRequestScreen(
       {super.key,
       required this.payload,
       required this.controller,
       required this.userList,
-      required this.userLocationList});
+      required this.userLocationList,
+      required this.imageList});
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +31,8 @@ class MapRequestScreen extends StatelessWidget {
             payload: payload,
             controller: controller,
             userList: userList,
-            locationList: userLocationList),
+            locationList: userLocationList,
+            imageList: imageList),
         builder: (mapController) {
           return Stack(children: [
             GoogleMap(

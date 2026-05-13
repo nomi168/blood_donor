@@ -3,11 +3,13 @@ import 'dart:io';
 import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/core/utils/api_response.dart';
 import 'package:blood_donor/features/auth/domain/auth_repository.dart';
+import 'package:blood_donor/features/auth/presentation/screens/animate_camera_screen.dart';
 import 'package:blood_donor/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
+import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -37,7 +39,13 @@ class SignupController extends GetxController {
 
   Future<void> getImage(ImageSource source) async {
     final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: source);
+    debugPrint("Hello $source");
+    final pickedFile;
+    if (ImageSource.camera == source) {
+      pickedFile = await Get.to(() => const FaceScanCamera());
+    } else {
+      pickedFile = await picker.pickImage(source: source);
+    }
 
     if (pickedFile != null) {
       final fileSize = await File(pickedFile.path).length();
@@ -50,11 +58,48 @@ class SignupController extends GetxController {
         if (compressedFileSize > maxFileSize) {
           _showFileSizeExceededMessage();
         } else {
-          image = compressedFile;
+          final faceDetected = await hasFace(compressedFile);
+
+          if (faceDetected) {
+            image = compressedFile;
+            update();
+          } else {
+            Get.snackbar(
+              "Invalid Image",
+              "Please upload an image containing a human face",
+              snackPosition: SnackPosition.TOP,
+              snackStyle: SnackStyle.FLOATING,
+              backgroundColor: Colors.red.withValues(alpha: 0.9),
+              colorText: Colors.white,
+              margin: EdgeInsets.all(10),
+              duration: Duration(seconds: 3),
+              borderRadius: 8,
+              icon: Icon(Icons.error, color: Colors.white),
+            );
+          }
+
           update();
         }
       } else {
-        image = File(pickedFile.path);
+        final faceDetected = await hasFace(File(pickedFile.path));
+
+        if (faceDetected) {
+          image = File(pickedFile.path);
+          update();
+        } else {
+          Get.snackbar(
+            "Invalid Image",
+            "Please upload an image containing a human face",
+            snackPosition: SnackPosition.TOP,
+            snackStyle: SnackStyle.FLOATING,
+            backgroundColor: Colors.red.withValues(alpha: 0.9),
+            colorText: Colors.white,
+            margin: EdgeInsets.all(10),
+            duration: Duration(seconds: 3),
+            borderRadius: 8,
+            icon: Icon(Icons.error, color: Colors.white),
+          );
+        }
         update();
       }
     } else {
@@ -113,6 +158,23 @@ class SignupController extends GetxController {
         ),
       ),
     );
+  }
+
+  Future<bool> hasFace(File imageFile) async {
+    final inputImage = InputImage.fromFile(imageFile);
+
+    final faceDetector = FaceDetector(
+      options: FaceDetectorOptions(
+        enableContours: false,
+        enableLandmarks: false,
+        performanceMode: FaceDetectorMode.fast,
+      ),
+    );
+
+    final faces = await faceDetector.processImage(inputImage);
+    faceDetector.close();
+
+    return faces.isNotEmpty; // ✅ true if face detected
   }
 
   Future<bool> checkEmail(String email) async {

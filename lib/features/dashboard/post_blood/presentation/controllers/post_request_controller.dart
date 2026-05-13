@@ -35,6 +35,7 @@ class PostRequestController extends GetxController {
 
   List<String> bloodType = ['Blood', 'Platelets', 'Exchange Blood'];
   List<String> bloodGroups = ['A+', 'B+', 'O+', 'AB+', 'A-', 'B-', 'O-', 'AB-'];
+  List<Map<String, dynamic>> imageList = [];
 
   String selectedBlood = '';
 
@@ -68,10 +69,15 @@ class PostRequestController extends GetxController {
       showLoader('please wait...');
       userLocationList.clear();
       userLocationList = await getDonorLocations();
+
       for (var location in userLocationList) {
         for (var data in userList) {
           if (data.id == location.userId) {
             filteredList.add(location);
+            imageList.add({
+              'user_id': data.id,
+              'image': data.image,
+            });
           }
         }
       }

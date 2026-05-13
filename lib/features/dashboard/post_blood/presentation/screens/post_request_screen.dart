@@ -714,7 +714,8 @@ class PostRequestScreen extends StatelessWidget {
                                   payload: payload,
                                   controller: mapController.controller,
                                   userList: controller.userList,
-                                  userLocationList: controller.filteredList);
+                                  userLocationList: controller.filteredList,
+                                  imageList: controller.imageList,);
                             },
                             transitionDuration:
                                 const Duration(microseconds: 100),

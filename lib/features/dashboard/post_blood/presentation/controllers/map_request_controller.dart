@@ -21,6 +21,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:googleapis_auth/auth_io.dart' as auth;
 import 'package:http/http.dart' as http;
 import 'package:sizer/sizer.dart';
+import 'dart:ui' as ui;
+import 'dart:typed_data';
 
 class MapRequestController extends GetxController {
   final RepositoryPostRequest _postRequest = RepositoryPostRequest();
@@ -28,11 +30,13 @@ class MapRequestController extends GetxController {
   final Completer<GoogleMapController> controller;
   final List<UserModel> userList;
   final List<UserLocationModel> locationList;
+  final List<Map<String, dynamic>> imageList;
   MapRequestController(
       {required this.payload,
       required this.controller,
       required this.userList,
-      required this.locationList});
+      required this.locationList,
+      required this.imageList});
   Completer<GoogleMapController> controller1 = Completer<GoogleMapController>();
   List<Map<String, double>> receiverLocations = [];
   List<String> nearbyDonors = [];
@@ -316,15 +320,33 @@ class MapRequestController extends GetxController {
             loc.longitude,
           );
           final distanceInKm = distanceInMeters / 1000;
-
           newMarkers.add(Marker(
             markerId: MarkerId(address),
             position: LatLng(loc.latitude, loc.longitude),
             infoWindow: InfoWindow(title: address),
           ));
+          // final imageUrl = getUserImage(donor.userId);
+          // final BitmapDescriptor markerIcon = imageUrl != null
+          //     ? await getCircularMarker(imageUrl, size: 120) 
+          //     : BitmapDescriptor.defaultMarker;
+          // final BitmapDescriptor markerIcon = Lottie.asset(
+          //   "assets/lottie/blood_icon_1.json",
+          //   width: 80,
+          //   height: 80,
+          //   repeat: true,
+          // );
+
+          // newMarkers.add(Marker(
+          //     markerId: MarkerId(donor.userId),
+          //     position: LatLng(loc.latitude, loc.longitude),
+          //     icon: icon,
+          //     infoWindow: InfoWindow(
+          //       title: 'Donor',
+          //       snippet: address,
+          //     )));
 
           if (distanceInKm <= 5) {
-            receiverIds.add(donor.userId); // More meaningful than location
+            receiverIds.add(donor.userId);
             receiverLocs
                 .add({'latitude': loc.latitude, 'longitude': loc.longitude});
             nearbyDonors.add(address);
@@ -366,6 +388,69 @@ class MapRequestController extends GetxController {
       logError('Error in donorOnMap(): $e');
     } finally {
       await EasyLoading.dismiss();
+    }
+  }
+
+  Future<BitmapDescriptor> getCircularMarker(String imageUrl,
+      {int size = 120}) async {
+    // Load network image
+    final ByteData imageData =
+        await NetworkAssetBundle(Uri.parse(imageUrl)).load(imageUrl);
+    final Uint8List bytes = imageData.buffer.asUint8List();
+
+    // Decode image
+    final ui.Codec codec =
+        await ui.instantiateImageCodec(bytes, targetWidth: size);
+    final ui.FrameInfo fi = await codec.getNextFrame();
+    final ui.Image image = fi.image;
+
+    // Create canvas to draw circular image
+    final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
+    final Canvas canvas = Canvas(pictureRecorder);
+    final Paint paint = Paint();
+
+    final double radius = size / 2;
+
+    // Draw circle
+    canvas.drawCircle(
+      Offset(radius, radius),
+      radius,
+      Paint()..color = Colors.white,
+    );
+
+    // Clip to circle
+    final Path path = Path()
+      ..addOval(Rect.fromLTWH(0, 0, size.toDouble(), size.toDouble()));
+    canvas.clipPath(path);
+
+    // Draw image inside circle
+    paint.isAntiAlias = true;
+    canvas.drawImageRect(
+        image,
+        Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
+        Rect.fromLTWH(0, 0, size.toDouble(), size.toDouble()),
+        paint);
+
+    // Optional: draw border
+    paint
+      ..color = Colors.blueAccent
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 6;
+    canvas.drawCircle(Offset(radius, radius), radius - 3, paint);
+
+    final ui.Image finalImage =
+        await pictureRecorder.endRecording().toImage(size, size);
+    final ByteData? byteData =
+        await finalImage.toByteData(format: ui.ImageByteFormat.png);
+
+    return BitmapDescriptor.fromBytes(byteData!.buffer.asUint8List());
+  }
+
+  String? getUserImage(String userId) {
+    try {
+      return imageList.firstWhere((e) => e['user_id'] == userId)['image'];
+    } catch (e) {
+      return null;
     }
   }
 
@@ -1025,7 +1110,7 @@ class MapRequestController extends GetxController {
   void _showDonatePopup() {
     showDialog(
       context: navigatorKey.currentContext!,
-       barrierDismissible: false,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return GetBuilder<MapRequestController>(builder: (homeController) {
           return AlertDialog(
