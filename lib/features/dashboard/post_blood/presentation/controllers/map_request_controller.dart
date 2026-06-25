@@ -6,7 +6,7 @@ import 'package:blood_donor/core/utils/api_response.dart';
 import 'package:blood_donor/core/utils/console_logs.dart';
 import 'package:blood_donor/features/auth/data/models/user_model.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
-import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboatd.dart';
+import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboard.dart';
 import 'package:blood_donor/features/dashboard/post_blood/data/models/user_location_model.dart';
 import 'package:blood_donor/features/dashboard/post_blood/domain/repository_post_request.dart';
 import 'package:blood_donor/main.dart';

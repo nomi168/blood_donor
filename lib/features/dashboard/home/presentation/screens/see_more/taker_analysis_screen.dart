@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/donor_accept_model.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/controllers/taker_anaylsis_controller.dart';
-import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboatd.dart';
+import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboard.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/screens/see_more/feedback_screen.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/screens/see_more/taker_reach.dart';
 import 'package:flutter/material.dart';

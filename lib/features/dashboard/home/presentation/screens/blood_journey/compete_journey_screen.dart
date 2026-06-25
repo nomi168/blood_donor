@@ -1,7 +1,7 @@
 import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/features/dashboard/home/data/models/donor_accept_model.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/controllers/complete_journey_controller..dart';
-import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboatd.dart';
+import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboard.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';

@@ -1,9 +1,11 @@
+import 'package:blood_donor/common/widgets/text_field_widget.dart';
 import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/core/utils/console_logs.dart';
 import 'package:blood_donor/core/validate_test_field.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:blood_donor/features/dashboard/post_blood/presentation/controllers/post_request_controller.dart';
 import 'package:blood_donor/features/dashboard/post_blood/presentation/screens/map_request_screen.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
@@ -23,17 +25,15 @@ class PostRequestScreen extends StatelessWidget {
             builder: (controller) {
               return SingleChildScrollView(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        SizedBox(
-                          width: 2.w,
-                        ),
                         IconButton(
                           icon: const Icon(
-                            Icons.arrow_back_ios,
-                            size: 27,
-                            color: Colors.black54,
+                            Icons.arrow_back,
+                            size: 24,
+                            color: Colors.black,
                           ),
                           onPressed: () {
                             Navigator.pop(context);
@@ -41,455 +41,316 @@ class PostRequestScreen extends StatelessWidget {
                         ),
                         Spacer(),
                         Text(
-                          'Post A Request',
+                          'Post Request',
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 17.sp,
-                              color: Colors.black54),
+                              fontSize: 16.sp,
+                              color: Colors.black),
                         ),
                         Spacer(),
                         SizedBox(
-                          width: 5.w,
+                          width: 10.w,
                         ),
                       ],
                     ),
-                    Container(
-                      margin: EdgeInsets.symmetric(horizontal: 5),
-                      child: Material(
-                        color: Colors.white,
-                        elevation: 7.0,
-                        borderRadius:
-                            BorderRadius.circular(10.0), // Add border radius
-                        child: TextFormField(
-                          controller: controller.hospital,
-                          decoration: InputDecoration(
-                            label: const Text('Search Hospital'),
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16.0), // Adjust padding
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              borderSide: const BorderSide(
-                                  color: Colors.grey), // Border color
-                            ),
-                            suffixIcon: const Icon(Icons.local_hospital),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              borderSide: const BorderSide(
-                                  color:
-                                      Colors.blue), // Border color when focused
-                            ),
-                            hintText: 'Search Hospital',
-                          ),
-                          validator: validateHospital,
-                        ),
-                      ),
+                    _buildText('Hospital'),
+                    SizedBox(
+                      height: 1.h,
+                    ),
+                    CustomTextField(
+                      controller: controller.hospital,
+                      label: 'Search Hospital',
+                      hintText: 'Search Hospital',
+                      validator: validateHospital,
                     ),
                     SizedBox(
-                      height: 10,
+                      height: 2.h,
                     ),
-                    Container(
-                      margin: EdgeInsets.symmetric(horizontal: 5),
-                      child: DropdownButtonFormField(
-                        decoration: const InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 13.0),
-                          labelText: "Select Blood Type",
-                          suffixIcon: Icon(Icons.bloodtype),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(10.0),
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.blue, width: 2.5),
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(10.0),
-                            ),
-                          ),
+                    _buildText('Blood-Type'),
+                    SizedBox(
+                      height: 1.h,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 3.w),
+                      child: DropdownButtonFormField<String>(
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w500,
                         ),
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(10.0)),
+                        dropdownColor: Colors.white,
+                        decoration: customDecoration(
+                            hint: "Select Blood Type",
+                            hintStyle: TextStyle(
+                                color: Colors.black, fontSize: 10.sp)),
                         items: controller.bloodType
-                            .map((e) => DropdownMenuItem(
-                                  // ignore: sort_child_properties_last
-                                  child: Text(e),
-                                  value: e,
-                                ))
+                            .map(
+                              (e) => DropdownMenuItem(
+                                value: e,
+                                child: Text(e),
+                              ),
+                            )
                             .toList(),
-                        onChanged: (v) {
-                          controller.selectedBlood = v!;
+                        onChanged: (value) {
+                          controller.selectedBlood = value!;
                           controller.update();
                         },
                       ),
                     ),
                     SizedBox(
-                      height: 10,
+                      height: 2.h,
                     ),
                     Row(
                       children: [
                         Expanded(
-                            child: Container(
-                                margin: EdgeInsets.symmetric(horizontal: 5),
-                                child: Material(
-                                  color: Colors.white,
-                                  elevation: 7.0,
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  child: TextFormField(
-                                    readOnly: true,
-                                    controller: TextEditingController(
-                                      text:
-                                          "${controller.selectedDate.toLocal()}"
-                                              .split(' ')[0],
-                                    ),
-                                    decoration: InputDecoration(
-                                      label: const Text('Select Date'),
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                              horizontal: 16.0),
-                                      border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                        borderSide: const BorderSide(
-                                            color: Colors.grey),
-                                      ),
-                                      suffixIcon:
-                                          const Icon(Icons.calendar_today),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                        borderSide: const BorderSide(
-                                            color: Colors.blue),
-                                      ),
-                                      hintText: 'Select Date',
-                                    ),
-                                    onTap: () => controller.selectDate(context),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildText('Date'),
+                              SizedBox(
+                                height: 1.h,
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(left: 3.w),
+                                child: TextFormField(
+                                  controller: TextEditingController(
+                                    text: "${controller.selectedDate.toLocal()}"
+                                        .split(' ')[0],
                                   ),
-                                ))),
+                                  readOnly: true,
+                                  decoration: customDecoration(
+                                    hint: "MM/DD/YYYY",
+                                    suffixIcon:
+                                        Icon(Icons.calendar_month_outlined),
+                                  ),
+                                  onTap: () => controller.selectDate(context),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: 4.w),
                         Expanded(
-                            child: Container(
-                                margin: EdgeInsets.symmetric(horizontal: 5),
-                                child: Material(
-                                  color: Colors.white,
-                                  elevation: 7.0,
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  child: TextFormField(
-                                    readOnly: true,
-                                    controller: TextEditingController(
-                                      // ignore: unnecessary_string_interpolations
-                                      text:
-                                          "${controller.selectedTime.format(context)}",
-                                    ),
-                                    decoration: InputDecoration(
-                                      label: const Text('Select Time'),
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                              horizontal: 16.0),
-                                      border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                        borderSide: const BorderSide(
-                                            color: Colors.grey),
-                                      ),
-                                      suffixIcon: const Icon(Icons.access_time),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                        borderSide: const BorderSide(
-                                            color: Colors.blue),
-                                      ),
-                                      hintText: 'Select Time',
-                                    ),
-                                    onTap: () => controller.selectTime(context),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildText('Time'),
+                              SizedBox(
+                                height: 1.h,
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(right: 3.w, left: 2.w),
+                                child: TextFormField(
+                                  controller: TextEditingController(
+                                    // ignore: unnecessary_string_interpolations
+                                    text:
+                                        "${controller.selectedTime.format(context)}",
                                   ),
-                                ))),
+                                  readOnly: true,
+                                  decoration: customDecoration(
+                                    hint: "00:00",
+                                    suffixIcon: Icon(Icons.access_time),
+                                  ),
+                                  onTap: () => controller.selectTime(context),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
-
                     SizedBox(
-                      height: 10,
+                      height: 2.h,
+                    ),
+                    _buildText('Address'),
+                    SizedBox(
+                      height: 1.h,
                     ),
                     Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 5),
-                      child: Material(
-                        color: Colors.white,
-                        elevation: 7.0,
-                        borderRadius: BorderRadius.circular(10.0),
-                        child: TextFormField(
-                          controller: controller.location,
-                          decoration: InputDecoration(
-                            label: const Text('Address'),
-                            hintText: 'Address',
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16.0, vertical: 14.0),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              borderSide: const BorderSide(color: Colors.grey),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              borderSide: const BorderSide(color: Colors.blue),
-                            ),
-                            suffixIcon: IconButton(
-                              icon: controller.isLoading
-                                  ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                          strokeWidth: 2))
-                                  : Container(
-                                      width: 120,
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 10, vertical: 10),
-                                      decoration: BoxDecoration(
-                                          color: Colors.blue,
-                                          borderRadius:
-                                              BorderRadius.circular(06)),
-                                      child: Row(
-                                        children: [
-                                          const Icon(Icons.my_location,
-                                              color: Colors.white),
-                                          SizedBox(
-                                            width: 10,
-                                          ),
-                                          Text(
-                                            'Location',
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
-                                        ],
-                                      ),
+                      margin: EdgeInsets.symmetric(horizontal: 3.w),
+                      child: TextFormField(
+                        validator: validateAddress,
+                        controller: controller.location,
+                        decoration: customDecoration(
+                          hint: "Select Address",
+                          suffixIcon: controller.isLoading
+                              ? Column(
+                                  children: [
+                                    SizedBox(
+                                      height: 1.h,
+                                      width: 1.w,
                                     ),
-                              onPressed: controller.isLoading
-                                  ? null
-                                  : controller.getCurrentAddress,
-                            ),
-                          ),
-                          validator: validateAddress,
+                                    CircularProgressIndicator(
+                                      strokeWidth: 3,
+                                      color: PRIMARY_COLOR,
+                                    ),
+                                  ],
+                                )
+                              : InkWell(
+                                  onTap: () {
+                                    controller.getCurrentAddress();
+                                  },
+                                  splashColor: Colors.transparent,
+                                  splashFactory: NoSplash.splashFactory,
+                                  highlightColor: Colors.transparent,
+                                  child: Container(
+                                    child: Icon(
+                                      Icons.location_on_outlined,
+                                    ),
+                                  ),
+                                ),
                         ),
                       ),
                     ),
-
                     SizedBox(
-                      height: 5,
+                      height: 1.w,
                     ),
                     Container(
-                      alignment: Alignment.centerLeft,
-                      margin: EdgeInsets.only(left: 10),
+                      margin: EdgeInsets.only(left: 4.w),
                       child: Text(
                         'Must be enter complete address with city name!',
-                        style: TextStyle(fontSize: 11, color: PRIMARY_COLOR),
+                        style: TextStyle(fontSize: 11, color: Colors.black54),
                       ),
                     ),
                     SizedBox(
-                      height: 10,
+                      height: 2.h,
                     ),
-                    Container(
-                      height: 100,
-                      margin: EdgeInsets.symmetric(horizontal: 5),
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.black38),
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(06)),
-                              height: 90,
-                              child: controller.selectedImage != null
-                                  ? Image.file(controller.selectedImage!,
-                                      fit: BoxFit.cover)
-                                  : const Center(child: Text('No Image')),
-                            ),
-                          ),
-                          SizedBox(width: 10),
-                          InkWell(
-                            splashColor: Colors.transparent,
-                            splashFactory: NoSplash.splashFactory,
-                            onTap: controller.pickImage,
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 10),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade300,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                'Select Doctor slip',
-                                style: TextStyle(
-                                    fontSize: 12, fontWeight: FontWeight.w500),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 10),
-                        ],
-                      ),
-                    ),
-                    // SizedBox(
-                    //   height: 10,
-                    // ),
-                    // Container(
-                    //   margin: EdgeInsets.symmetric(horizontal: 5),
-                    //   child: Material(
-                    //     color: Colors.white,
-                    //     elevation: 7.0, // Add shadow/elevation
-                    //     borderRadius:
-                    //         BorderRadius.circular(10.0), // Add border radius
-                    //     child: TextFormField(
-                    //       keyboardType: TextInputType.number,
-                    //       controller: controller.unit,
-                    //       decoration: InputDecoration(
-                    //         label: const Text('Units'),
-                    //         contentPadding: const EdgeInsets.symmetric(
-                    //             horizontal: 16.0), // Adjust padding
-                    //         border: OutlineInputBorder(
-                    //           borderRadius: BorderRadius.circular(8.0),
-                    //           borderSide: const BorderSide(
-                    //               color: Colors.grey), // Border color
-                    //         ),
-                    //         suffixIcon: const Icon(Icons.bloodtype_sharp),
-                    //         focusedBorder: OutlineInputBorder(
-                    //           borderRadius: BorderRadius.circular(8.0),
-                    //           borderSide: const BorderSide(
-                    //               color:
-                    //                   Colors.blue), // Border color when focused
-                    //         ),
-                    //         hintText: 'Unit',
-                    //       ),
-                    //       validator: validateAddress,
-                    //     ),
-                    //   ),
-                    // ),
-
+                    _buildText('Upload Document'),
                     SizedBox(
-                      height: 10,
+                      height: 1.h,
                     ),
                     Container(
-                      margin: EdgeInsets.symmetric(horizontal: 5),
-                      child: Material(
-                        color: Colors.white,
-                        elevation: 7.0,
-                        borderRadius: BorderRadius.circular(10.0),
-                        // ignore: sized_box_for_whitespace
-                        child: TextFormField(
-                          controller: controller.note,
-                          maxLines: 3,
-                          mouseCursor: MouseCursor.defer,
-                          decoration: InputDecoration(
-                            label: const Text('Note'),
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16.0, vertical: 20.0),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              borderSide: const BorderSide(color: Colors.grey),
-                            ),
-                            suffixIcon: const Icon(Icons.note),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              borderSide: const BorderSide(color: Colors.blue),
-                            ),
-                            hintText: 'Note',
+                      margin: EdgeInsets.symmetric(horizontal: 4.w),
+                      child: DottedBorder(
+                        color: Colors.grey.shade300,
+                        dashPattern: const [6, 4],
+                        borderType: BorderType.Rect,
+                        radius: Radius.circular(12),
+                        child: InkWell(
+                          onTap: controller.pickImage,
+                          splashColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          splashFactory: NoSplash.splashFactory,
+                          child: Container(
+                            height: 110,
+                            width: double.infinity,
+                            alignment: Alignment.center,
+                            child: controller.selectedImage != null
+                                ? Image.file(controller.selectedImage!,
+                                    fit: BoxFit.cover)
+                                : Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.attach_file,
+                                        color: Colors.grey,
+                                      ),
+                                      SizedBox(height: 6),
+                                      Text(
+                                        "Upload Doctor Slip",
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                           ),
-                          validator: validateNote,
                         ),
                       ),
                     ),
+                    SizedBox(height: 2.h),
+                    _buildText('Note'),
                     SizedBox(
-                      height: 10,
+                      height: 1.h,
                     ),
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 5),
-                      child: Material(
-                        color: Colors.white,
-                        elevation: 7.0,
-                        borderRadius: BorderRadius.circular(10.0),
-                        child: DropdownButtonFormField<String>(
-                          decoration: InputDecoration(
-                            label: const Text('Blood Group'),
-                            contentPadding:
-                                const EdgeInsets.symmetric(horizontal: 16.0),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              borderSide: const BorderSide(color: Colors.grey),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              borderSide: const BorderSide(color: Colors.blue),
-                            ),
-                            suffixIcon: const Icon(
-                              Icons.bloodtype,
-                              color: Color(0xFFDE0A1E),
-                              size: 35.0,
-                            ),
-                          ),
-                          hint: const Text('Select Blood Group'),
-                          value: controller.blood.text.isEmpty
-                              ? null
-                              : controller.blood.text,
-                          items: controller.bloodGroups.map((group) {
-                            return DropdownMenuItem(
-                              value: group,
-                              child: Text(group),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            if (value != null) {
-                              controller.blood.text = value;
-                            }
-                          },
-                          validator: (value) => value == null || value.isEmpty
-                              ? 'Please select blood group'
-                              : null,
+                    CustomTextField(
+                      controller: controller.note,
+                      label: 'Note',
+                      hintText: 'Search Note',
+                      validator: validateNote,
+                      maxLines: 3,
+                      mouseCursor: MouseCursor.defer,
+                    ),
+                    SizedBox(height: 2.h),
+                    _buildText('Blood-Group'),
+                    SizedBox(
+                      height: 1.h,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 3.w),
+                      child: DropdownButtonFormField<String>(
+                        validator: (value) => value == null || value.isEmpty
+                            ? 'Please select blood group'
+                            : null,
+                        value: controller.blood.text.isEmpty
+                            ? null
+                            : controller.blood.text,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w500,
                         ),
+                        dropdownColor: Colors.white,
+                        decoration: customDecoration(
+                            hint: "Select Blood Group",
+                            hintStyle: TextStyle(
+                                color: Colors.black, fontSize: 10.sp)),
+                        items: controller.bloodGroups
+                            .map(
+                              (e) => DropdownMenuItem(
+                                value: e,
+                                child: Text(e),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            controller.blood.text = value;
+                          }
+                        },
                       ),
                     ),
                     SizedBox(
-                      height: 10,
+                      height: 2.h,
                     ),
-                    Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.black)),
-                      margin: EdgeInsets.symmetric(horizontal: 5),
-                      child: Row(
-                        children: [
-                          Text(
-                            'Critical',
-                            style: TextStyle(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.bold,
-                                color: controller.isToggled
-                                    ? PRIMARY_COLOR
-                                    : Colors.black),
-                          ),
-                          Spacer(),
-                          Switch(
-                            value: controller.isToggled,
-                            activeColor: Colors.red,
-                            onChanged: (bool value) {
-                              controller.isToggled = value;
-
-                              if (value) {
-                                controller.selectedValue = 'critical';
-                              } else {
-                                controller.selectedValue = 'normal';
-                              }
-                              controller.update();
-                            },
-                          ),
-                        ],
+                    _buildText('Patient Case'),
+                    SizedBox(
+                      height: 1.h,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 3.w),
+                      child: DropdownButtonFormField<String>(
+                        value: controller.selectedValue.isEmpty
+                            ? null
+                            : controller.selectedValue,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        dropdownColor: Colors.white,
+                        decoration: customDecoration(
+                            hint: "Select Your Patient Case",
+                            hintStyle: TextStyle(
+                                color: Colors.black12, fontSize: 10.sp)),
+                        items: controller.patientCase
+                            .map(
+                              (e) => DropdownMenuItem(
+                                value: e,
+                                child: Text(e),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) {
+                          controller.selectedValue = value!;
+                          controller.update();
+                        },
                       ),
                     ),
                     Row(
                       children: [
                         Checkbox(
+                          side: BorderSide(color: Colors.black45),
                           value: controller.isEmergencyHelp,
                           checkColor: Colors.white,
                           focusColor: Colors.red,
@@ -506,17 +367,17 @@ class PostRequestScreen extends StatelessWidget {
                           child: Text(
                             'By clicking, you are allowing access to Emergency Help.',
                             style: TextStyle(
-                                fontSize: 15.sp, fontWeight: FontWeight.bold),
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black54),
                           ),
                         )
                       ],
                     ),
-                    // SizedBox(
-                    //   height: 10,
-                    // ),
                     Row(
                       children: [
                         Checkbox(
+                          side: BorderSide(color: Colors.black45),
                           value: controller.isTerm,
                           checkColor: Colors.white,
                           focusColor: Colors.red,
@@ -533,7 +394,9 @@ class PostRequestScreen extends StatelessWidget {
                           child: Text(
                             'By clicking, you agree to our terms and codition',
                             style: TextStyle(
-                                fontSize: 15.sp, fontWeight: FontWeight.bold),
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black54),
                           ),
                         )
                       ],
@@ -610,22 +473,6 @@ class PostRequestScreen extends StatelessWidget {
                           return;
                         }
 
-                        // if (controller.unit.text.isEmpty) {
-                        //   Get.snackbar(
-                        //     "Error",
-                        //     "please enter the unit",
-                        //     snackPosition: SnackPosition.TOP,
-                        //     snackStyle: SnackStyle.FLOATING,
-                        //     backgroundColor: Colors.red.withValues(alpha: 0.9),
-                        //     colorText: Colors.white,
-                        //     margin: EdgeInsets.all(10),
-                        //     duration: Duration(seconds: 3),
-                        //     borderRadius: 8,
-                        //     icon: Icon(Icons.error, color: Colors.white),
-                        //   );
-
-                        //   return;
-                        // }
                         if (controller.note.text.isEmpty) {
                           Get.snackbar(
                             "Error",
@@ -655,8 +502,22 @@ class PostRequestScreen extends StatelessWidget {
                             borderRadius: 8,
                             icon: Icon(Icons.error, color: Colors.white),
                           );
-                          ;
 
+                          return;
+                        }
+                        if (controller.selectedValue.isEmpty) {
+                          Get.snackbar(
+                            "Error",
+                            "please select the patient case",
+                            snackPosition: SnackPosition.TOP,
+                            snackStyle: SnackStyle.FLOATING,
+                            backgroundColor: Colors.red.withValues(alpha: 0.9),
+                            colorText: Colors.white,
+                            margin: EdgeInsets.all(10),
+                            duration: Duration(seconds: 3),
+                            borderRadius: 8,
+                            icon: Icon(Icons.error, color: Colors.white),
+                          );
                           return;
                         }
                         if (!controller.isTerm) {
@@ -711,11 +572,12 @@ class PostRequestScreen extends StatelessWidget {
                             pageBuilder:
                                 (context, animation, secondaryAnimation) {
                               return MapRequestScreen(
-                                  payload: payload,
-                                  controller: mapController.controller,
-                                  userList: controller.userList,
-                                  userLocationList: controller.filteredList,
-                                  imageList: controller.imageList,);
+                                payload: payload,
+                                controller: mapController.controller,
+                                userList: controller.userList,
+                                userLocationList: controller.filteredList,
+                                imageList: controller.imageList,
+                              );
                             },
                             transitionDuration:
                                 const Duration(microseconds: 100),
@@ -739,6 +601,9 @@ class PostRequestScreen extends StatelessWidget {
                         );
                       },
                       child: Container(
+                        alignment: Alignment.center,
+                        height: 6.h,
+                        width: double.infinity,
                         padding:
                             EdgeInsets.symmetric(horizontal: 40, vertical: 10),
                         decoration: BoxDecoration(
@@ -764,5 +629,18 @@ class PostRequestScreen extends StatelessWidget {
             },
           ),
         ));
+  }
+
+  Widget _buildText(String text) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 4.w),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 15.sp,
+        ),
+      ),
+    );
   }
 }

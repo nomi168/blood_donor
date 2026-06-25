@@ -5,7 +5,7 @@ import 'package:blood_donor/features/dashboard/home/data/models/donor_accept_mod
 import 'package:blood_donor/features/dashboard/home/presentation/controllers/donor_location_controller.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/screens/blood_journey/compete_journey_screen.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/screens/blood_journey/current_location.dart';
-import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboatd.dart';
+import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';

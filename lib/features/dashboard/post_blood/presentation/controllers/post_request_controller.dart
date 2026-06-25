@@ -35,6 +35,7 @@ class PostRequestController extends GetxController {
 
   List<String> bloodType = ['Blood', 'Platelets', 'Exchange Blood'];
   List<String> bloodGroups = ['A+', 'B+', 'O+', 'AB+', 'A-', 'B-', 'O-', 'AB-'];
+   List<String> patientCase = ['normal', 'critical'];
   List<Map<String, dynamic>> imageList = [];
 
   String selectedBlood = '';

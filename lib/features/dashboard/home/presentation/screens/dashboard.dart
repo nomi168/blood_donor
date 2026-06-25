@@ -11,6 +11,7 @@ import 'package:blood_donor/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:restart_app/restart_app.dart';
@@ -22,12 +23,15 @@ class Dashboard extends StatefulWidget {
   State<Dashboard> createState() => DashboardState();
 }
 
-class DashboardState extends State<Dashboard> {
+class DashboardState extends State<Dashboard>
+    with SingleTickerProviderStateMixin {
   final AccountRepository _accountRepository = AccountRepository();
   String selectedOption = '';
   bool checkExistDonor = false;
   final PageController _pageController = PageController(initialPage: 2);
   int _selectedIndex = 2;
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
 
   final List<Widget> _pages = [
     const FeedScreen(id: '12456'),
@@ -40,9 +44,31 @@ class DashboardState extends State<Dashboard> {
   @override
   void initState() {
     super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.12,
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeInOut,
+      ),
+    );
     justOnlyFindTaker();
 
     //  onInitData();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _pageController.dispose();
+
+    super.dispose();
   }
 
   Future<void> justOnlyFindTaker() async {
@@ -132,12 +158,6 @@ class DashboardState extends State<Dashboard> {
   }
 
   @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
@@ -154,37 +174,120 @@ class DashboardState extends State<Dashboard> {
           physics: const NeverScrollableScrollPhysics(),
           children: _pages,
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: Colors.white,
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: PRIMARY_COLOR,
-          unselectedItemColor: Colors.grey,
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.feed),
-              label: 'Feed',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.chat_bubble),
-              label: 'Chat',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.person),
-              label: 'Account',
-            ),
-            if (selectedOption != "taker")
-              BottomNavigationBarItem(
-                icon: Icon(Icons.switch_account),
-                label: 'Swtich',
-              )
-          ],
+        floatingActionButton: selectedOption != 'taker'
+    ? ScaleTransition(
+        scale: _scaleAnimation,
+        child: GestureDetector(
+          onTap: () => _onItemTapped(4),
+          child: AnimatedBuilder(
+            animation: _animationController,
+            builder: (context, child) {
+              return Container(
+                width: 65,
+                height: 65,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.grey.shade300,
+                  ),
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.red.withValues(alpha: 
+                        0.15 +
+                            (_animationController.value * 0.25),
+                      ),
+                      blurRadius:
+                          10 + (_animationController.value * 15),
+                      spreadRadius:
+                          1 + (_animationController.value * 4),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: SvgPicture.asset(
+                    'images/svg/Logo.svg',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              );
+            },
+          ),
         ),
+      )
+    : null,
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        bottomNavigationBar: BottomAppBar(
+          surfaceTintColor: Colors.grey,
+          shadowColor: Colors.black26,
+          color: Colors.white,
+          shape: selectedOption != 'taker'
+              ? const CircularNotchedRectangle()
+              : null,
+          notchMargin: 8,
+          child: SizedBox(
+            height: 70,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _navItem(
+                  icon: Icons.bloodtype_rounded,
+                  label: "Feed",
+                  index: 0,
+                ),
+                _navItem(
+                  icon: CupertinoIcons.home,
+                  label: "Home",
+                  index: 2,
+                ),
+                if (selectedOption != 'taker') const SizedBox(width: 60),
+                _navItem(
+                  icon: CupertinoIcons.chat_bubble,
+                  label: "Chat",
+                  index: 1,
+                ),
+                _navItem(
+                  icon: CupertinoIcons.person,
+                  label: "Account",
+                  index: 3,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _navItem({
+    required IconData icon,
+    required String label,
+    required int index,
+  }) {
+    final bool isSelected = _selectedIndex == index;
+
+    return InkWell(
+      splashColor: Colors.transparent,
+      highlightColor: Colors.transparent,
+      splashFactory: NoSplash.splashFactory,
+      onTap: () => _onItemTapped(index),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            color: isSelected ? PRIMARY_COLOR : Colors.grey,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: isSelected ? PRIMARY_COLOR : Colors.grey,
+              fontSize: 12,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -665,5 +768,101 @@ class DashboardState extends State<Dashboard> {
     } finally {
       await EasyLoading.dismiss();
     }
+  }
+}
+
+class CustomBottomNavBar extends StatelessWidget {
+  final int selectedIndex;
+  final Function(int) onTap;
+
+  const CustomBottomNavBar({
+    super.key,
+    required this.selectedIndex,
+    required this.onTap,
+  });
+
+  Color getColor(int index) {
+    return selectedIndex == index ? const Color(0xffE50928) : Colors.grey;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 85,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(25),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: .08),
+            blurRadius: 10,
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _item(
+              icon: CupertinoIcons.chat_bubble_text,
+              label: "Chat",
+              index: 1,
+            ),
+          ),
+          Expanded(
+            child: _item(
+              icon: Icons.assignment_outlined,
+              label: "Request",
+              index: 0,
+            ),
+          ),
+          const SizedBox(width: 90),
+          Expanded(
+            child: _item(
+              icon: CupertinoIcons.bell,
+              label: "Notification",
+              index: 3,
+            ),
+          ),
+          Expanded(
+            child: _item(
+              icon: CupertinoIcons.person,
+              label: "Profile",
+              index: 4,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _item({
+    required IconData icon,
+    required String label,
+    required int index,
+  }) {
+    return InkWell(
+      onTap: () => onTap(index),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            color: getColor(index),
+            size: 26,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: getColor(index),
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -1,7 +1,7 @@
 import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/core/utils/console_logs.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/questions_controller.dart';
-import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboatd.dart';
+import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';

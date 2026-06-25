@@ -2,7 +2,7 @@ import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/core/utils/api_response.dart';
 import 'package:blood_donor/features/auth/data/models/user_model.dart';
 import 'package:blood_donor/features/auth/domain/auth_repository.dart';
-import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboatd.dart';
+import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';

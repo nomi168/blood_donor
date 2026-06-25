@@ -3,7 +3,7 @@
 import 'package:blood_donor/core/constants.dart';
 import 'package:blood_donor/features/auth/data/models/user_model.dart';
 import 'package:blood_donor/features/auth/presentation/controllers/forgot_password_controller.dart';
-import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboatd.dart';
+import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';

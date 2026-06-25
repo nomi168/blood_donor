@@ -5,7 +5,7 @@ import 'package:blood_donor/features/auth/presentation/controllers/login_control
 import 'package:blood_donor/features/auth/presentation/controllers/user_controller.dart';
 import 'package:blood_donor/features/auth/presentation/screens/forgot_screen.dart';
 import 'package:blood_donor/features/auth/presentation/screens/signup_screen.dart';
-import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboatd.dart';
+import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';

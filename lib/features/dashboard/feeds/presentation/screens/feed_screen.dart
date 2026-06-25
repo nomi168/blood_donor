@@ -4,7 +4,7 @@ import 'package:blood_donor/features/auth/presentation/controllers/user_controll
 import 'package:blood_donor/features/dashboard/feeds/data/models/feed_taker_model.dart';
 import 'package:blood_donor/features/dashboard/feeds/presentation/controller/feed_controller.dart';
 import 'package:blood_donor/features/dashboard/feeds/presentation/screens/map_on_screen.dart';
-import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboatd.dart';
+import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboard.dart';
 import 'package:blood_donor/main.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

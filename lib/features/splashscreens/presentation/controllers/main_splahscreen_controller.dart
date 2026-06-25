@@ -1,5 +1,5 @@
 import 'package:blood_donor/core/utils/api_response.dart';
-import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboatd.dart';
+import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboard.dart';
 import 'package:blood_donor/features/splashscreens/domain/splashscreen_repository.dart';
 import 'package:blood_donor/main.dart';
 import 'package:flutter/material.dart';

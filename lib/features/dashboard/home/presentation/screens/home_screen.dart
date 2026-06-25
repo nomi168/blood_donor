@@ -8,7 +8,7 @@ import 'package:blood_donor/features/auth/presentation/controllers/user_controll
 import 'package:blood_donor/features/auth/presentation/screens/card_scanning_screen.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/screens/blood_banks_update/taker_blood_bank_screen.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/screens/blood_journey/donor_location_screen.dart';
-import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboatd.dart';
+import 'package:blood_donor/features/dashboard/home/presentation/screens/dashboard.dart';
 import 'package:blood_donor/features/dashboard/home/presentation/screens/see_more/taker_analysis_screen.dart';
 import 'package:blood_donor/features/dashboard/notifications/presentation/constroller/notification_controller.dart';
 import 'package:blood_donor/features/dashboard/notifications/presentation/screens/notification_screen.dart';
