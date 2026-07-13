@@ -175,50 +175,51 @@ class DashboardState extends State<Dashboard>
           children: _pages,
         ),
         floatingActionButton: selectedOption != 'taker'
-    ? ScaleTransition(
-        scale: _scaleAnimation,
-        child: GestureDetector(
-          onTap: () => _onItemTapped(4),
-          child: AnimatedBuilder(
-            animation: _animationController,
-            builder: (context, child) {
-              return Container(
-                width: 65,
-                height: 65,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.grey.shade300,
+            ? ScaleTransition(
+                scale: _scaleAnimation,
+                child: GestureDetector(
+                  onTap: () => _onItemTapped(4),
+                  child: AnimatedBuilder(
+                    animation: _animationController,
+                    builder: (context, child) {
+                      return Container(
+                        width: 65,
+                        height: 65,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.grey.shade300,
+                          ),
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.red.withValues(
+                                alpha:
+                                    0.15 + (_animationController.value * 0.25),
+                              ),
+                              blurRadius:
+                                  10 + (_animationController.value * 15),
+                              spreadRadius:
+                                  1 + (_animationController.value * 4),
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: SvgPicture.asset(
+                            'images/svg/Logo.svg',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.red.withValues(alpha: 
-                        0.15 +
-                            (_animationController.value * 0.25),
-                      ),
-                      blurRadius:
-                          10 + (_animationController.value * 15),
-                      spreadRadius:
-                          1 + (_animationController.value * 4),
-                    ),
-                  ],
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: SvgPicture.asset(
-                    'images/svg/Logo.svg',
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      )
-    : null,
+              )
+            : null,
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         bottomNavigationBar: BottomAppBar(
+          height: 60,
           surfaceTintColor: Colors.grey,
           shadowColor: Colors.black26,
           color: Colors.white,
@@ -277,14 +278,14 @@ class DashboardState extends State<Dashboard>
         children: [
           Icon(
             icon,
+            size: 20,
             color: isSelected ? PRIMARY_COLOR : Colors.grey,
           ),
-          const SizedBox(height: 4),
           Text(
             label,
             style: TextStyle(
               color: isSelected ? PRIMARY_COLOR : Colors.grey,
-              fontSize: 12,
+              fontSize: 11,
             ),
           ),
         ],

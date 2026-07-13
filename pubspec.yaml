@@ -34,7 +34,6 @@ dependencies:
   dots_indicator: ^3.0.0
 
   sizer: ^3.0.5
-  draggable_bottom_sheet: ^1.0.2
 
   firebase_core: ^3.10.1
   cloud_firestore: ^5.6.2
@@ -47,7 +46,6 @@ dependencies:
   intl: ^0.19.0
   flutter_easyloading: ^3.0.5
   shimmer: ^3.0.0
-  lottie: ^3.3.1
   
  
   
@@ -60,7 +58,6 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_svg: ^2.0.9
   google_maps_flutter: ^2.5.3
-  sliding_switch: ^1.1.0
   geolocator: ^13.0.2
   geocoding: ^3.0.0
   flutter_screenutil: ^5.9.0
@@ -76,7 +73,6 @@ dependencies:
   intl_phone_field: ^3.2.0
   carousel_slider: ^5.0.0
   coupon_uikit: ^0.2.1
-  animated_notch_bottom_bar: ^1.0.3 
   cached_network_image: ^3.3.1
   package_info_plus: ^8.1.4
   email_otp: ^3.0.2
@@ -84,15 +80,12 @@ dependencies:
   googleapis_auth: ^1.6.0
   cnic_scanner: ^0.0.5
   local_auth: ^2.3.0
-  easy_stepper: ^0.8.5+1
   shared_preferences_android: ^2.4.4
   get: ^4.7.2
-  flashy_tab_bar2: ^0.0.10
   modal_bottom_sheet: ^3.0.0
   font_awesome_flutter: ^10.9.1
   badges: ^3.1.2
   flutter_animate: ^4.5.2
-  floating_bottom_bar: ^0.0.3
   firebase_analytics: ^11.4.5
   flutter_contacts: ^1.1.9+2
   flutter_spinkit: ^5.2.1
